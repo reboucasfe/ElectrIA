@@ -51,7 +51,7 @@ const Index = () => {
           <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-                asasdas
+                Automatize Suas Propostas no WhatsApp e Feche Mais Vendas
               </h1>
               <p className="text-lg md:text-xl text-gray-600 mb-10">
                 Nossa IA cria propostas profissionais para eletricistas em segundos e as envia diretamente pelo WhatsApp.
@@ -280,7 +280,7 @@ const Index = () => {
               <AccordionItem value="item-2" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-lg font-medium hover:no-underline">Funciona com WhatsApp normal ou só Business?</AccordionTrigger>
                 <AccordionContent className="text-gray-600">Recomendamos o WhatsApp Business para uma integração completa e profissional, aproveitando todos os recursos da plataforma. No entanto, a ferramenta é compatível com o WhatsApp normal.</AccordionContent>
-              </AccordionItem>
+              </AIccordiontem>
               <AccordionItem value="item-3" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-lg font-medium hover:no-underline">Posso personalizar as propostas?</AccordionTrigger>
                 <AccordionContent className="text-gray-600">Sim! Você pode personalizar os templates de proposta com sua logo, informações de contato, termos de serviço e até mesmo adicionar imagens de trabalhos anteriores.</AccordionContent>
