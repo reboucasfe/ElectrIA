@@ -1,137 +1,122 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Zap, Bot, MessageSquare, CheckCircle, BarChart3, ClipboardList, Users, Star, ShieldCheck } from "lucide-react";
+import { Zap, Bot, MessageSquare, CheckCircle, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check } from "lucide-react";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800">
+    <div className="bg-white text-gray-800">
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <nav className="container mx-auto px-6 py-3 flex justify-between items-center">
+      <header className="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center">
             <Zap className="h-8 w-8 text-blue-600 mr-2" />
             <span className="text-xl font-bold text-gray-900">EletroProposta IA</span>
           </div>
-          <div className="hidden md:flex items-center space-x-6">
-            <a href="#como-funciona" className="text-gray-600 hover:text-blue-600">Como Funciona</a>
-            <a href="#precos" className="text-gray-600 hover:text-blue-600">Preços</a>
-            <a href="#faq" className="text-gray-600 hover:text-blue-600">FAQ</a>
+          <div className="hidden md:flex items-center space-x-8">
+            <a href="#como-funciona" className="text-gray-600 hover:text-blue-600 transition-colors">Como Funciona</a>
+            <a href="#precos" className="text-gray-600 hover:text-blue-600 transition-colors">Preços</a>
+            <a href="#faq" className="text-gray-600 hover:text-blue-600 transition-colors">FAQ</a>
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost">Login</Button>
+            <Button className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
+          </div>
         </nav>
       </header>
 
       <main>
         {/* Hero Section */}
-        <section className="relative text-center py-20 px-4 md:py-32 bg-gradient-to-br from-blue-50 to-indigo-100">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-              Automatize Suas Propostas no WhatsApp e Feche Mais Vendas
-            </h1>
-            <p className="text-lg md:text-xl text-gray-700 mb-10">
-              IA especializada que cria propostas profissionais para eletricistas em segundos. Integração direta com WhatsApp.
-            </p>
-            <Button
-              size="lg"
-              className="bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105"
-            >
-              Ver Demonstração
-            </Button>
-          </div>
-        </section>
-
-        {/* Pain Points Section */}
-        <section className="py-16 px-4 bg-white">
-          <div className="max-w-5xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Cansado de Perder Clientes por Propostas Demoradas?
-            </h2>
-            <p className="text-gray-600 mb-12">Você se identifica com algum destes problemas?</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center"><CheckCircle className="text-red-500 mr-2" /> Demora para criar propostas</CardTitle>
-                </CardHeader>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center"><CheckCircle className="text-red-500 mr-2" /> Perda de clientes por agilidade</CardTitle>
-                </CardHeader>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center"><CheckCircle className="text-red-500 mr-2" /> Propostas mal formatadas</CardTitle>
-                </CardHeader>
-              </Card>
+        <section className="relative text-center md:text-left py-20 px-4 md:py-32">
+          <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
+                Automatize Suas Propostas no WhatsApp e Feche Mais Vendas
+              </h1>
+              <p className="text-lg md:text-xl text-gray-600 mb-10">
+                Nossa IA cria propostas profissionais para eletricistas em segundos e as envia diretamente pelo WhatsApp.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
+                <Button
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 w-full sm:w-auto"
+                >
+                  Começar Teste Grátis <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+              <p className="mt-6 text-sm text-gray-500">Confiado por mais de 500 eletricistas em todo o Brasil.</p>
+            </div>
+            <div className="bg-gray-100 rounded-lg aspect-video flex items-center justify-center">
+              <p className="text-gray-400">Visual do Produto Aqui</p>
             </div>
           </div>
         </section>
 
         {/* How it Works Section */}
-        <section id="como-funciona" className="py-16 px-4 bg-blue-50">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12">
-              Como Nossa IA Revoluciona Seu Atendimento
+        <section id="como-funciona" className="py-20 px-4 bg-gray-50">
+          <div className="container mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Crie uma Proposta em 3 Passos Simples
             </h2>
+            <p className="text-lg text-gray-600 mb-16 max-w-2xl mx-auto">Nossa IA revoluciona seu atendimento, transformando solicitações em propostas fechadas em minutos.</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center text-center p-6">
-                <div className="bg-blue-600 text-white rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold mb-6 shadow-md">1</div>
-                <h3 className="text-xl font-semibold mb-3">Recebe a Solicitação</h3>
-                <p className="text-gray-700">Cliente descreve o problema via WhatsApp.</p>
+                <div className="bg-blue-100 text-blue-600 rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold mb-6 shadow-sm">1</div>
+                <h3 className="text-xl font-semibold mb-3">Receba a Solicitação</h3>
+                <p className="text-gray-600">O cliente descreve o problema ou serviço necessário diretamente no seu WhatsApp.</p>
               </div>
               <div className="flex flex-col items-center text-center p-6">
-                <div className="bg-green-600 text-white rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold mb-6 shadow-md">2</div>
+                <div className="bg-blue-100 text-blue-600 rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold mb-6 shadow-sm">2</div>
                 <h3 className="text-xl font-semibold mb-3">IA Processa e Calcula</h3>
-                <p className="text-gray-700">Analisa o serviço, calcula custos e mão de obra.</p>
+                <p className="text-gray-600">A IA analisa o serviço, calcula custos de material e mão de obra com base no seu catálogo.</p>
               </div>
               <div className="flex flex-col items-center text-center p-6">
-                <div className="bg-purple-600 text-white rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold mb-6 shadow-md">3</div>
-                <h3 className="text-xl font-semibold mb-3">Proposta Profissional</h3>
-                <p className="text-gray-700">Envia proposta completa automaticamente.</p>
+                <div className="bg-blue-100 text-blue-600 rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold mb-6 shadow-sm">3</div>
+                <h3 className="text-xl font-semibold mb-3">Envie a Proposta</h3>
+                <p className="text-gray-600">Uma proposta completa e profissional é gerada e enviada para o cliente em segundos.</p>
               </div>
             </div>
           </div>
         </section>
 
         {/* Features Section */}
-        <section className="py-16 px-4 bg-white">
-          <div className="max-w-6xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12">
+        <section className="py-20 px-4 bg-white">
+          <div className="container mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-16">
               Tudo que Você Precisa em Uma Ferramenta
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <Card className="p-6 text-center"><Bot className="h-10 w-10 text-blue-600 mx-auto mb-4" /><CardTitle>IA para Serviços Elétricos</CardTitle></Card>
-              <Card className="p-6 text-center"><MessageSquare className="h-10 w-10 text-green-600 mx-auto mb-4" /><CardTitle>Integração com WhatsApp</CardTitle></Card>
-              <Card className="p-6 text-center"><BarChart3 className="h-10 w-10 text-purple-600 mx-auto mb-4" /><CardTitle>Cálculo Automático de Custos</CardTitle></Card>
-              <Card className="p-6 text-center"><ClipboardList className="h-10 w-10 text-orange-600 mx-auto mb-4" /><CardTitle>Templates de Proposta</CardTitle></Card>
-              <Card className="p-6 text-center"><Users className="h-10 w-10 text-red-600 mx-auto mb-4" /><CardTitle>Dashboard de Acompanhamento</CardTitle></Card>
-              <Card className="p-6 text-center"><Zap className="h-10 w-10 text-yellow-500 mx-auto mb-4" /><CardTitle>Catálogo de Serviços</CardTitle></Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+              <div className="text-left"><Bot className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">IA Especializada</h3><p className="text-gray-600">Treinada para entender termos técnicos de serviços elétricos.</p></div>
+              <div className="text-left"><MessageSquare className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">Integração com WhatsApp</h3><p className="text-gray-600">Conecte seu número e automatize o atendimento.</p></div>
+              <div className="text-left"><BarChart3 className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">Cálculo Automático</h3><p className="text-gray-600">Calcule custos de materiais e mão de obra instantaneamente.</p></div>
+              <div className="text-left"><ClipboardList className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">Templates de Proposta</h3><p className="text-gray-600">Use nossos templates ou crie os seus com sua marca.</p></div>
+              <div className="text-left"><Users className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">Dashboard de Vendas</h3><p className="text-gray-600">Acompanhe o status de cada proposta enviada.</p></div>
+              <div className="text-left"><Zap className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">Catálogo de Serviços</h3><p className="text-gray-600">Cadastre seus serviços e preços para agilizar os cálculos.</p></div>
             </div>
           </div>
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-16 px-4 bg-blue-50">
-          <div className="max-w-5xl mx-auto text-center">
+        <section className="py-20 px-4 bg-gray-50">
+          <div className="container mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12">O que Nossos Clientes Dizem</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card className="p-6 text-left">
-                <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <Card className="p-6 text-left shadow-lg">
+                <CardContent className="p-0">
                   <div className="flex items-center mb-4">
-                    <div className="flex text-yellow-400">{[...Array(5)].map((_, i) => <Star key={i} />)}</div>
+                    <div className="flex text-yellow-400">{[...Array(5)].map((_, i) => <Star key={i} className="fill-current" />)}</div>
                   </div>
-                  <p className="mb-4">"A agilidade que ganhei é incrível. Fechei 40% mais serviços no primeiro mês!"</p>
-                  <p className="font-bold">- João Silva, São Paulo</p>
+                  <p className="mb-4 text-gray-700">"A agilidade que ganhei é incrível. Fechei 40% mais serviços no primeiro mês! A ferramenta se pagou em uma semana."</p>
+                  <p className="font-bold text-gray-900">- João Silva, Eletricista em São Paulo</p>
                 </CardContent>
               </Card>
-              <Card className="p-6 text-left">
-                <CardContent>
+              <Card className="p-6 text-left shadow-lg">
+                <CardContent className="p-0">
                   <div className="flex items-center mb-4">
-                    <div className="flex text-yellow-400">{[...Array(5)].map((_, i) => <Star key={i} />)}</div>
+                    <div className="flex text-yellow-400">{[...Array(5)].map((_, i) => <Star key={i} className="fill-current" />)}</div>
                   </div>
-                  <p className="mb-4">"Meus clientes elogiam o profissionalismo das propostas. A ferramenta se pagou em uma semana."</p>
-                  <p className="font-bold">- Carlos Pereira, Rio de Janeiro</p>
+                  <p className="mb-4 text-gray-700">"Meus clientes elogiam o profissionalismo das propostas. Antes eu perdia tempo, agora foco no que importa: o serviço."</p>
+                  <p className="font-bold text-gray-900">- Carlos Pereira, Eletricista no Rio de Janeiro</p>
                 </CardContent>
               </Card>
             </div>
@@ -139,79 +124,85 @@ const Index = () => {
         </section>
 
         {/* Pricing Section */}
-        <section id="precos" className="py-16 px-4 bg-white">
-          <div className="max-w-6xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12">Escolha o Plano Ideal para Seu Negócio</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card className="p-8 flex flex-col">
-                <CardHeader><CardTitle>Básico</CardTitle></CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-4xl font-bold mb-4">R$ 97<span className="text-lg font-normal">/mês</span></p>
-                  <ul className="space-y-2 text-gray-600"><li>20 propostas/mês</li><li>Integração WhatsApp</li><li>Suporte via email</li></ul>
+        <section id="precos" className="py-20 px-4 bg-white">
+          <div className="container mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Escolha o Plano Ideal para Seu Negócio</h2>
+            <p className="text-lg text-gray-600 mb-16 max-w-2xl mx-auto">Comece com um teste grátis de 7 dias. Sem compromisso.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              <Card className="p-8 flex flex-col shadow-lg">
+                <CardHeader className="p-0 mb-6"><CardTitle>Básico</CardTitle></CardHeader>
+                <CardContent className="p-0 flex-grow">
+                  <p className="text-4xl font-bold mb-2">R$ 97<span className="text-lg font-normal text-gray-500">/mês</span></p>
+                  <p className="text-gray-500 mb-6">Ideal para autônomos</p>
+                  <ul className="space-y-3 text-gray-600 text-left"><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> 20 propostas/mês</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Integração WhatsApp</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Suporte via email</li></ul>
                 </CardContent>
-                <Button variant="outline" className="mt-6">Começar Teste</Button>
+                <Button variant="outline" className="mt-8 w-full">Começar Teste</Button>
               </Card>
-              <Card className="p-8 flex flex-col border-2 border-blue-600 relative">
+              <Card className="p-8 flex flex-col shadow-lg border-2 border-blue-600 relative">
                 <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold">MAIS POPULAR</div>
-                <CardHeader><CardTitle>Profissional</CardTitle></CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-4xl font-bold mb-4">R$ 197<span className="text-lg font-normal">/mês</span></p>
-                  <ul className="space-y-2 text-gray-600"><li>50 propostas/mês</li><li>Dashboard de Vendas</li><li>Relatórios Avançados</li></ul>
+                <CardHeader className="p-0 mb-6"><CardTitle>Profissional</CardTitle></CardHeader>
+                <CardContent className="p-0 flex-grow">
+                  <p className="text-4xl font-bold mb-2">R$ 197<span className="text-lg font-normal text-gray-500">/mês</span></p>
+                  <p className="text-gray-500 mb-6">Para quem busca crescer</p>
+                  <ul className="space-y-3 text-gray-600 text-left"><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> 50 propostas/mês</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Dashboard de Vendas</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Relatórios Avançados</li></ul>
                 </CardContent>
-                <Button className="mt-6 bg-blue-600 hover:bg-blue-700">Começar Teste</Button>
+                <Button className="mt-8 w-full bg-blue-600 hover:bg-blue-700">Começar Teste</Button>
               </Card>
-              <Card className="p-8 flex flex-col">
-                <CardHeader><CardTitle>Enterprise</CardTitle></CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-4xl font-bold mb-4">R$ 347<span className="text-lg font-normal">/mês</span></p>
-                  <ul className="space-y-2 text-gray-600"><li>Propostas Ilimitadas</li><li>Multi-usuários</li><li>Integração API</li></ul>
+              <Card className="p-8 flex flex-col shadow-lg">
+                <CardHeader className="p-0 mb-6"><CardTitle>Enterprise</CardTitle></CardHeader>
+                <CardContent className="p-0 flex-grow">
+                  <p className="text-4xl font-bold mb-2">R$ 347<span className="text-lg font-normal text-gray-500">/mês</span></p>
+                  <p className="text-gray-500 mb-6">Para equipes e empresas</p>
+                  <ul className="space-y-3 text-gray-600 text-left"><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Propostas Ilimitadas</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Múltiplos Usuários</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Integração API</li></ul>
                 </CardContent>
-                <Button variant="outline" className="mt-6">Começar Teste</Button>
+                <Button variant="outline" className="mt-8 w-full">Começar Teste</Button>
               </Card>
             </div>
           </div>
         </section>
 
         {/* FAQ Section */}
-        <section id="faq" className="py-16 px-4 bg-blue-50">
-          <div className="max-w-3xl mx-auto">
+        <section id="faq" className="py-20 px-4 bg-gray-50">
+          <div className="container mx-auto max-w-3xl">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">Perguntas Frequentes</h2>
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-1">
-                <AccordionTrigger>Como a IA aprende sobre meus preços?</AccordionTrigger>
-                <AccordionContent>Você configura seu catálogo de serviços e preços uma única vez. A IA usa essas informações para calcular os orçamentos automaticamente.</AccordionContent>
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              <AccordionItem value="item-1" className="border rounded-lg px-6">
+                <AccordionTrigger className="text-lg font-medium hover:no-underline">Como a IA aprende sobre meus preços?</AccordionTrigger>
+                <AccordionContent className="text-gray-600">Você configura seu catálogo de serviços e preços uma única vez. A IA usa essas informações para calcular os orçamentos automaticamente, garantindo precisão em cada proposta.</AccordionContent>
               </AccordionItem>
-              <AccordionItem value="item-2">
-                <AccordionTrigger>Funciona com WhatsApp normal ou só Business?</AccordionTrigger>
-                <AccordionContent>Recomendamos o WhatsApp Business para uma integração completa e profissional, aproveitando todos os recursos da plataforma.</AccordionContent>
+              <AccordionItem value="item-2" className="border rounded-lg px-6">
+                <AccordionTrigger className="text-lg font-medium hover:no-underline">Funciona com WhatsApp normal ou só Business?</AccordionTrigger>
+                <AccordionContent className="text-gray-600">Recomendamos o WhatsApp Business para uma integração completa e profissional, aproveitando todos os recursos da plataforma. No entanto, a ferramenta é compatível com o WhatsApp normal.</AccordionContent>
               </AccordionItem>
-              <AccordionItem value="item-3">
-                <AccordionTrigger>Posso personalizar as propostas?</AccordionTrigger>
-                <AccordionContent>Sim! Você pode personalizar os templates de proposta com sua logo, informações de contato e termos de serviço.</AccordionContent>
+              <AccordionItem value="item-3" className="border rounded-lg px-6">
+                <AccordionTrigger className="text-lg font-medium hover:no-underline">Posso personalizar as propostas?</AccordionTrigger>
+                <AccordionContent className="text-gray-600">Sim! Você pode personalizar os templates de proposta com sua logo, informações de contato, termos de serviço e até mesmo adicionar imagens de trabalhos anteriores.</AccordionContent>
               </AccordionItem>
             </Accordion>
           </div>
         </section>
 
         {/* Final CTA Section */}
-        <section className="py-20 px-4 bg-indigo-600 text-white text-center">
-          <div className="max-w-3xl mx-auto">
+        <section className="py-20 px-4 bg-blue-600 text-white text-center">
+          <div className="container mx-auto max-w-3xl">
             <h2 className="text-3xl md:text-5xl font-extrabold mb-6">Pronto para Revolucionar Seu Negócio?</h2>
-            <p className="text-lg md:text-xl mb-10">Comece seu teste grátis de 7 dias. Sem compromisso, cancele quando quiser.</p>
+            <p className="text-lg md:text-xl mb-10 opacity-90">Pare de perder clientes por demora. Comece seu teste grátis de 7 dias e veja suas vendas decolarem.</p>
             <Button
               size="lg"
-              className="bg-white text-indigo-600 hover:bg-gray-100 text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105"
+              className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-10 py-7 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105"
             >
-              Começar Teste Grátis
+              Começar Teste Grátis Agora
             </Button>
-            <p className="mt-4 text-sm text-indigo-200 flex items-center justify-center"><ShieldCheck className="h-4 w-4 mr-2" /> Garantia de 30 dias</p>
+            <p className="mt-6 text-sm text-blue-200 flex items-center justify-center"><ShieldCheck className="h-4 w-4 mr-2" /> Garantia de 30 dias e cancelamento fácil.</p>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="py-8 px-4 text-center text-gray-600 bg-gray-100">
-        <p>&copy; {new Date().getFullYear()} EletroProposta IA. Todos os direitos reservados.</p>
+      <footer className="py-12 px-4 bg-gray-900 text-gray-400">
+        <div className="container mx-auto text-center">
+          <p>&copy; {new Date().getFullYear()} EletroProposta IA. Todos os direitos reservados.</p>
+        </div>
       </footer>
     </div>
   );
