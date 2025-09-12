@@ -261,7 +261,7 @@ const Index = () => {
                       </Tooltip>
                     </li>
                   </ul>
-                </Content>
+                </CardContent>
                 <Button variant="outline" className="mt-8 w-full">Começar Teste</Button>
               </Card>
             </div>
