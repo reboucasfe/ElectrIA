@@ -1,10 +1,29 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle } from "lucide-react";
 
 const Index = () => {
+  const [billingCycle, setBillingCycle] = useState('monthly');
+
+  const prices = {
+    monthly: {
+      basic: 97,
+      professional: 197,
+      enterprise: 347,
+    },
+    annual: {
+      basic: Math.round(97 * 0.75),
+      professional: Math.round(197 * 0.75),
+      enterprise: Math.round(347 * 0.75),
+    }
+  };
+
+  const displayPrice = prices[billingCycle];
+
   return (
     <div className="bg-white text-gray-800">
       {/* Header */}
@@ -128,12 +147,31 @@ const Index = () => {
         <section id="precos" className="py-20 px-4 bg-white">
           <div className="container mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Escolha o Plano Ideal para Seu Negócio</h2>
-            <p className="text-lg text-gray-600 mb-16 max-w-2xl mx-auto">Comece com um teste grátis de 7 dias. Sem compromisso.</p>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">Comece com um teste grátis de 7 dias. Sem compromisso.</p>
+            
+            <div className="flex justify-center items-center gap-2 mb-12 bg-gray-100 p-1 rounded-full w-fit mx-auto">
+              <Button 
+                  onClick={() => setBillingCycle('monthly')}
+                  variant={billingCycle === 'monthly' ? 'default' : 'ghost'}
+                  className="rounded-full px-6"
+              >
+                  Mensal
+              </Button>
+              <Button 
+                  onClick={() => setBillingCycle('annual')}
+                  variant={billingCycle === 'annual' ? 'default' : 'ghost'}
+                  className="rounded-full px-6"
+              >
+                  Anual <Badge className="ml-2 bg-green-500 text-white hover:bg-green-600">Economize 25%</Badge>
+              </Button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               <Card className="p-8 flex flex-col shadow-lg">
                 <CardHeader className="p-0 mb-6"><CardTitle>Básico</CardTitle></CardHeader>
                 <CardContent className="p-0 flex-grow">
-                  <p className="text-4xl font-bold mb-2">R$ 97<span className="text-lg font-normal text-gray-500">/mês</span></p>
+                  <p className="text-4xl font-bold mb-2">R$ {displayPrice.basic}<span className="text-lg font-normal text-gray-500">/mês</span></p>
+                  {billingCycle === 'annual' && <p className="text-sm text-gray-500 mb-2">Cobrado R$ {displayPrice.basic * 12} anualmente</p>}
                   <p className="text-gray-500 mb-6">Ideal para autônomos</p>
                   <ul className="space-y-3 text-gray-600 text-left">
                     <li className="flex items-center justify-between">
@@ -165,7 +203,8 @@ const Index = () => {
                 <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold">MAIS POPULAR</div>
                 <CardHeader className="p-0 mb-6"><CardTitle>Profissional</CardTitle></CardHeader>
                 <CardContent className="p-0 flex-grow">
-                  <p className="text-4xl font-bold mb-2">R$ 197<span className="text-lg font-normal text-gray-500">/mês</span></p>
+                  <p className="text-4xl font-bold mb-2">R$ {displayPrice.professional}<span className="text-lg font-normal text-gray-500">/mês</span></p>
+                  {billingCycle === 'annual' && <p className="text-sm text-gray-500 mb-2">Cobrado R$ {displayPrice.professional * 12} anualmente</p>}
                   <p className="text-gray-500 mb-6">Para quem busca crescer</p>
                   <ul className="space-y-3 text-gray-600 text-left">
                     <li className="flex items-center justify-between">
@@ -196,7 +235,8 @@ const Index = () => {
               <Card className="p-8 flex flex-col shadow-lg">
                 <CardHeader className="p-0 mb-6"><CardTitle>Enterprise</CardTitle></CardHeader>
                 <CardContent className="p-0 flex-grow">
-                  <p className="text-4xl font-bold mb-2">R$ 347<span className="text-lg font-normal text-gray-500">/mês</span></p>
+                  <p className="text-4xl font-bold mb-2">R$ {displayPrice.enterprise}<span className="text-lg font-normal text-gray-500">/mês</span></p>
+                  {billingCycle === 'annual' && <p className="text-sm text-gray-500 mb-2">Cobrado R$ {displayPrice.enterprise * 12} anualmente</p>}
                   <p className="text-gray-500 mb-6">Para equipes e empresas</p>
                   <ul className="space-y-3 text-gray-600 text-left">
                     <li className="flex items-center justify-between">
@@ -221,7 +261,7 @@ const Index = () => {
                       </Tooltip>
                     </li>
                   </ul>
-                </CardContent>
+                </Content>
                 <Button variant="outline" className="mt-8 w-full">Começar Teste</Button>
               </Card>
             </div>
