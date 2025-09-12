@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Zap, Bot, MessageSquare, CheckCircle, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle } from "lucide-react";
 
 const Index = () => {
   return (
@@ -31,7 +32,7 @@ const Index = () => {
           <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-                Automatize Suas Propostas no WhatsApp e Feche Mais Vendas
+                asasdas
               </h1>
               <p className="text-lg md:text-xl text-gray-600 mb-10">
                 Nossa IA cria propostas profissionais para eletricistas em segundos e as envia diretamente pelo WhatsApp.
@@ -134,7 +135,29 @@ const Index = () => {
                 <CardContent className="p-0 flex-grow">
                   <p className="text-4xl font-bold mb-2">R$ 97<span className="text-lg font-normal text-gray-500">/mês</span></p>
                   <p className="text-gray-500 mb-6">Ideal para autônomos</p>
-                  <ul className="space-y-3 text-gray-600 text-left"><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> 20 propostas/mês</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Integração WhatsApp</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Suporte via email</li></ul>
+                  <ul className="space-y-3 text-gray-600 text-left">
+                    <li className="flex items-center justify-between">
+                      <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> 20 propostas/mês</span>
+                      <Tooltip>
+                        <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
+                        <TooltipContent><p>Você pode gerar e enviar até 20 propostas comerciais para seus clientes todos os meses.</p></TooltipContent>
+                      </Tooltip>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Integração WhatsApp</span>
+                      <Tooltip>
+                        <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
+                        <TooltipContent><p>Conecte seu número de WhatsApp para enviar as propostas diretamente aos seus clientes.</p></TooltipContent>
+                      </Tooltip>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Suporte via email</span>
+                      <Tooltip>
+                        <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
+                        <TooltipContent><p>Receba ajuda e tire suas dúvidas com nossa equipe de suporte através de email.</p></TooltipContent>
+                      </Tooltip>
+                    </li>
+                  </ul>
                 </CardContent>
                 <Button variant="outline" className="mt-8 w-full">Começar Teste</Button>
               </Card>
@@ -144,7 +167,29 @@ const Index = () => {
                 <CardContent className="p-0 flex-grow">
                   <p className="text-4xl font-bold mb-2">R$ 197<span className="text-lg font-normal text-gray-500">/mês</span></p>
                   <p className="text-gray-500 mb-6">Para quem busca crescer</p>
-                  <ul className="space-y-3 text-gray-600 text-left"><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> 50 propostas/mês</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Dashboard de Vendas</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Relatórios Avançados</li></ul>
+                  <ul className="space-y-3 text-gray-600 text-left">
+                    <li className="flex items-center justify-between">
+                      <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> 50 propostas/mês</span>
+                      <Tooltip>
+                        <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
+                        <TooltipContent><p>Aumente seu volume de negócios com a capacidade de gerar e enviar até 50 propostas mensais.</p></TooltipContent>
+                      </Tooltip>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Dashboard de Vendas</span>
+                      <Tooltip>
+                        <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
+                        <TooltipContent><p>Acompanhe o status de todas as suas propostas (enviadas, visualizadas, aceitas) em um painel visual.</p></TooltipContent>
+                      </Tooltip>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Relatórios Avançados</span>
+                      <Tooltip>
+                        <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
+                        <TooltipContent><p>Obtenha insights sobre suas vendas e taxas de conversão com relatórios detalhados.</p></TooltipContent>
+                      </Tooltip>
+                    </li>
+                  </ul>
                 </CardContent>
                 <Button className="mt-8 w-full bg-blue-600 hover:bg-blue-700">Começar Teste</Button>
               </Card>
@@ -153,7 +198,29 @@ const Index = () => {
                 <CardContent className="p-0 flex-grow">
                   <p className="text-4xl font-bold mb-2">R$ 347<span className="text-lg font-normal text-gray-500">/mês</span></p>
                   <p className="text-gray-500 mb-6">Para equipes e empresas</p>
-                  <ul className="space-y-3 text-gray-600 text-left"><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Propostas Ilimitadas</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Múltiplos Usuários</li><li className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Integração API</li></ul>
+                  <ul className="space-y-3 text-gray-600 text-left">
+                    <li className="flex items-center justify-between">
+                      <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Propostas Ilimitadas</span>
+                      <Tooltip>
+                        <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
+                        <TooltipContent><p>Sem limites! Crie e envie quantas propostas forem necessárias para escalar seu negócio.</p></TooltipContent>
+                      </Tooltip>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Múltiplos Usuários</span>
+                      <Tooltip>
+                        <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
+                        <TooltipContent><p>Permita que vários membros da sua equipe acessem a plataforma e gerenciem propostas.</p></TooltipContent>
+                      </Tooltip>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Integração API</span>
+                      <Tooltip>
+                        <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
+                        <TooltipContent><p>Conecte a EletroProposta IA com outras ferramentas que você já usa através da nossa API.</p></TooltipContent>
+                      </Tooltip>
+                    </li>
+                  </ul>
                 </CardContent>
                 <Button variant="outline" className="mt-8 w-full">Começar Teste</Button>
               </Card>
