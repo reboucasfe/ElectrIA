@@ -280,7 +280,7 @@ const Index = () => {
               <AccordionItem value="item-2" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-lg font-medium hover:no-underline">Funciona com WhatsApp normal ou só Business?</AccordionTrigger>
                 <AccordionContent className="text-gray-600">Recomendamos o WhatsApp Business para uma integração completa e profissional, aproveitando todos os recursos da plataforma. No entanto, a ferramenta é compatível com o WhatsApp normal.</AccordionContent>
-              </AIccordiontem>
+              </AccordionItem>
               <AccordionItem value="item-3" className="border rounded-lg px-6">
                 <AccordionTrigger className="text-lg font-medium hover:no-underline">Posso personalizar as propostas?</AccordionTrigger>
                 <AccordionContent className="text-gray-600">Sim! Você pode personalizar os templates de proposta com sua logo, informações de contato, termos de serviço e até mesmo adicionar imagens de trabalhos anteriores.</AccordionContent>
