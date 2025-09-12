@@ -11,12 +11,12 @@ const Index = () => {
 
   const prices = {
     monthly: {
-      basic: 97,
+      basic: 127,
       professional: 197,
       enterprise: 347,
     },
     annual: {
-      basic: Math.round(97 * 0.75),
+      basic: Math.round(127 * 0.75),
       professional: Math.round(197 * 0.75),
       enterprise: Math.round(347 * 0.75),
     }
