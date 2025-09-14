@@ -95,7 +95,7 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
       showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.');
       reset();
       onClose();
-      navigate('/login');
+      navigate('/upgrade'); // Redireciona para a página de upgrade
     }
     setLoading(false);
   };

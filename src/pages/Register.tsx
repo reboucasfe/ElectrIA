@@ -26,7 +26,7 @@ const Register = () => {
       }
     } else {
       showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.');
-      navigate('/login');
+      navigate('/upgrade'); // Redireciona para a página de upgrade
     }
     setLoading(false);
   };
