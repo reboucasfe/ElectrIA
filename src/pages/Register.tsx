@@ -7,7 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { showError, showSuccess } from '@/utils/toast';
 
-const Register = () => {
+interface RegisterProps {
+  onOpenLoginModal: () => void; // Nova prop para abrir o modal de login
+}
+
+const Register = ({ onOpenLoginModal }: RegisterProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -76,7 +80,7 @@ const Register = () => {
         </form>
         <div className="mt-4 text-center text-sm">
           Já tem uma conta?{' '}
-          <Link to="/login" className="underline">
+          <Link to="#" onClick={onOpenLoginModal} className="underline">
             Login
           </Link>
         </div>
