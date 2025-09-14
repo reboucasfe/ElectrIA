@@ -95,11 +95,12 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
         showError(error.message);
       }
     } else {
-      // showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.'); // Removido
+      showSuccess('Cadastro realizado com sucesso! Redirecionando para o pagamento...'); // Reintroduzido o toast de sucesso
       reset();
       onClose();
-      console.log("RegisterModal: selectedPlanId", selectedPlanId);
-      console.log("RegisterModal: selectedBillingCycle", selectedBillingCycle);
+      console.log("Attempting navigation from RegisterModal.");
+      console.log("selectedPlanId:", selectedPlanId);
+      console.log("selectedBillingCycle:", selectedBillingCycle);
       if (selectedPlanId && selectedBillingCycle) {
         navigate('/payment', { state: { planId: selectedPlanId, billingCycle: selectedBillingCycle } });
       } else {
