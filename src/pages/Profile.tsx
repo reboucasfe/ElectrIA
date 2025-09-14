@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { supabase } from '@/lib/supabaseClient';
 import { showError, showSuccess } from '@/utils/toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
@@ -18,9 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// Esquema de validação para o formulário de perfil
 const profileSchema = z.object({
   fullName: z.string().min(3, { message: "O nome completo deve ter pelo menos 3 caracteres." }),
-  avatarUrl: z.string().url({ message: "Por favor, insira uma URL de imagem válida." }).or(z.literal('')),
   companyName: z.string().optional(),
   whatsapp: z.string().min(10, { message: "WhatsApp é obrigatório e deve ter pelo menos 10 dígitos." }),
   howDidYouHear: z.string().min(1, { message: "Por favor, selecione uma opção." }),
@@ -31,19 +31,27 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 const Profile = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.user_metadata?.avatar_url || null);
 
-  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<ProfileFormValues>({
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: user?.user_metadata?.full_name || '',
-      avatarUrl: user?.user_metadata?.avatar_url || '',
       companyName: user?.user_metadata?.company_name || '',
       whatsapp: user?.user_metadata?.whatsapp || '',
       howDidYouHear: user?.user_metadata?.how_did_you_hear || '',
     },
   });
 
-  const avatarUrlValue = watch('avatarUrl');
+  // Efeito para limpar a URL do objeto quando a prévia do avatar muda ou o componente é desmontado
+  useEffect(() => {
+    return () => {
+      if (avatarPreview && avatarPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+    };
+  }, [avatarPreview]);
 
   const getInitials = (email: string | undefined) => {
     if (!email) return 'U';
@@ -58,22 +66,80 @@ const Profile = () => {
     return email.substring(0, 2).toUpperCase();
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
+
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        showError("Apenas arquivos JPG e PNG são permitidos.");
+        setSelectedFile(null);
+        setAvatarPreview(user?.user_metadata?.avatar_url || null);
+        return;
+      }
+
+      if (file.size > MAX_FILE_SIZE) {
+        showError("O tamanho da imagem não pode exceder 5MB.");
+        setSelectedFile(null);
+        setAvatarPreview(user?.user_metadata?.avatar_url || null);
+        return;
+      }
+
+      setSelectedFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    } else {
+      setSelectedFile(null);
+      setAvatarPreview(user?.user_metadata?.avatar_url || null);
+    }
+  };
+
   const onSubmit = async (data: ProfileFormValues) => {
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({
+
+    let newAvatarUrl = user?.user_metadata?.avatar_url || null;
+
+    if (selectedFile && user) {
+      const fileExtension = selectedFile.name.split('.').pop();
+      const filePath = `${user.id}/${Date.now()}.${fileExtension}`; // Caminho único para o arquivo
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('avatars') // Nome do seu bucket no Supabase Storage
+        .upload(filePath, selectedFile, {
+          cacheControl: '3600',
+          upsert: true, // Sobrescreve se o arquivo já existir
+        });
+
+      if (uploadError) {
+        showError(`Erro ao fazer upload da imagem: ${uploadError.message}`);
+        setLoading(false);
+        return;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      if (publicUrlData) {
+        newAvatarUrl = publicUrlData.publicUrl;
+      }
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser({
       data: {
         full_name: data.fullName,
-        avatar_url: data.avatarUrl,
+        avatar_url: newAvatarUrl, // Atualiza com a nova URL da imagem
         company_name: data.companyName,
         whatsapp: data.whatsapp,
         how_did_you_hear: data.howDidYouHear,
       }
     });
 
-    if (error) {
-      showError(error.message);
+    if (updateError) {
+      showError(updateError.message);
     } else {
       showSuccess("Perfil atualizado com sucesso!");
+      // O AuthContext deve capturar a mudança via onAuthStateChange
     }
     setLoading(false);
   };
@@ -90,17 +156,19 @@ const Profile = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="flex items-center space-x-4">
               <Avatar className="h-20 w-20">
-                <AvatarImage src={avatarUrlValue || user?.user_metadata?.avatar_url} alt="User avatar" />
+                <AvatarImage src={avatarPreview || user?.user_metadata?.avatar_url || undefined} alt="User avatar" />
                 <AvatarFallback>{getInitials(user?.email)}</AvatarFallback>
               </Avatar>
               <div className="w-full space-y-2">
-                <Label htmlFor="avatarUrl">URL da Foto de Perfil</Label>
+                <Label htmlFor="avatarFile">Foto de Perfil</Label>
                 <Input
-                  id="avatarUrl"
-                  placeholder="https://exemplo.com/sua-foto.png"
-                  {...register('avatarUrl')}
+                  id="avatarFile"
+                  type="file"
+                  accept="image/jpeg, image/png"
+                  onChange={handleFileChange}
+                  disabled={loading}
                 />
-                {errors.avatarUrl && <p className="text-sm text-red-500">{errors.avatarUrl.message}</p>}
+                <p className="text-xs text-gray-500">Apenas JPG/PNG, máximo 5MB.</p>
               </div>
             </div>
 
