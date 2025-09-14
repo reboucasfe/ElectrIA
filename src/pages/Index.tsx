@@ -28,7 +28,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => { // Re
       const element = document.getElementById(id);
       if (element) {
         setTimeout(() => {
-          element.scrollOfView({ behavior: "smooth", block: "start" });
+          element.scrollIntoView({ behavior: "smooth", block: "start" }); // Correção aqui
         }, 100);
       }
     }
