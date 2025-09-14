@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String // Lembre-se de armazenar uma senha com hash
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  calculations Calculation[]
+}
+
+model Calculation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  inputData Json
+  result    Json
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversations WhatsappConversation[]
+}
+
+model WhatsappConversation {
+  id               String   @id @default(cuid())
+  calculationId    String
+  calculation      Calculation @relation(fields: [calculationId], references: [id], onDelete: Cascade)
+  
+  waConversationId String   @unique // O ID da conversa do provedor do WhatsApp
+  messages         Json     // Armazena o histórico de mensagens nesta conversa
+  status           String   @default("ongoing") // ex: ongoing, completed, archived
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  aiResponses      AiResponse[]
+}
+
+model AiResponse {
+  id             String   @id @default(cuid())
+  conversationId String
+  conversation   WhatsappConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  responseText   String
+  metadata       Json?    // Quaisquer metadados extras da IA
+  
+  createdAt      DateTime @default(now())
+}
