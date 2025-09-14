@@ -1,19 +1,21 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // Importar useLocation
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { showError, showSuccess } from '@/utils/toast';
-import { CreditCard, QrCode, CheckCircle } from 'lucide-react'; // 'Pix' foi substituído por 'QrCode'
+import { CreditCard, QrCode, CheckCircle } from 'lucide-react';
 
 const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation(); // Hook para acessar o estado da navegação
+  const { planId, billingCycle } = (location.state || {}) as { planId?: string, billingCycle?: string };
 
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,12 +28,24 @@ const PaymentPage = () => {
     }, 2000);
   };
 
+  const getPlanTitle = (id?: string) => {
+    switch (id) {
+      case 'essencial': return 'Plano Essencial';
+      case 'professional': return 'Plano Profissional';
+      case 'premium': return 'Plano Premium';
+      default: return 'Plano Selecionado';
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle className="text-2xl">Finalizar Pagamento</CardTitle>
-          <CardDescription>Escolha seu método de pagamento e conclua a compra.</CardDescription>
+          <CardDescription>
+            Você está {planId === 'essencial' ? 'renovando' : 'fazendo upgrade para'} o <span className="font-semibold">{getPlanTitle(planId)}</span> ({billingCycle === 'annual' ? 'Anual' : 'Mensal'}).
+            Escolha seu método de pagamento e conclua a compra.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handlePaymentSubmit} className="space-y-6">
