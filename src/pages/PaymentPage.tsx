@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { showError, showSuccess } from '@/utils/toast';
 import { CreditCard, QrCode, CheckCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabaseClient'; // Importar supabase
+import { useAuth } from '@/contexts/AuthContext'; // Importar useAuth
 
 const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
@@ -16,16 +18,36 @@ const PaymentPage = () => {
   const navigate = useNavigate();
   const location = useLocation(); // Hook para acessar o estado da navegação
   const { planId, billingCycle } = (location.state || {}) as { planId?: string, billingCycle?: string };
+  const { user } = useAuth(); // Obter o usuário logado
 
-  const handlePaymentSubmit = (e: React.FormEvent) => {
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
     // Simula um processamento de pagamento
-    setTimeout(() => {
-      setLoading(false);
-      showSuccess("Pagamento simulado com sucesso! Redirecionando para o dashboard.");
-      navigate('/dashboard'); // Redireciona para o dashboard após a simulação
-    }, 2000);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    if (user) {
+      // Atualiza o status de pagamento do usuário para 'paid'
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: {
+          payment_status: 'paid',
+          // Você pode adicionar aqui o planId e billingCycle ao user_metadata se desejar
+          // current_plan_id: planId,
+          // current_billing_cycle: billingCycle,
+        }
+      });
+
+      if (updateError) {
+        showError(`Erro ao atualizar status de pagamento: ${updateError.message}`);
+        setLoading(false);
+        return;
+      }
+    }
+
+    setLoading(false);
+    showSuccess("Pagamento simulado com sucesso! Redirecionando para o dashboard.");
+    navigate('/dashboard'); // Redireciona para o dashboard após a simulação
   };
 
   const getPlanTitle = (id?: string) => {

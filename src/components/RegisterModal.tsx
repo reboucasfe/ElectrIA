@@ -82,6 +82,7 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
           how_did_you_hear: data.howDidYouHear,
           has_coupon: data.hasCoupon,
           coupon_code: data.couponCode,
+          payment_status: 'pending', // Adiciona o status de pagamento pendente
         },
       },
     });
@@ -97,12 +98,8 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
       showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.');
       reset();
       onClose();
-      // Redirect to payment page with selected plan details
-      if (selectedPlanId && selectedBillingCycle) {
-        navigate('/payment', { state: { planId: selectedPlanId, billingCycle: selectedBillingCycle } });
-      } else {
-        navigate('/upgrade'); // Fallback if no plan was pre-selected
-      }
+      // Redireciona para a página de upgrade, independentemente do plano selecionado
+      navigate('/upgrade');
     }
     setLoading(false);
   };

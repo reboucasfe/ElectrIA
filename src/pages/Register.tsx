@@ -16,7 +16,15 @@ const Register = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        data: {
+          payment_status: 'pending', // Adiciona o status de pagamento pendente
+        },
+      },
+    });
     if (error) {
       // Intercepta a mensagem de erro do Supabase para "usuário já registrado"
       if (error.message === 'User already registered') {

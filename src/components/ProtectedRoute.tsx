@@ -21,6 +21,11 @@ const ProtectedRoute = () => {
     return <Navigate to="/login" replace />;
   }
 
+  // Se o usuário está logado, mas o status de pagamento não é 'paid', redireciona para a página de upgrade
+  if (user && user.user_metadata?.payment_status !== 'paid') {
+    return <Navigate to="/upgrade" replace />;
+  }
+
   return <Outlet />;
 };
 
