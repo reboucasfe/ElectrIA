@@ -101,7 +101,7 @@ const RegisterModal = ({ isOpen, onClose, trigger }: RegisterModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className={cn(
-        "fixed inset-0 z-50 w-screen h-screen max-w-none flex items-center justify-center bg-transparent backdrop-blur-sm", // Adicionado w-screen, h-screen e max-w-none
+        "fixed inset-0 z-50 w-screen h-screen max-w-none flex items-center justify-center bg-transparent backdrop-blur-sm p-0 border-0 shadow-none rounded-none",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
       )}>
         <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-xl">
