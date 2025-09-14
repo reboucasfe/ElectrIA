@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form'; // Importar Controller
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { supabase } from '@/lib/supabaseClient';
@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Upload } from 'lucide-react';
-import InputMask from 'react-input-mask'; // Importar InputMask
+import InputMask from 'react-input-mask';
 
 // Esquema de validação para o formulário de perfil
 const profileSchema = z.object({
@@ -43,7 +43,7 @@ const Profile = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.user_metadata?.avatar_url || null);
 
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<ProfileFormValues>({
+  const { register, handleSubmit, formState: { errors }, setValue, control } = useForm<ProfileFormValues>({ // Adicionar 'control'
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: user?.user_metadata?.full_name || '',
@@ -207,23 +207,31 @@ const Profile = () => {
 
             <div className="space-y-2">
               <Label htmlFor="whatsapp">WhatsApp</Label>
-              <InputMask
-                mask="(99) 9.9999-9999"
-                maskChar="_"
-                value={register('whatsapp').value} // Use o valor do react-hook-form
-                onChange={register('whatsapp').onChange} // Use o onChange do react-hook-form
-                onBlur={register('whatsapp').onBlur} // Use o onBlur do react-hook-form
-              >
-                {(inputProps: any) => (
-                  <Input
-                    {...inputProps}
-                    id="whatsapp"
-                    type="tel"
-                    placeholder="(XX) X.XXXX-XXXX"
-                    className={errors.whatsapp ? "border-red-500" : ""}
-                  />
+              <Controller
+                name="whatsapp"
+                control={control}
+                render={({ field }) => (
+                  <InputMask
+                    mask="(99) 9.9999-9999"
+                    maskChar="_"
+                    value={field.value}
+                    onChange={(e) => {
+                      field.onChange(e.target.value.replace(/\D/g, '')); // Passa o valor não mascarado
+                    }}
+                    onBlur={field.onBlur}
+                  >
+                    {(inputProps: any) => (
+                      <Input
+                        {...inputProps}
+                        id="whatsapp"
+                        type="tel"
+                        placeholder="(XX) X.XXXX-XXXX"
+                        className={errors.whatsapp ? "border-red-500" : ""}
+                      />
+                    )}
+                  </InputMask>
                 )}
-              </InputMask>
+              />
               {errors.whatsapp && <p className="text-sm text-red-500">{errors.whatsapp.message}</p>}
             </div>
 

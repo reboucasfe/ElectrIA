@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form"; // Importar Controller
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/lib/supabaseClient";
@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Eye, EyeOff } from 'lucide-react';
-import InputMask from 'react-input-mask'; // Importar InputMask
+import InputMask from 'react-input-mask';
 
 const registerFormSchema = z.object({
   fullName: z.string().min(1, { message: "Nome completo é obrigatório." }),
@@ -55,7 +55,7 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<RegisterFormValues>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue, watch, control } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
       fullName: "",
@@ -171,23 +171,31 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
           </div>
           <div className="grid gap-2">
             <Label htmlFor="whatsapp">WhatsApp</Label>
-            <InputMask
-              mask="(99) 9.9999-9999"
-              maskChar="_"
-              value={register('whatsapp').value} // Use o valor do react-hook-form
-              onChange={register('whatsapp').onChange} // Use o onChange do react-hook-form
-              onBlur={register('whatsapp').onBlur} // Use o onBlur do react-hook-form
-            >
-              {(inputProps: any) => (
-                <Input
-                  {...inputProps}
-                  id="whatsapp"
-                  type="tel"
-                  placeholder="(XX) X.XXXX-XXXX"
-                  className={errors.whatsapp ? "border-red-500" : ""}
-                />
+            <Controller
+              name="whatsapp"
+              control={control}
+              render={({ field }) => (
+                <InputMask
+                  mask="(99) 9.9999-9999"
+                  maskChar="_"
+                  value={field.value}
+                  onChange={(e) => {
+                    field.onChange(e.target.value.replace(/\D/g, '')); // Passa o valor não mascarado
+                  }}
+                  onBlur={field.onBlur}
+                >
+                  {(inputProps: any) => (
+                    <Input
+                      {...inputProps}
+                      id="whatsapp"
+                      type="tel"
+                      placeholder="(XX) X.XXXX-XXXX"
+                      className={errors.whatsapp ? "border-red-500" : ""}
+                    />
+                  )}
+                </InputMask>
               )}
-            </InputMask>
+            />
             {errors.whatsapp && <p className="text-sm text-red-500">{errors.whatsapp.message}</p>}
           </div>
           <div className="grid gap-2">
