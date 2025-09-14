@@ -13,7 +13,10 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
-import UpdatePassword from "./pages/UpdatePassword"; // Importando a nova página
+import UpdatePassword from "./pages/UpdatePassword";
+import DashboardLayout from "./layouts/DashboardLayout";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -54,16 +57,22 @@ const App = () => {
           <Toaster />
           <Sonner />
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/update-password" element={<UpdatePassword />} /> {/* Nova rota */}
+            <Route path="/update-password" element={<UpdatePassword />} />
             
+            {/* Protected Dashboard Routes */}
             <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<Settings />} />
+              </Route>
             </Route>
 
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Catch-all Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
