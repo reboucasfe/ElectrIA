@@ -43,6 +43,24 @@ const Login = () => {
     // No need to set loading to false here, as the page will redirect
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      showError('Por favor, insira seu e-mail para redefinir a senha.');
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/update-password', // Você precisará criar esta rota
+    });
+
+    if (error) {
+      showError(error.message);
+    } else {
+      showSuccess('Verifique seu e-mail para o link de redefinição de senha!');
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <Card className="w-full max-w-md">
@@ -65,7 +83,18 @@ const Login = () => {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                  <Button 
+                    variant="link" 
+                    type="button" 
+                    onClick={handleForgotPassword} 
+                    className="ml-auto inline-block text-sm text-blue-600 hover:text-blue-700"
+                    disabled={loading}
+                  >
+                    Esqueceu a senha?
+                  </Button>
+                </div>
                 <Input 
                   id="password" 
                   type="password" 
