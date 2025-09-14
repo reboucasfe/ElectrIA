@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { showError, showSuccess } from '@/utils/toast';
-import { FaGoogle } from 'react-icons/fa';
+import { FcGoogle } from 'react-icons/fc'; // Importado FcGoogle para o ícone colorido
 import { Eye, EyeOff } from 'lucide-react';
 
 interface LoginFormContentProps {
@@ -139,7 +139,7 @@ const LoginFormContent = ({ onClose, onOpenRegisterModal }: LoginFormContentProp
         onClick={handleGoogleLogin}
         disabled={loading}
       >
-        <FaGoogle className="h-4 w-4" /> Entrar com Google
+        <FcGoogle className="h-4 w-4" /> Entrar com Google
       </Button>
       <div className="mt-4 text-center text-sm">
         Não tem uma conta?{' '}
