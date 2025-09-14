@@ -155,7 +155,7 @@ const Index = () => {
         </section>
 
         {/* Pricing Section */}
-        <section id="precos" className="py-20 px-4 bg-white">
+        <section id="planos" className="py-20 px-4 bg-white">
           <div className="container mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Escolha o Plano Ideal para Seu Negócio</h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">Comece com um teste grátis de 7 dias. Sem compromisso.</p>

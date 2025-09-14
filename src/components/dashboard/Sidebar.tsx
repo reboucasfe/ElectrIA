@@ -13,7 +13,7 @@ const Sidebar = () => {
   return (
     <aside className="hidden md:flex flex-col w-64 bg-gray-50 border-r">
       <div className="p-4 border-b">
-        <Link to="/" className="flex items-center">
+        <Link to="/#planos" className="flex items-center">
           <Zap className="h-8 w-8 text-blue-600 mr-2" />
           <span className="text-xl font-bold text-gray-900">EletroProposta IA</span>
         </Link>

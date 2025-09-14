@@ -15,13 +15,13 @@ export const Header = () => {
   return (
     <header className="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link to="/" className="flex items-center">
+        <Link to={user ? "/#planos" : "/"} className="flex items-center">
           <Zap className="h-8 w-8 text-blue-600 mr-2" />
           <span className="text-xl font-bold text-gray-900">EletroProposta IA</span>
         </Link>
         <div className="hidden md:flex items-center space-x-8">
           <Link to="/#como-funciona" className="text-gray-600 hover:text-blue-600 transition-colors">Como Funciona</Link>
-          <Link to="/#precos" className="text-gray-600 hover:text-blue-600 transition-colors">Preços</Link>
+          <Link to="/#planos" className="text-gray-600 hover:text-blue-600 transition-colors">Planos</Link>
           <Link to="/#faq" className="text-gray-600 hover:text-blue-600 transition-colors">FAQ</Link>
         </div>
         <div className="flex items-center space-x-4">
