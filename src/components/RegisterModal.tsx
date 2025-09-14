@@ -18,13 +18,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, EyeOff } from 'lucide-react'; // Importar os ícones Eye e EyeOff
+import { Eye, EyeOff } from 'lucide-react';
+import InputMask from 'react-input-mask'; // Importar InputMask
 
 const registerFormSchema = z.object({
   fullName: z.string().min(1, { message: "Nome completo é obrigatório." }),
   companyName: z.string().optional(),
   email: z.string().email({ message: "Por favor, insira um e-mail válido." }),
-  whatsapp: z.string().min(10, { message: "WhatsApp é obrigatório e deve ter pelo menos 10 dígitos." }).max(14, { message: "O número de WhatsApp deve ter no máximo 14 dígitos." }),
+  whatsapp: z.string()
+    .transform((val) => val.replace(/\D/g, '')) // Remove non-digits
+    .refine((val) => val.length === 11, { // Validate raw length for 11 digits (DDD + 9XXXX-XXXX)
+      message: "O número de WhatsApp deve ter 11 dígitos (DDD + 9XXXX-XXXX)."
+    })
+    .refine((val) => /^\d+$/.test(val), { // Ensure it's only digits after transform
+      message: "O número de WhatsApp deve conter apenas dígitos."
+    }),
   password: z.string().min(8, { message: "A senha deve ter pelo menos 8 caracteres." }),
   confirmPassword: z.string(),
   howDidYouHear: z.string().min(1, { message: "Por favor, selecione uma opção." }),
@@ -163,13 +171,23 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
           </div>
           <div className="grid gap-2">
             <Label htmlFor="whatsapp">WhatsApp</Label>
-            <Input
-              id="whatsapp"
-              type="tel"
-              placeholder="(XX) XXXXX-XXXX"
-              maxLength={14}
-              {...register('whatsapp')}
-            />
+            <InputMask
+              mask="(99) 9.9999-9999"
+              maskChar="_"
+              value={register('whatsapp').value} // Use o valor do react-hook-form
+              onChange={register('whatsapp').onChange} // Use o onChange do react-hook-form
+              onBlur={register('whatsapp').onBlur} // Use o onBlur do react-hook-form
+            >
+              {(inputProps: any) => (
+                <Input
+                  {...inputProps}
+                  id="whatsapp"
+                  type="tel"
+                  placeholder="(XX) X.XXXX-XXXX"
+                  className={errors.whatsapp ? "border-red-500" : ""}
+                />
+              )}
+            </InputMask>
             {errors.whatsapp && <p className="text-sm text-red-500">{errors.whatsapp.message}</p>}
           </div>
           <div className="grid gap-2">
