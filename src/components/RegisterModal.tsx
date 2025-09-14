@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Eye, EyeOff } from 'lucide-react'; // Importar os ícones Eye e EyeOff
 
 const registerFormSchema = z.object({
   fullName: z.string().min(1, { message: "Nome completo é obrigatório." }),
@@ -40,6 +41,8 @@ interface RegisterModalProps {
 
 const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<RegisterFormValues>({
@@ -161,23 +164,57 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Senha</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="********"
-              {...register('password')}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="********"
+                {...register('password')}
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                onClick={() => setShowPassword((prev) => !prev)}
+                disabled={loading}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4 text-gray-500" />
+                ) : (
+                  <Eye className="h-4 w-4 text-gray-500" />
+                )}
+              </Button>
+            </div>
             <p className="text-xs text-gray-500">Deve ter pelo menos 8 caracteres.</p>
             {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="********"
-              {...register('confirmPassword')}
-            />
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="********"
+                {...register('confirmPassword')}
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                disabled={loading}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-4 w-4 text-gray-500" />
+                ) : (
+                  <Eye className="h-4 w-4 text-gray-500" />
+                )}
+              </Button>
+            </div>
             {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
           </div>
           <div className="grid gap-2">
