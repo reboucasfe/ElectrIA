@@ -20,7 +20,7 @@ const Register = () => {
     if (error) {
       showError(error.message);
     } else {
-      showSuccess('Registration successful! Please check your email to verify your account.');
+      showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.');
       navigate('/login');
     }
     setLoading(false);
