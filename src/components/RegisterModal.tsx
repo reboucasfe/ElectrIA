@@ -24,7 +24,7 @@ const registerFormSchema = z.object({
   fullName: z.string().min(1, { message: "Nome completo é obrigatório." }),
   companyName: z.string().optional(),
   email: z.string().email({ message: "Por favor, insira um e-mail válido." }),
-  whatsapp: z.string().min(10, { message: "WhatsApp é obrigatório e deve ter pelo menos 10 dígitos." }),
+  whatsapp: z.string().min(10, { message: "WhatsApp é obrigatório e deve ter pelo menos 10 dígitos." }).max(14, { message: "O número de WhatsApp deve ter no máximo 14 dígitos." }),
   password: z.string().min(8, { message: "A senha deve ter pelo menos 8 caracteres." }),
   confirmPassword: z.string(),
   howDidYouHear: z.string().min(1, { message: "Por favor, selecione uma opção." }),
@@ -162,21 +162,12 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              {...register('email')}
-            />
-            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
-          </div>
-          <div className="grid gap-2">
             <Label htmlFor="whatsapp">WhatsApp</Label>
             <Input
               id="whatsapp"
               type="tel"
               placeholder="(XX) XXXXX-XXXX"
+              maxLength={14}
               {...register('whatsapp')}
             />
             {errors.whatsapp && <p className="text-sm text-red-500">{errors.whatsapp.message}</p>}

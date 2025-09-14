@@ -23,7 +23,7 @@ import { Upload } from 'lucide-react'; // Importar o ícone Upload
 const profileSchema = z.object({
   fullName: z.string().min(3, { message: "O nome completo deve ter pelo menos 3 caracteres." }),
   companyName: z.string().optional(),
-  whatsapp: z.string().min(10, { message: "WhatsApp é obrigatório e deve ter pelo menos 10 dígitos." }),
+  whatsapp: z.string().min(10, { message: "WhatsApp é obrigatório e deve ter pelo menos 10 dígitos." }).max(14, { message: "O número de WhatsApp deve ter no máximo 14 dígitos." }),
   howDidYouHear: z.string().min(1, { message: "Por favor, selecione uma opção." }),
 });
 
@@ -203,6 +203,7 @@ const Profile = () => {
                 id="whatsapp"
                 type="tel"
                 placeholder="(XX) XXXXX-XXXX"
+                maxLength={14}
                 {...register('whatsapp')}
               />
               {errors.whatsapp && <p className="text-sm text-red-500">{errors.whatsapp.message}</p>}
