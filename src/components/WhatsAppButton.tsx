@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { FaWhatsapp } from "react-icons/fa";
+import { IoLogoWhatsapp } from "react-icons/io5";
 
 const WhatsAppButton = () => {
   // IMPORTANTE: Substitua este número pelo seu número de WhatsApp com o código do país.
@@ -22,7 +22,7 @@ const WhatsAppButton = () => {
             size="icon"
             className="bg-green-500 hover:bg-green-600 text-white rounded-full h-16 w-16 shadow-lg flex items-center justify-center"
           >
-            <FaWhatsapp className="h-8 w-8" />
+            <IoLogoWhatsapp className="h-8 w-8" />
           </Button>
         </a>
       </TooltipTrigger>
