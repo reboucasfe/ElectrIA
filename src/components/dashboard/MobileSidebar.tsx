@@ -1,5 +1,5 @@
 import { NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, User, Settings, Crown } from 'lucide-react';
+import { LayoutDashboard, User, Settings, Crown } from 'lucide-react'; // Adicionado Crown, removido Zap
 import { cn } from '@/lib/utils';
 
 const MobileSidebar = () => {
@@ -7,15 +7,15 @@ const MobileSidebar = () => {
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/profile', icon: User, label: 'Perfil' },
     { href: '/settings', icon: Settings, label: 'Configurações' },
-    { href: '/upgrade', icon: Crown, label: 'Upgrade' },
+    { href: '/upgrade', icon: Crown, label: 'Upgrade' }, // Item 'Upgrade' movido para o final com ícone de coroa
   ];
 
   return (
     <aside className="flex flex-col h-full bg-gray-50">
       <div className="p-4 border-b">
         <Link to="/#planos" className="flex items-center">
-          <Crown className="h-8 w-8 text-amber-500 mr-2" /> {/* Ícone de coroa em dourado */}
-          <span className="text-xl font-bold text-amber-600">EletroProposta IA</span> {/* Texto em dourado */}
+          <Crown className="h-8 w-8 text-blue-600 mr-2" /> {/* Ícone de coroa no título */}
+          <span className="text-xl font-bold text-gray-900">EletroProposta IA</span>
         </Link>
       </div>
       <nav className="flex-1 p-4 space-y-2">
