@@ -18,10 +18,19 @@ export function UserNav() {
 
   const handleSignOut = async () => {
     await signOut();
+    navigate('/login');
   };
 
   const getInitials = (email: string | undefined) => {
     if (!email) return 'U';
+    const name = user?.user_metadata?.full_name;
+    if (name) {
+      const parts = name.split(' ');
+      if (parts.length > 1) {
+        return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+      }
+      return name.substring(0, 2).toUpperCase();
+    }
     return email.substring(0, 2).toUpperCase();
   };
 
@@ -38,7 +47,7 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Usuário</p>
+            <p className="text-sm font-medium leading-none">{user?.user_metadata?.full_name || 'Usuário'}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {user?.email}
             </p>

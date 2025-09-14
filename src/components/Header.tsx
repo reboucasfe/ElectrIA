@@ -9,6 +9,7 @@ export const Header = () => {
 
   const handleSignOut = async () => {
     await signOut();
+    navigate('/login');
   };
 
   return (
