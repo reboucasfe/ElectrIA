@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useForm, Controller } from "react-hook-form"; // Importar Controller
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/lib/supabaseClient";
@@ -26,11 +26,11 @@ const registerFormSchema = z.object({
   companyName: z.string().optional(),
   email: z.string().email({ message: "Por favor, insira um e-mail válido." }),
   whatsapp: z.string()
-    .transform((val) => val.replace(/\D/g, '')) // Remove non-digits
-    .refine((val) => val.length === 11, { // Validate raw length for 11 digits (DDD + 9XXXX-XXXX)
+    .transform((val) => val.replace(/\D/g, ''))
+    .refine((val) => val.length === 11, {
       message: "O número de WhatsApp deve ter 11 dígitos (DDD + 9XXXX-XXXX)."
     })
-    .refine((val) => /^\d+$/.test(val), { // Ensure it's only digits after transform
+    .refine((val) => /^\d+$/.test(val), {
       message: "O número de WhatsApp deve conter apenas dígitos."
     }),
   password: z.string().min(8, { message: "A senha deve ter pelo menos 8 caracteres." }),
@@ -45,8 +45,8 @@ type RegisterFormValues = z.infer<typeof registerFormSchema>;
 interface RegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedPlanId?: string; // New prop
-  selectedBillingCycle?: 'monthly' | 'annual'; // New prop
+  selectedPlanId?: string;
+  selectedBillingCycle?: 'monthly' | 'annual';
 }
 
 const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }: RegisterModalProps) => {
@@ -72,7 +72,6 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
 
   const hasCouponValue = watch('hasCoupon');
 
-  // Adicionado useEffect para logar os props quando o modal abre
   useEffect(() => {
     if (isOpen) {
       console.log("RegisterModal opened. Props received:");
@@ -99,13 +98,12 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
           how_did_you_hear: data.howDidYouHear,
           has_coupon: data.hasCoupon,
           coupon_code: data.couponCode,
-          payment_status: 'pending', // Adiciona o status de pagamento pendente
+          payment_status: 'pending',
         },
       },
     });
 
     if (error) {
-      // Intercepta a mensagem de erro do Supabase para "usuário já registrado"
       if (error.message === 'User already registered') {
         showError('Este e-mail já está cadastrado. Por favor, faça login ou use outro e-mail.');
       } else {
@@ -115,13 +113,12 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
       showSuccess('Cadastro realizado com sucesso! Redirecionando para o pagamento...');
       reset();
       onClose();
-      // Lógica de redirecionamento mais robusta
       if (selectedPlanId && selectedBillingCycle) {
         console.log("RegisterModal: Navigating to /payment with state:", { planId: selectedPlanId, billingCycle: selectedBillingCycle });
         navigate('/payment', { state: { planId: selectedPlanId, billingCycle: selectedBillingCycle } });
       } else {
         console.log("RegisterModal: No plan selected, navigating to /upgrade.");
-        navigate('/upgrade'); // Fallback if no plan was pre-selected
+        navigate('/upgrade');
       }
     }
     setLoading(false);
@@ -170,6 +167,16 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
             />
           </div>
           <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="m@example.com"
+              {...register('email')}
+            />
+            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+          </div>
+          <div className="grid gap-2">
             <Label htmlFor="whatsapp">WhatsApp</Label>
             <Controller
               name="whatsapp"
@@ -180,7 +187,7 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
                   maskChar="_"
                   value={field.value}
                   onChange={(e) => {
-                    field.onChange(e.target.value.replace(/\D/g, '')); // Passa o valor não mascarado
+                    field.onChange(e.target.value.replace(/\D/g, ''));
                   }}
                   onBlur={field.onBlur}
                 >
