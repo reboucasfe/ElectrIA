@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Upload } from 'lucide-react'; // Importar o ícone Upload
 
 // Esquema de validação para o formulário de perfil
 const profileSchema = z.object({
@@ -161,13 +162,17 @@ const Profile = () => {
               </Avatar>
               <div className="w-full space-y-2">
                 <Label htmlFor="avatarFile">Foto de Perfil</Label>
-                <Input
-                  id="avatarFile"
-                  type="file"
-                  accept="image/jpeg, image/png"
-                  onChange={handleFileChange}
-                  disabled={loading}
-                />
+                <div className="relative">
+                  <Input
+                    id="avatarFile"
+                    type="file"
+                    accept="image/jpeg, image/png"
+                    onChange={handleFileChange}
+                    disabled={loading}
+                    className="pr-10" // Adiciona padding à direita para o ícone
+                  />
+                  <Upload className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+                </div>
                 <p className="text-xs text-gray-500">Apenas JPG/PNG, máximo 5MB.</p>
               </div>
             </div>
