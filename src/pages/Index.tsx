@@ -10,7 +10,7 @@ import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldC
 import { Header } from "@/components/Header";
 
 const Index = () => {
-  const [billingCycle, setBillingCycle] = useState('monthly');
+  const [billingCycle, setBillingCycle] = useState('annual'); // Alterado para 'annual'
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
