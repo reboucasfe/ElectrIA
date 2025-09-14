@@ -22,7 +22,7 @@ const WhatsAppButton = () => {
             size="icon"
             className="bg-green-500 hover:bg-green-600 text-white rounded-full h-14 w-14 shadow-lg flex items-center justify-center"
           >
-            <FaWhatsapp className="h-10 w-10" />
+            <FaWhatsapp className="h-12 w-12" />
           </Button>
         </a>
       </TooltipTrigger>
