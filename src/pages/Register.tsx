@@ -33,7 +33,7 @@ const Register = () => {
         showError(error.message);
       }
     } else {
-      showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.');
+      // showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.'); // Removido
       navigate('/upgrade'); // Redireciona para a página de upgrade
     }
     setLoading(false);

@@ -131,6 +131,15 @@ const PaymentPage = () => {
             <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
               {loading ? 'Processando...' : 'Concluir Pagamento'}
             </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full mt-2" 
+              onClick={() => navigate('/upgrade')}
+              disabled={loading}
+            >
+              Selecionar Outro Plano
+            </Button>
           </form>
         </CardContent>
       </Card>

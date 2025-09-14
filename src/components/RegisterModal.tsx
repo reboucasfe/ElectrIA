@@ -95,11 +95,16 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
         showError(error.message);
       }
     } else {
-      showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.');
+      // showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.'); // Removido
       reset();
       onClose();
-      // Redireciona para a página de upgrade, independentemente do plano selecionado
-      navigate('/upgrade');
+      console.log("RegisterModal: selectedPlanId", selectedPlanId);
+      console.log("RegisterModal: selectedBillingCycle", selectedBillingCycle);
+      if (selectedPlanId && selectedBillingCycle) {
+        navigate('/payment', { state: { planId: selectedPlanId, billingCycle: selectedBillingCycle } });
+      } else {
+        navigate('/upgrade'); // Fallback if no plan was pre-selected
+      }
     }
     setLoading(false);
   };
