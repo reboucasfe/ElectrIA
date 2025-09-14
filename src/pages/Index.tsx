@@ -47,6 +47,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
   const displayPrice = prices[billingCycle];
 
   const handlePlanButtonClick = (planId: string) => {
+    console.log("Index.tsx: handlePlanButtonClick called with planId:", planId, "and billingCycle:", billingCycle);
     if (user) {
       navigate('/upgrade');
     } else {

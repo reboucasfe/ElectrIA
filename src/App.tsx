@@ -55,6 +55,7 @@ const App = () => {
   const [selectedBillingCycleForRegister, setSelectedBillingCycleForRegister] = useState<'monthly' | 'annual' | undefined>(undefined);
 
   const handleOpenRegisterModal = (planId?: string, billingCycle?: 'monthly' | 'annual') => {
+    console.log("App.tsx: handleOpenRegisterModal received planId:", planId, "and billingCycle:", billingCycle);
     setSelectedPlanIdForRegister(planId);
     setSelectedBillingCycleForRegister(billingCycle);
     setIsRegisterModalOpen(true);
