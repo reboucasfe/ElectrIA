@@ -20,9 +20,9 @@ const WhatsAppButton = () => {
         >
           <Button
             size="icon"
-            className="bg-green-500 hover:bg-green-600 text-white rounded-full h-16 w-16 shadow-lg flex items-center justify-center"
+            className="bg-green-500 hover:bg-green-600 text-white rounded-full h-14 w-14 shadow-lg flex items-center justify-center"
           >
-            <RiWhatsappLine className="h-8 w-8" />
+            <RiWhatsappLine className="h-7 w-7" />
           </Button>
         </a>
       </TooltipTrigger>
