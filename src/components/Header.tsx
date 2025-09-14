@@ -1,15 +1,20 @@
+"use client";
+
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Zap } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMemo } from 'react';
 
 interface HeaderProps {
-  onOpenRegisterModal?: () => void;
+  onOpenRegisterModal?: (planId?: string, billingCycle?: 'monthly' | 'annual') => void;
 }
 
 export const Header = ({ onOpenRegisterModal }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  const isPaid = useMemo(() => user?.user_metadata?.payment_status === 'paid', [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -20,8 +25,12 @@ export const Header = ({ onOpenRegisterModal }: HeaderProps) => {
     if (onOpenRegisterModal) {
       onOpenRegisterModal();
     } else {
-      navigate('/register'); // Fallback if prop is not provided (shouldn't happen in App.tsx)
+      navigate('/register');
     }
+  };
+
+  const handleFinalizeSubscriptionClick = () => {
+    navigate('/payment');
   };
 
   return (
@@ -37,12 +46,19 @@ export const Header = ({ onOpenRegisterModal }: HeaderProps) => {
           <Link to="/#faq" className="text-gray-600 hover:text-blue-600 transition-colors">FAQ</Link>
         </div>
         <div className="flex items-center space-x-4">
-          {user ? (
-            <>
-              <Button variant="ghost" onClick={() => navigate('/dashboard')}>Dashboard</Button>
-              <Button onClick={handleSignOut}>Sair</Button>
-            </>
-          ) : (
+          {user ? ( // Usuário está logado
+            isPaid ? ( // Usuário é pagante
+              <>
+                <Button variant="ghost" onClick={() => navigate('/dashboard')}>Dashboard</Button>
+                <Button onClick={handleSignOut}>Sair</Button>
+              </>
+            ) : ( // Usuário está logado, mas NÃO é pagante
+              <>
+                <Button variant="ghost" onClick={handleSignOut}>Sair</Button>
+                <Button onClick={handleFinalizeSubscriptionClick} className="bg-blue-600 hover:bg-blue-700">Finalizar Assinatura</Button>
+              </>
+            )
+          ) : ( // Usuário NÃO está logado
             <>
               <Button variant="ghost" onClick={() => navigate('/login')}>Login</Button>
               <Button onClick={handleStartNowClick} className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>

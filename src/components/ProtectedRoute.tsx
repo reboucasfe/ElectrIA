@@ -1,8 +1,13 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
+import React from 'react';
 
-const ProtectedRoute = () => {
+interface ProtectedRouteProps {
+  children?: React.ReactNode; // Torna children opcional
+}
+
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
@@ -19,39 +24,32 @@ const ProtectedRoute = () => {
   }
 
   if (!user) {
-    // Se não estiver logado, redireciona para a página de login
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  // Usuário está logado
   const paymentStatus = user.user_metadata?.payment_status;
   const isPaid = paymentStatus === 'paid';
   const currentPath = location.pathname;
 
-  // Rotas permitidas para usuários com status de pagamento pendente/não pago
-  const allowedPathsForUnpaid = ['/payment']; 
-
   // Se o usuário NÃO é pagante
   if (!isPaid) {
     // Se ele está tentando acessar a página de pagamento, permite
-    if (allowedPathsForUnpaid.includes(currentPath)) {
-      return <Outlet />;
+    if (currentPath === '/payment') {
+      return children || <Outlet />; // Renderiza children se fornecido, senão Outlet
     }
     // Se ele está tentando acessar qualquer outra rota protegida (dashboard, perfil, configurações, upgrade),
     // redireciona-o para a página de pagamento.
-    return <Navigate to="/payment" replace />;
+    return <Navigate to="/payment" replace state={{ from: location }} />;
   }
 
   // Se o usuário É pagante
   // Se um usuário pagante de alguma forma cair na página de pagamento, redireciona-o para o dashboard
-  // (a menos que esteja explicitamente passando por um fluxo de upgrade, que seria tratado por estado,
-  // mas para simplicidade, se ele é pagante e está em /payment, assume-se que não deveria estar lá).
   if (isPaid && currentPath === '/payment') {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/dashboard" replace state={{ from: location }} />;
   }
 
   // Se o usuário é pagante e está em qualquer outra rota protegida, permite o acesso
-  return <Outlet />;
+  return children || <Outlet />;
 };
 
 export default ProtectedRoute;

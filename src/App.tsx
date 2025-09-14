@@ -20,8 +20,8 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Upgrade from "./pages/Upgrade";
 import WhatsAppButton from "./components/WhatsAppButton";
-import RegisterModal from "./components/RegisterModal"; // Import the new modal
-import PaymentPage from "./pages/PaymentPage"; // Import the new PaymentPage
+import RegisterModal from "./components/RegisterModal";
+import PaymentPage from "./pages/PaymentPage";
 
 const queryClient = new QueryClient();
 
@@ -81,16 +81,17 @@ const App = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/update-password" element={<UpdatePassword />} />
+              {/* Payment page, protegida, mas usa o cabeçalho do AuthLayout */}
+              <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
             </Route>
             
-            {/* Protected Dashboard Routes */}
+            {/* Protected Dashboard Routes (apenas para usuários pagantes) */}
             <Route element={<ProtectedRoute />}>
               <Route element={<DashboardLayout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/upgrade" element={<Upgrade />} />
-                <Route path="/payment" element={<PaymentPage />} /> {/* New payment route */}
               </Route>
             </Route>
 
