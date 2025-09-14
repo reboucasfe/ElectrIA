@@ -68,7 +68,7 @@ const App = () => {
             <Route path="/" element={<Index onOpenRegisterModal={() => setIsRegisterModalOpen(true)} />} />
             
             {/* Auth Routes with Header */}
-            <Route element={<AuthLayout />}>
+            <Route element={<AuthLayout onOpenRegisterModal={() => setIsRegisterModalOpen(true)} />}>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/update-password" element={<UpdatePassword />} />
