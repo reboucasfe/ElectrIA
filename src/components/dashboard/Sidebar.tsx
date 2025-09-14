@@ -1,20 +1,20 @@
 import { NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, User, Settings, Zap } from 'lucide-react';
+import { LayoutDashboard, User, Settings, Crown } from 'lucide-react'; // Adicionado Crown, removido Zap
 import { cn } from '@/lib/utils';
 
 const Sidebar = () => {
   const navItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { href: '/upgrade', icon: Zap, label: 'Eletro Proposta' },
     { href: '/profile', icon: User, label: 'Perfil' },
     { href: '/settings', icon: Settings, label: 'Configurações' },
+    { href: '/upgrade', icon: Crown, label: 'Upgrade' }, // Item 'Upgrade' movido para o final com ícone de coroa
   ];
 
   return (
     <aside className="hidden md:flex flex-col w-64 bg-gray-50 border-r">
       <div className="p-4 border-b">
         <Link to="/#planos" className="flex items-center">
-          <Zap className="h-8 w-8 text-blue-600 mr-2" />
+          <Crown className="h-8 w-8 text-blue-600 mr-2" /> {/* Ícone de coroa no título */}
           <span className="text-xl font-bold text-gray-900">EletroProposta IA</span>
         </Link>
       </div>
