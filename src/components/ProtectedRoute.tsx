@@ -1,10 +1,10 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate, Outlet, useLocation } from 'react-router-dom'; // Importar useLocation
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
-  const location = useLocation(); // Obter a localização atual
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -19,20 +19,38 @@ const ProtectedRoute = () => {
   }
 
   if (!user) {
+    // Se não estiver logado, redireciona para a página de login
     return <Navigate to="/login" replace />;
   }
 
-  // Rotas permitidas mesmo com status de pagamento pendente
-  const allowedPathsForPendingPayment = ['/upgrade', '/payment'];
-  const isTryingToAccessPaymentRelatedPage = allowedPathsForPendingPayment.includes(location.pathname);
+  // Usuário está logado
+  const paymentStatus = user.user_metadata?.payment_status;
+  const isPaid = paymentStatus === 'paid';
+  const currentPath = location.pathname;
 
-  // Se o usuário está logado, mas o status de pagamento não é 'paid',
-  // e ele NÃO está tentando acessar uma página relacionada a pagamento,
-  // então redireciona para a página de upgrade.
-  if (user && user.user_metadata?.payment_status !== 'paid' && !isTryingToAccessPaymentRelatedPage) {
-    return <Navigate to="/upgrade" replace />;
+  // Rotas permitidas para usuários com status de pagamento pendente/não pago
+  const allowedPathsForUnpaid = ['/payment']; 
+
+  // Se o usuário NÃO é pagante
+  if (!isPaid) {
+    // Se ele está tentando acessar a página de pagamento, permite
+    if (allowedPathsForUnpaid.includes(currentPath)) {
+      return <Outlet />;
+    }
+    // Se ele está tentando acessar qualquer outra rota protegida (dashboard, perfil, configurações, upgrade),
+    // redireciona-o para a página de pagamento.
+    return <Navigate to="/payment" replace />;
   }
 
+  // Se o usuário É pagante
+  // Se um usuário pagante de alguma forma cair na página de pagamento, redireciona-o para o dashboard
+  // (a menos que esteja explicitamente passando por um fluxo de upgrade, que seria tratado por estado,
+  // mas para simplicidade, se ele é pagante e está em /payment, assume-se que não deveria estar lá).
+  if (isPaid && currentPath === '/payment') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Se o usuário é pagante e está em qualquer outra rota protegida, permite o acesso
   return <Outlet />;
 };
 
