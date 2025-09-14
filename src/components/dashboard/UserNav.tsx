@@ -18,7 +18,6 @@ export function UserNav() {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/');
   };
 
   const getInitials = (email: string | undefined) => {
