@@ -10,10 +10,20 @@ import { supabase } from '@/lib/supabaseClient';
 import { showError, showSuccess } from '@/utils/toast';
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const profileSchema = z.object({
   fullName: z.string().min(3, { message: "O nome completo deve ter pelo menos 3 caracteres." }),
   avatarUrl: z.string().url({ message: "Por favor, insira uma URL de imagem válida." }).or(z.literal('')),
+  companyName: z.string().optional(),
+  whatsapp: z.string().min(10, { message: "WhatsApp é obrigatório e deve ter pelo menos 10 dígitos." }),
+  howDidYouHear: z.string().min(1, { message: "Por favor, selecione uma opção." }),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -22,11 +32,14 @@ const Profile = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<ProfileFormValues>({
+  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: user?.user_metadata?.full_name || '',
       avatarUrl: user?.user_metadata?.avatar_url || '',
+      companyName: user?.user_metadata?.company_name || '',
+      whatsapp: user?.user_metadata?.whatsapp || '',
+      howDidYouHear: user?.user_metadata?.how_did_you_hear || '',
     },
   });
 
@@ -51,6 +64,9 @@ const Profile = () => {
       data: {
         full_name: data.fullName,
         avatar_url: data.avatarUrl,
+        company_name: data.companyName,
+        whatsapp: data.whatsapp,
+        how_did_you_hear: data.howDidYouHear,
       }
     });
 
@@ -96,6 +112,44 @@ const Profile = () => {
                 {...register('fullName')}
               />
               {errors.fullName && <p className="text-sm text-red-500">{errors.fullName.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="companyName">Nome da sua Empresa (opcional)</Label>
+              <Input
+                id="companyName"
+                placeholder="Nome da Empresa"
+                {...register('companyName')}
+              />
+              {errors.companyName && <p className="text-sm text-red-500">{errors.companyName.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="whatsapp">WhatsApp</Label>
+              <Input
+                id="whatsapp"
+                type="tel"
+                placeholder="(XX) XXXXX-XXXX"
+                {...register('whatsapp')}
+              />
+              {errors.whatsapp && <p className="text-sm text-red-500">{errors.whatsapp.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="howDidYouHear">Como nos conheceu?</Label>
+              <Select onValueChange={(value) => setValue('howDidYouHear', value)} defaultValue={user?.user_metadata?.how_did_you_hear || ''}>
+                <SelectTrigger id="howDidYouHear">
+                  <SelectValue placeholder="Escolha uma opção" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="google">Google</SelectItem>
+                  <SelectItem value="social_media">Redes Sociais</SelectItem>
+                  <SelectItem value="friend_referral">Indicação de Amigo</SelectItem>
+                  <SelectItem value="event">Evento</SelectItem>
+                  <SelectItem value="other">Outro</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.howDidYouHear && <p className="text-sm text-red-500">{errors.howDidYouHear.message}</p>}
             </div>
 
             <div className="space-y-2">
