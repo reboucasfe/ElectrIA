@@ -3,13 +3,25 @@ import { Button } from '@/components/ui/button';
 import { Zap } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-export const Header = () => {
+interface HeaderProps {
+  onOpenRegisterModal?: () => void;
+}
+
+export const Header = ({ onOpenRegisterModal }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/login');
+  };
+
+  const handleStartNowClick = () => {
+    if (onOpenRegisterModal) {
+      onOpenRegisterModal();
+    } else {
+      navigate('/register'); // Fallback if prop is not provided (shouldn't happen in App.tsx)
+    }
   };
 
   return (
@@ -33,7 +45,7 @@ export const Header = () => {
           ) : (
             <>
               <Button variant="ghost" onClick={() => navigate('/login')}>Login</Button>
-              <Button onClick={() => navigate('/register')} className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
+              <Button onClick={handleStartNowClick} className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
             </>
           )}
         </div>

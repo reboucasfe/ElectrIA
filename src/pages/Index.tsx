@@ -8,14 +8,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Badge } from "@/components/ui/badge";
 import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle } from "lucide-react";
 import { Header } from "@/components/Header";
-import RegisterModal from "@/components/RegisterModal"; // Import the new modal
 
-const Index = () => {
+interface IndexProps {
+  onOpenRegisterModal: () => void;
+}
+
+const Index = ({ onOpenRegisterModal }: IndexProps) => {
   const [billingCycle, setBillingCycle] = useState('annual');
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false); // State for modal
 
   useEffect(() => {
     if (location.hash) {
@@ -48,7 +50,7 @@ const Index = () => {
     if (user) {
       navigate('/upgrade');
     } else {
-      setIsRegisterModalOpen(true); // Open modal for registration
+      onOpenRegisterModal(); // Open modal for registration
     }
   };
 
@@ -56,7 +58,7 @@ const Index = () => {
     if (user) {
       navigate('/dashboard');
     } else {
-      setIsRegisterModalOpen(true); // Open modal for registration
+      onOpenRegisterModal(); // Open modal for registration
     }
   };
 
@@ -64,14 +66,14 @@ const Index = () => {
     if (user) {
       navigate('/upgrade');
     } else {
-      setIsRegisterModalOpen(true); // Open modal for registration
+      onOpenRegisterModal(); // Open modal for registration
     }
   };
 
   return (
     <TooltipProvider>
     <div className="bg-white text-gray-800">
-      <Header />
+      <Header onOpenRegisterModal={onOpenRegisterModal} />
 
       <main>
         {/* Hero Section */}
@@ -88,7 +90,7 @@ const Index = () => {
                 <Button
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 w-full sm:w-auto"
-                  onClick={handleHeroButtonClick} // Use new handler
+                  onClick={handleHeroButtonClick}
                 >
                   {user ? 'Ir para o Dashboard' : 'Começar Agora'} <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -227,7 +229,7 @@ const Index = () => {
                   </ul>
                 </CardContent>
                 <Button variant="outline" className="mt-8 w-full" onClick={handlePlanButtonClick}>
-                  {user ? 'Fazer Upgrade' : 'Começar Teste'}
+                  {user ? 'Fazer Upgrade' : 'Começar Agora'}
                 </Button>
               </Card>
               <Card className="p-8 flex flex-col shadow-lg border-2 border-blue-600 relative">
@@ -262,7 +264,7 @@ const Index = () => {
                   </ul>
                 </CardContent>
                 <Button className="mt-8 w-full bg-blue-600 hover:bg-blue-700" onClick={handlePlanButtonClick}>
-                  {user ? 'Fazer Upgrade' : 'Começar Teste'}
+                  {user ? 'Fazer Upgrade' : 'Começar Agora'}
                 </Button>
               </Card>
               <Card className="p-8 flex flex-col shadow-lg">
@@ -296,7 +298,7 @@ const Index = () => {
                   </ul>
                 </CardContent>
                 <Button variant="outline" className="mt-8 w-full" onClick={handlePlanButtonClick}>
-                  {user ? 'Fazer Upgrade' : 'Começar Teste'}
+                  {user ? 'Fazer Upgrade' : 'Começar Agora'}
                 </Button>
               </Card>
             </div>
@@ -332,9 +334,9 @@ const Index = () => {
             <Button
               size="lg"
               className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-10 py-7 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105"
-              onClick={handleFinalCTAClick} // Use new handler
+              onClick={handleFinalCTAClick}
             >
-              {user ? 'Ver Planos' : 'Começar Teste Grátis Agora'}
+              {user ? 'Ver Planos' : 'Começar Agora'}
             </Button>
             <p className="mt-6 text-sm text-blue-200 flex items-center justify-center"><ShieldCheck className="h-4 w-4 mr-2" /> Garantia de 30 dias e cancelamento fácil.</p>
           </div>
@@ -347,8 +349,6 @@ const Index = () => {
           <p>&copy; {new Date().getFullYear()} EletroProposta IA. Todos os direitos reservados.</p>
         </div>
       </footer>
-
-      <RegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />
     </div>
     </TooltipProvider>
   );

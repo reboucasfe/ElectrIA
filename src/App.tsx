@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +20,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Upgrade from "./pages/Upgrade";
 import WhatsAppButton from "./components/WhatsAppButton";
+import RegisterModal from "./components/RegisterModal"; // Import the new modal
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,8 @@ const SupabaseSetupMessage = () => (
 );
 
 const App = () => {
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
   if (!isSupabaseConfigured) {
     return <SupabaseSetupMessage />;
   }
@@ -61,7 +64,7 @@ const App = () => {
           <Sonner />
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Index onOpenRegisterModal={() => setIsRegisterModalOpen(true)} />} />
             
             {/* Auth Routes with Header */}
             <Route element={<AuthLayout />}>
@@ -84,6 +87,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
           <WhatsAppButton />
+          <RegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
