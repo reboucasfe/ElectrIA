@@ -13,12 +13,13 @@ interface HeaderProps {
 export const Header = ({ onOpenRegisterModal }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation(); // Adicionado useLocation
 
   const isPaid = useMemo(() => user?.user_metadata?.payment_status === 'paid', [user]);
 
   const handleSignOut = async () => {
     await signOut();
+    // Redireciona para a página inicial se estiver na página de pagamento, caso contrário, para o login
     if (location.pathname === '/payment') {
       navigate('/');
     } else {
@@ -65,7 +66,7 @@ export const Header = ({ onOpenRegisterModal }: HeaderProps) => {
             )
           ) : ( // Usuário NÃO está logado
             <>
-              <Button onClick={() => navigate('/login')} className="bg-blue-600 hover:bg-blue-700">Login</Button>
+              <Button variant="ghost" onClick={() => navigate('/login')}>Login</Button>
               <Button onClick={handleStartNowClick} className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
             </>
           )}
