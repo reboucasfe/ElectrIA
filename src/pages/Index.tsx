@@ -8,6 +8,21 @@ import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldC
 
 const Index = () => {
   const [billingCycle, setBillingCycle] = useState('annual');
+  const [dbStatus, setDbStatus] = useState<{ message: string; error?: string } | null>(null);
+
+  const checkDbConnection = async () => {
+    setDbStatus({ message: 'Testando conexão...' });
+    try {
+      const response = await fetch('/api/test-connection');
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Falha ao conectar');
+      }
+      setDbStatus({ message: data.message });
+    } catch (error) {
+      setDbStatus({ message: 'A conexão falhou!', error: error.message });
+    }
+  };
 
   const prices = {
     monthly: {
@@ -46,6 +61,27 @@ const Index = () => {
       </header>
 
       <main>
+        {/* DB Connection Test Section */}
+        <section className="py-8 px-4 bg-yellow-50 border-b border-yellow-200">
+          <div className="container mx-auto text-center">
+            <h2 className="text-2xl font-bold mb-4">Teste de Conexão com o Banco de Dados</h2>
+            <p className="text-gray-600 mb-4">
+              Clique no botão abaixo para verificar se a aplicação consegue se conectar ao banco de dados Supabase.
+            </p>
+            <Button onClick={checkDbConnection} disabled={dbStatus?.message === 'Testando conexão...'}>
+              {dbStatus?.message === 'Testando conexão...' ? 'Testando...' : 'Testar Conexão'}
+            </Button>
+            {dbStatus && dbStatus.message !== 'Testando conexão...' && (
+              <div className="mt-4 p-4 rounded-md bg-gray-100 inline-block">
+                <p className={`font-semibold ${dbStatus.error ? 'text-red-600' : 'text-green-600'}`}>
+                  {dbStatus.message}
+                </p>
+                {dbStatus.error && <p className="text-sm text-red-500 mt-2">Verifique se a variável de ambiente DATABASE_URL está configurada corretamente.</p>}
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* Hero Section */}
         <section className="relative text-center md:text-left py-20 px-4 md:py-32">
           <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
