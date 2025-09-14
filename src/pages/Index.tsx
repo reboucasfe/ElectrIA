@@ -72,7 +72,7 @@ const Index = () => {
                   className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 w-full sm:w-auto"
                   onClick={() => navigate(user ? '/dashboard' : '/register')}
                 >
-                  {user ? 'Ir para o Dashboard' : 'Começar Teste Grátis'} <ArrowRight className="ml-2 h-5 w-5" />
+                  {user ? 'Ir para o Dashboard' : 'Começar Agora'} <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
               <p className="mt-6 text-sm text-gray-500">Confiado por mais de 500 eletricistas em todo o Brasil.</p>
