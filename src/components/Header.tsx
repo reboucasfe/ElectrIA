@@ -20,9 +20,9 @@ export const Header = () => {
           <span className="text-xl font-bold text-gray-900">EletroProposta IA</span>
         </Link>
         <div className="hidden md:flex items-center space-x-8">
-          <a href="/#como-funciona" className="text-gray-600 hover:text-blue-600 transition-colors">Como Funciona</a>
-          <a href="/#precos" className="text-gray-600 hover:text-blue-600 transition-colors">Preços</a>
-          <a href="/#faq" className="text-gray-600 hover:text-blue-600 transition-colors">FAQ</a>
+          <Link to="/#como-funciona" className="text-gray-600 hover:text-blue-600 transition-colors">Como Funciona</Link>
+          <Link to="/#precos" className="text-gray-600 hover:text-blue-600 transition-colors">Preços</Link>
+          <Link to="/#faq" className="text-gray-600 hover:text-blue-600 transition-colors">FAQ</Link>
         </div>
         <div className="flex items-center space-x-4">
           {user ? (
