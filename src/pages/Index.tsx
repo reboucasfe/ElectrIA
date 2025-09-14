@@ -10,7 +10,7 @@ import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldC
 import { Header } from "@/components/Header";
 
 const Index = () => {
-  const [billingCycle, setBillingCycle] = useState('annual'); // Alterado para 'annual'
+  const [billingCycle, setBillingCycle] = useState('annual');
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,15 +28,15 @@ const Index = () => {
   }, [location]);
 
   const prices = {
-    monthly: {
-      basic: 127,
-      professional: 197,
-      enterprise: 347,
-    },
     annual: {
-      basic: Math.round(127 * 0.75),
-      professional: Math.round(197 * 0.75),
-      enterprise: Math.round(347 * 0.75),
+      essencial: 127,
+      professional: 147,
+      premium: 347,
+    },
+    monthly: {
+      essencial: Math.round(127 * 1.25), // 25% acima do anual
+      professional: Math.round(147 * 1.25), // 25% acima do anual
+      premium: Math.round(347 * 1.25), // 25% acima do anual
     }
   };
 
@@ -179,10 +179,10 @@ const Index = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               <Card className="p-8 flex flex-col shadow-lg">
-                <CardHeader className="p-0 mb-6"><CardTitle>Básico</CardTitle></CardHeader>
+                <CardHeader className="p-0 mb-6"><CardTitle>Essencial</CardTitle></CardHeader>
                 <CardContent className="p-0 flex-grow">
-                  <p className="text-4xl font-bold mb-2">R$ {displayPrice.basic}<span className="text-lg font-normal text-gray-500">/mês</span></p>
-                  {billingCycle === 'annual' && <p className="text-sm text-gray-500 mb-2">Cobrado R$ {displayPrice.basic * 12} anualmente</p>}
+                  <p className="text-4xl font-bold mb-2">R$ {displayPrice.essencial}<span className="text-lg font-normal text-gray-500">/mês</span></p>
+                  {billingCycle === 'annual' && <p className="text-sm text-gray-500 mb-2">Cobrado R$ {prices.annual.essencial * 12} anualmente</p>}
                   <p className="text-gray-500 mb-6">Ideal para autônomos</p>
                   <ul className="space-y-3 text-gray-600 text-left">
                     <li className="flex items-center justify-between">
@@ -217,7 +217,7 @@ const Index = () => {
                 <CardHeader className="p-0 mb-6"><CardTitle>Profissional</CardTitle></CardHeader>
                 <CardContent className="p-0 flex-grow">
                   <p className="text-4xl font-bold mb-2">R$ {displayPrice.professional}<span className="text-lg font-normal text-gray-500">/mês</span></p>
-                  {billingCycle === 'annual' && <p className="text-sm text-gray-500 mb-2">Cobrado R$ {displayPrice.professional * 12} anualmente</p>}
+                  {billingCycle === 'annual' && <p className="text-sm text-gray-500 mb-2">Cobrado R$ {prices.annual.professional * 12} anualmente</p>}
                   <p className="text-gray-500 mb-6">Para quem busca crescer</p>
                   <ul className="space-y-3 text-gray-600 text-left">
                     <li className="flex items-center justify-between">
@@ -248,10 +248,10 @@ const Index = () => {
                 </Button>
               </Card>
               <Card className="p-8 flex flex-col shadow-lg">
-                <CardHeader className="p-0 mb-6"><CardTitle>Enterprise</CardTitle></CardHeader>
+                <CardHeader className="p-0 mb-6"><CardTitle>Premium</CardTitle></CardHeader>
                 <CardContent className="p-0 flex-grow">
-                  <p className="text-4xl font-bold mb-2">R$ {displayPrice.enterprise}<span className="text-lg font-normal text-gray-500">/mês</span></p>
-                  {billingCycle === 'annual' && <p className="text-sm text-gray-500 mb-2">Cobrado R$ {displayPrice.enterprise * 12} anualmente</p>}
+                  <p className="text-4xl font-bold mb-2">R$ {displayPrice.premium}<span className="text-lg font-normal text-gray-500">/mês</span></p>
+                  {billingCycle === 'annual' && <p className="text-sm text-gray-500 mb-2">Cobrado R$ {prices.annual.premium * 12} anualmente</p>}
                   <p className="text-gray-500 mb-6">Para equipes e empresas</p>
                   <ul className="space-y-3 text-gray-600 text-left">
                     <li className="flex items-center justify-between">
