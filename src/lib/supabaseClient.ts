@@ -16,7 +16,3 @@ export const supabase = createClient(
 if (!isSupabaseConfigured) {
   console.warn("Supabase environment variables are not set. Displaying configuration notice.");
 }
-
-// Adicionando logs para depuração
-console.log("VITE_SUPABASE_URL (from app):", supabaseUrl);
-console.log("VITE_SUPABASE_ANON_KEY (from app):", supabaseAnonKey);
