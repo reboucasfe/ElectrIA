@@ -197,7 +197,11 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
             {errors.howDidYouHear && <p className="text-sm text-red-500">{errors.howDidYouHear.message}</p>}
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="hasCoupon" {...register('hasCoupon')} />
+            <Checkbox
+              id="hasCoupon"
+              checked={hasCouponValue}
+              onCheckedChange={(checked) => setValue('hasCoupon', checked)}
+            />
             <Label htmlFor="hasCoupon" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Tenho um cupom
             </Label>
