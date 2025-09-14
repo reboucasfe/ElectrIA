@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -64,6 +64,15 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
 
   const hasCouponValue = watch('hasCoupon');
 
+  // Adicionado useEffect para logar os props quando o modal abre
+  useEffect(() => {
+    if (isOpen) {
+      console.log("RegisterModal opened. Props received:");
+      console.log("  selectedPlanId:", selectedPlanId);
+      console.log("  selectedBillingCycle:", selectedBillingCycle);
+    }
+  }, [isOpen, selectedPlanId, selectedBillingCycle]);
+
   const onSubmit = async (data: RegisterFormValues) => {
     if (data.password !== data.confirmPassword) {
       showError("As senhas não coincidem.");
@@ -95,15 +104,15 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
         showError(error.message);
       }
     } else {
-      showSuccess('Cadastro realizado com sucesso! Redirecionando para o pagamento...'); // Reintroduzido o toast de sucesso
+      showSuccess('Cadastro realizado com sucesso! Redirecionando para o pagamento...');
       reset();
       onClose();
-      console.log("Attempting navigation from RegisterModal.");
-      console.log("selectedPlanId:", selectedPlanId);
-      console.log("selectedBillingCycle:", selectedBillingCycle);
+      // Lógica de redirecionamento mais robusta
       if (selectedPlanId && selectedBillingCycle) {
+        console.log("RegisterModal: Navigating to /payment with state:", { planId: selectedPlanId, billingCycle: selectedBillingCycle });
         navigate('/payment', { state: { planId: selectedPlanId, billingCycle: selectedBillingCycle } });
       } else {
+        console.log("RegisterModal: No plan selected, navigating to /upgrade.");
         navigate('/upgrade'); // Fallback if no plan was pre-selected
       }
     }
