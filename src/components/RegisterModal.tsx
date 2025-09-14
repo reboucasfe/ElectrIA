@@ -82,7 +82,12 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
     });
 
     if (error) {
-      showError(error.message);
+      // Intercepta a mensagem de erro do Supabase para "usuário já registrado"
+      if (error.message === 'User already registered') {
+        showError('Este e-mail já está cadastrado. Por favor, faça login ou use outro e-mail.');
+      } else {
+        showError(error.message);
+      }
     } else {
       showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.');
       reset();

@@ -23,7 +23,7 @@ const Login = () => {
     if (error) {
       showError(error.message);
     } else {
-      showSuccess('Login successful!');
+      showSuccess('Login realizado com sucesso!');
       navigate('/dashboard');
     }
     setLoading(false);
