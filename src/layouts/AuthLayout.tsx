@@ -3,13 +3,12 @@ import { Outlet } from 'react-router-dom';
 
 interface AuthLayoutProps {
   onOpenRegisterModal: () => void;
-  onOpenLoginModal: () => void; // Nova prop
 }
 
-const AuthLayout = ({ onOpenRegisterModal, onOpenLoginModal }: AuthLayoutProps) => {
+const AuthLayout = ({ onOpenRegisterModal }: AuthLayoutProps) => {
   return (
     <>
-      <Header onOpenRegisterModal={onOpenRegisterModal} onOpenLoginModal={onOpenLoginModal} />
+      <Header onOpenRegisterModal={onOpenRegisterModal} />
       <main className="flex items-center justify-center py-20 bg-gray-50 min-h-[calc(100vh-80px)]">
         <Outlet />
       </main>
