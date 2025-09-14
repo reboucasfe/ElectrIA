@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
@@ -11,57 +11,88 @@ import { showError, showSuccess } from '@/utils/toast';
 import { CreditCard, QrCode, CheckCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const formatCurrency = (value: number) => {
+  return value.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+};
 
 const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
   const [loading, setLoading] = useState(false);
+  const [installments, setInstallments] = useState('1');
   const navigate = useNavigate();
   const location = useLocation();
-  const { planId, billingCycle } = (location.state || {}) as { planId?: string, billingCycle?: string };
+  const { planId = 'professional', billingCycle = 'annual' } = (location.state || {}) as { planId?: string, billingCycle?: string };
   const { user } = useAuth();
+
+  const { totalPrice, planTitle, cycleText } = useMemo(() => {
+    const prices = {
+      essencial: 127,
+      professional: 147,
+      premium: 347,
+    };
+    const titles = {
+      essencial: 'Plano Essencial',
+      professional: 'Plano Profissional',
+      premium: 'Plano Premium',
+    };
+    const planKey = planId as keyof typeof prices;
+    const monthlyPrice = prices[planKey] || prices.professional;
+    const planTitle = titles[planKey] || titles.professional;
+    let totalPrice = 0;
+    let cycleText = '';
+
+    if (billingCycle === 'annual') {
+      totalPrice = monthlyPrice * 12;
+      cycleText = 'Anual';
+    } else {
+      totalPrice = Math.round(monthlyPrice * 1.25);
+      cycleText = 'Mensal';
+    }
+    return { totalPrice, planTitle, cycleText };
+  }, [planId, billingCycle]);
+
+  const installmentOptions = useMemo(() => {
+    const options = [];
+    for (let i = 1; i <= 12; i++) {
+      const installmentValue = formatCurrency(totalPrice / i);
+      options.push(
+        <SelectItem key={i} value={String(i)}>
+          {i}x de {installmentValue}
+        </SelectItem>
+      );
+    }
+    return options;
+  }, [totalPrice]);
 
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simula um processamento de pagamento
     await new Promise(resolve => setTimeout(resolve, 2000));
-
     if (user) {
-      // Atualiza o status de pagamento do usuário para 'paid'
       const { error: updateError } = await supabase.auth.updateUser({
-        data: {
-          payment_status: 'paid',
-          // Você pode adicionar aqui o planId e billingCycle ao user_metadata se desejar
-          // current_plan_id: planId,
-          // current_billing_cycle: billingCycle,
-        }
+        data: { payment_status: 'paid' }
       });
-
       if (updateError) {
         showError(`Erro ao atualizar status de pagamento: ${updateError.message}`);
         setLoading(false);
         return;
       }
     }
-
     setLoading(false);
     showSuccess("Pagamento simulado com sucesso! Redirecionando para o dashboard.");
-    navigate('/dashboard'); // Redireciona para o dashboard após a simulação
+    navigate('/dashboard');
   };
-
-  const getPlanTitle = (id?: string) => {
-    switch (id) {
-      case 'essencial': return 'Plano Essencial';
-      case 'professional': return 'Plano Profissional';
-      case 'premium': return 'Plano Premium';
-      default: return 'Plano Selecionado';
-    }
-  };
-
-  const isExistingPayingCustomer = user?.user_metadata?.payment_status === 'paid';
-  const actionText = isExistingPayingCustomer ? 'fazendo upgrade para' : 'adquirindo';
-
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
@@ -69,19 +100,18 @@ const PaymentPage = () => {
         <CardHeader>
           <CardTitle className="text-2xl">Finalizar Pagamento</CardTitle>
           <CardDescription>
-            Você está {actionText} o <span className="font-semibold">{getPlanTitle(planId)}</span> ({billingCycle === 'annual' ? 'Anual' : 'Mensal'}).
-            Escolha seu método de pagamento e conclua a compra.
+            Você está adquirindo o <span className="font-semibold">{planTitle} ({cycleText})</span>.
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="bg-gray-100 p-4 rounded-lg mb-6 text-center">
+            <p className="text-sm text-gray-600">Valor Total</p>
+            <p className="text-3xl font-bold">{formatCurrency(totalPrice)}</p>
+          </div>
           <form onSubmit={handlePaymentSubmit} className="space-y-6">
             <div className="space-y-4">
               <Label className="text-base">Método de Pagamento</Label>
-              <RadioGroup
-                value={paymentMethod}
-                onValueChange={setPaymentMethod}
-                className="grid grid-cols-1 md:grid-cols-2 gap-4"
-              >
+              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2 border p-4 rounded-md cursor-pointer hover:bg-gray-50">
                   <RadioGroupItem value="creditCard" id="creditCard" />
                   <Label htmlFor="creditCard" className="flex items-center gap-2 text-base font-normal cursor-pointer">
@@ -117,14 +147,22 @@ const PaymentPage = () => {
                   <Label htmlFor="cardName">Nome no Cartão</Label>
                   <Input id="cardName" placeholder="Nome Completo" required />
                 </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="installments">Parcelas</Label>
+                  <Select value={installments} onValueChange={setInstallments}>
+                    <SelectTrigger id="installments">
+                      <SelectValue placeholder="Selecione o número de parcelas" />
+                    </SelectTrigger>
+                    <SelectContent>{installmentOptions}</SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
 
             {paymentMethod === 'pix' && (
               <div className="space-y-4 text-center animate-in fade-in-0 slide-in-from-top-2 duration-300">
                 <p className="text-gray-600">
-                  Ao clicar em "Concluir Pagamento", um código Pix será gerado para você.
-                  Você terá um tempo limitado para escanear o QR Code ou copiar o código e realizar o pagamento.
+                  Ao clicar em "Concluir Pagamento", um QR Code será gerado para você.
                 </p>
                 <div className="flex items-center justify-center text-green-600 font-semibold gap-2">
                   <CheckCircle className="h-5 w-5" /> Pagamento instantâneo e seguro.
@@ -133,15 +171,9 @@ const PaymentPage = () => {
             )}
 
             <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
-              {loading ? 'Processando...' : 'Concluir Pagamento'}
+              {loading ? 'Processando...' : `Pagar ${formatCurrency(totalPrice)}`}
             </Button>
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="w-full mt-2" 
-              onClick={() => navigate('/')}
-              disabled={loading}
-            >
+            <Button type="button" variant="outline" className="w-full mt-2" onClick={() => navigate('/')} disabled={loading}>
               Selecionar Outro Plano
             </Button>
           </form>
