@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, User, Settings } from 'lucide-react';
+import { LayoutDashboard, User, Settings, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const Sidebar = () => {
   const navItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { href: '/upgrade', icon: Zap, label: 'Eletro Proposta' },
     { href: '/profile', icon: User, label: 'Perfil' },
     { href: '/settings', icon: Settings, label: 'Configurações' },
   ];

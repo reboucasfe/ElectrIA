@@ -17,6 +17,7 @@ import UpdatePassword from "./pages/UpdatePassword";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import Upgrade from "./pages/Upgrade";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/upgrade" element={<Upgrade />} />
               </Route>
             </Route>
 
