@@ -28,6 +28,7 @@ const registerFormSchema = z.object({
   confirmPassword: z.string(),
   howDidYouHear: z.string().min(1, { message: "Por favor, selecione uma opção." }),
   hasCoupon: z.boolean().default(false).optional(),
+  couponCode: z.string().optional(),
 });
 
 type RegisterFormValues = z.infer<typeof registerFormSchema>;
@@ -41,7 +42,7 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<RegisterFormValues>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
       fullName: "",
@@ -52,8 +53,11 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
       confirmPassword: "",
       howDidYouHear: "",
       hasCoupon: false,
+      couponCode: "",
     },
   });
+
+  const hasCouponValue = watch('hasCoupon');
 
   const onSubmit = async (data: RegisterFormValues) => {
     if (data.password !== data.confirmPassword) {
@@ -72,6 +76,7 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
           whatsapp: data.whatsapp,
           how_did_you_hear: data.howDidYouHear,
           has_coupon: data.hasCoupon,
+          coupon_code: data.couponCode,
         },
       },
     });
@@ -88,7 +93,6 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
   };
 
   const handleOverlayMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Fecha o modal apenas se o clique for diretamente no overlay (fundo)
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -193,6 +197,17 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
               Tenho um cupom
             </Label>
           </div>
+          
+          {hasCouponValue && (
+            <div className="grid gap-2 animate-in fade-in-0 slide-in-from-top-2 duration-300">
+              <Input
+                id="couponCode"
+                placeholder="inserir cupom de desconto"
+                {...register('couponCode')}
+              />
+            </div>
+          )}
+
           <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
             {loading ? 'Criando Conta...' : 'Criar Conta'}
           </Button>
