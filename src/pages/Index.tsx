@@ -5,9 +5,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle } from "lucide-react";
+import { Header } from "@/components/Header";
 
 const Index = () => {
-  const [billingCycle, setBillingCycle] = useState('annual');
+  const [billingCycle, setBillingCycle] = useState('monthly');
 
   const prices = {
     monthly: {
@@ -16,9 +17,9 @@ const Index = () => {
       enterprise: 347,
     },
     annual: {
-      basic: 97,
-      professional: 147,
-      enterprise: 247,
+      basic: Math.round(127 * 0.75),
+      professional: Math.round(197 * 0.75),
+      enterprise: Math.round(347 * 0.75),
     }
   };
 
@@ -26,24 +27,7 @@ const Index = () => {
 
   return (
     <div className="bg-white text-gray-800">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
-        <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <Zap className="h-8 w-8 text-blue-600 mr-2" />
-            <span className="text-xl font-bold text-gray-900">EletroProposta IA</span>
-          </div>
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#como-funciona" className="text-gray-600 hover:text-blue-600 transition-colors">Como Funciona</a>
-            <a href="#precos" className="text-gray-600 hover:text-blue-600 transition-colors">Preços</a>
-            <a href="#faq" className="text-gray-600 hover:text-blue-600 transition-colors">FAQ</a>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost">Login</Button>
-            <Button className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
-          </div>
-        </nav>
-      </header>
+      <Header />
 
       <main>
         {/* Hero Section */}
