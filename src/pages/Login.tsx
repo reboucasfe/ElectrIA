@@ -6,12 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { showError, showSuccess } from '@/utils/toast';
-import { FaGoogle } from 'react-icons/fa'; // Importando o ícone do Google
+import { FaGoogle } from 'react-icons/fa';
+import { Eye, EyeOff } from 'lucide-react'; // Importando os ícones de olho
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Novo estado para alternar a visibilidade da senha
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -32,7 +34,7 @@ const Login = () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/dashboard', // Redireciona para o dashboard após o login
+        redirectTo: window.location.origin + '/dashboard',
       },
     });
 
@@ -50,7 +52,7 @@ const Login = () => {
     }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/update-password', // Você precisará criar esta rota
+      redirectTo: window.location.origin + '/update-password',
     });
 
     if (error) {
@@ -95,13 +97,30 @@ const Login = () => {
                     Esqueceu a senha?
                   </Button>
                 </div>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  required 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="relative"> {/* Adicionado um div para posicionar o ícone */}
+                  <Input 
+                    id="password" 
+                    type={showPassword ? 'text' : 'password'} // Alterna o tipo do input
+                    required 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pr-10" // Adiciona padding à direita para o ícone
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword((prev) => !prev)} // Alterna a visibilidade
+                    disabled={loading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </div>
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? 'Entrando...' : 'Login'}
