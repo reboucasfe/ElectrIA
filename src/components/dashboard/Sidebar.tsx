@@ -1,12 +1,12 @@
 import { NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, User, Settings, Zap, Crown } from 'lucide-react'; // Importando Crown
+import { LayoutDashboard, User, Settings, Zap, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const Sidebar = () => {
   const navItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { href: '/upgrade', icon: Crown, label: 'Upgrade Plano' }, // Alterado para Crown e 'Upgrade Plano'
-    { href: '/profile', icon: User, label: 'Perfil' },
+    { href: '/profile', icon: User, label: 'Perfil' }, // Perfil movido para cima
+    { href: '/upgrade', icon: Crown, label: 'Upgrade Plano' }, // Upgrade Plano movido para baixo
     { href: '/settings', icon: Settings, label: 'Configurações' },
   ];
 
