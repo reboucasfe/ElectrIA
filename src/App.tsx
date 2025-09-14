@@ -19,6 +19,7 @@ import AuthLayout from "./layouts/AuthLayout";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Upgrade from "./pages/Upgrade";
+import WhatsAppButton from "./components/WhatsAppButton";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,7 @@ const App = () => {
             {/* Catch-all Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <WhatsAppButton />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
