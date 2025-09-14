@@ -21,6 +21,7 @@ import Settings from "./pages/Settings";
 import Upgrade from "./pages/Upgrade";
 import WhatsAppButton from "./components/WhatsAppButton";
 import RegisterModal from "./components/RegisterModal"; // Import the new modal
+import PaymentPage from "./pages/PaymentPage"; // Import the new PaymentPage
 
 const queryClient = new QueryClient();
 
@@ -80,6 +81,7 @@ const App = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/upgrade" element={<Upgrade />} />
+                <Route path="/payment" element={<PaymentPage />} /> {/* New payment route */}
               </Route>
             </Route>
 

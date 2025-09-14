@@ -1,9 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Zap } from "lucide-react";
-import { showError } from "@/utils/toast";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 
 const Upgrade = () => {
+  const navigate = useNavigate(); // Inicializar useNavigate
+
   const premiumFeatures = [
     "Geração ilimitada de propostas com IA",
     "Integração completa com WhatsApp Business",
@@ -13,7 +15,7 @@ const Upgrade = () => {
   ];
 
   const handleUpgradeClick = () => {
-    showError("A integração com o sistema de pagamentos ainda não foi implementada.");
+    navigate('/payment'); // Redireciona para a página de pagamento simulada
   };
 
   return (
