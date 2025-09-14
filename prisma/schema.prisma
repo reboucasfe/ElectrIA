@@ -10,10 +10,64 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Placeholder model to allow `prisma generate` to succeed.
-// You can replace this with your actual data models later.
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String? // Para autenticação futura
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  calculations Calculation[]
+}
+
+model Calculation {
+  id                String   @id @default(cuid())
+  inputExpression   String
+  result            String
+  calculationDate   DateTime @default(now())
+  metadata          Json? // Para dados extras, como tipo de cálculo, etc.
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  whatsappConversation WhatsappConversation?
+}
+
+enum ConversationStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  FAILED
+}
+
+model WhatsappConversation {
+  id               String             @id @default(cuid())
+  whatsappThreadId String             @unique // ID da conversa no WhatsApp
+  startTime        DateTime           @default(now())
+  endTime          DateTime?
+  status           ConversationStatus @default(PENDING)
+  transcript       Json? // Histórico da conversa em JSON
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  calculationId String      @unique
+  calculation   Calculation @relation(fields: [calculationId], references: [id], onDelete: Cascade)
+
+  aiResponses AIResponse[]
+}
+
+model AIResponse {
+  id             String   @id @default(cuid())
+  prompt         String
+  response       String
+  modelUsed      String? // Ex: 'gpt-4', 'claude-3'
+  responseTimeMs Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  conversationId String
+  conversation   WhatsappConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
