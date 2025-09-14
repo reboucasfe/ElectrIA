@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UpdatePassword from "./pages/UpdatePassword";
 import DashboardLayout from "./layouts/DashboardLayout";
+import AuthLayout from "./layouts/AuthLayout";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Upgrade from "./pages/Upgrade";
@@ -60,9 +61,13 @@ const App = () => {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/update-password" element={<UpdatePassword />} />
+            
+            {/* Auth Routes with Header */}
+            <Route element={<AuthLayout />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/update-password" element={<UpdatePassword />} />
+            </Route>
             
             {/* Protected Dashboard Routes */}
             <Route element={<ProtectedRoute />}>
