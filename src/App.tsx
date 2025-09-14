@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { isSupabaseConfigured } from "./lib/supabaseClient";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -15,7 +16,36 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const SupabaseSetupMessage = () => (
+  <div className="flex items-center justify-center h-screen bg-gray-100 p-4">
+    <div className="w-full max-w-lg p-8 bg-white rounded-lg shadow-xl text-center">
+      <h1 className="text-2xl font-bold text-red-600 mb-4">Configuration Needed</h1>
+      <p className="text-gray-700 mb-2">
+        Your Supabase connection details are missing.
+      </p>
+      <p className="text-gray-600 text-sm mb-6">
+        The application cannot start until you provide the Supabase URL and Anon Key.
+      </p>
+      <div className="text-left bg-gray-50 p-4 rounded-md border border-gray-200">
+        <h2 className="font-semibold text-gray-800 mb-2">What to do:</h2>
+        <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+          <li>Go to the <strong>Integrations</strong> tab in the Dyad UI.</li>
+          <li>Find the Supabase integration (or add it if it's not there).</li>
+          <li>Enter your project's <strong>URL</strong> and <strong>Anon Key</strong>.</li>
+          <li>Click <strong>Save</strong>.</li>
+          <li>Click the <strong>Rebuild</strong> button above the chat to apply the changes.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+);
+
+const App = () => {
+  if (!isSupabaseConfigured) {
+    return <SupabaseSetupMessage />;
+  }
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <BrowserRouter>
@@ -38,6 +68,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
