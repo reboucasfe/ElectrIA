@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { MdWhatsapp } from "react-icons/md"; // Importando um ícone diferente
 
 const WhatsAppButton = () => {
   // IMPORTANTE: Substitua este número pelo seu número de WhatsApp com o código do país.
@@ -20,9 +19,9 @@ const WhatsAppButton = () => {
         >
           <Button
             size="icon"
-            className="bg-green-500 hover:bg-green-600 text-white rounded-full h-14 w-14 shadow-lg flex items-center justify-center"
+            className="bg-green-500 hover:bg-green-600 text-white rounded-full h-14 w-14 shadow-lg flex items-center justify-center p-0"
           >
-            <MdWhatsapp className="h-7 w-7" /> {/* Usando o novo ícone */}
+            <img src="/whatsapp-icon.png" alt="WhatsApp" className="h-full w-full object-contain p-2" />
           </Button>
         </a>
       </TooltipTrigger>
