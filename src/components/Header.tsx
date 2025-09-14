@@ -1,6 +1,6 @@
 "use client";
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Zap } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,12 +13,18 @@ interface HeaderProps {
 export const Header = ({ onOpenRegisterModal }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation(); // Adicionado useLocation
 
   const isPaid = useMemo(() => user?.user_metadata?.payment_status === 'paid', [user]);
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/login');
+    // Redireciona para a página inicial se estiver na página de pagamento, caso contrário, para o login
+    if (location.pathname === '/payment') {
+      navigate('/');
+    } else {
+      navigate('/login');
+    }
   };
 
   const handleStartNowClick = () => {
