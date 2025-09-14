@@ -8,12 +8,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Badge } from "@/components/ui/badge";
 import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle } from "lucide-react";
 import { Header } from "@/components/Header";
+import RegisterDialog from "@/components/RegisterDialog"; // Importar o novo componente
 
 const Index = () => {
   const [billingCycle, setBillingCycle] = useState('annual');
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isRegisterDialogOpen, setIsRegisterDialogOpen] = useState(false); // Estado para controlar o diálogo
 
   useEffect(() => {
     if (location.hash) {
@@ -46,7 +48,7 @@ const Index = () => {
     if (user) {
       navigate('/upgrade');
     } else {
-      navigate('/register');
+      setIsRegisterDialogOpen(true); // Abrir o diálogo de registro
     }
   };
 
@@ -329,6 +331,9 @@ const Index = () => {
           <p>&copy; {new Date().getFullYear()} EletroProposta IA. Todos os direitos reservados.</p>
         </div>
       </footer>
+
+      {/* Register Dialog */}
+      <RegisterDialog isOpen={isRegisterDialogOpen} onClose={() => setIsRegisterDialogOpen(false)} />
     </div>
     </TooltipProvider>
   );
