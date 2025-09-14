@@ -1,14 +1,18 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle } from "lucide-react";
 import { Header } from "@/components/Header";
 
 const Index = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const prices = {
     monthly: {
@@ -25,7 +29,16 @@ const Index = () => {
 
   const displayPrice = prices[billingCycle];
 
+  const handlePlanButtonClick = () => {
+    if (user) {
+      navigate('/upgrade');
+    } else {
+      navigate('/register');
+    }
+  };
+
   return (
+    <TooltipProvider>
     <div className="bg-white text-gray-800">
       <Header />
 
@@ -44,8 +57,9 @@ const Index = () => {
                 <Button
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 w-full sm:w-auto"
+                  onClick={() => navigate(user ? '/dashboard' : '/register')}
                 >
-                  Começar Teste Grátis <ArrowRight className="ml-2 h-5 w-5" />
+                  {user ? 'Ir para o Dashboard' : 'Começar Teste Grátis'} <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
               <p className="mt-6 text-sm text-gray-500">Confiado por mais de 500 eletricistas em todo o Brasil.</p>
@@ -181,7 +195,9 @@ const Index = () => {
                     </li>
                   </ul>
                 </CardContent>
-                <Button variant="outline" className="mt-8 w-full">Começar Teste</Button>
+                <Button variant="outline" className="mt-8 w-full" onClick={handlePlanButtonClick}>
+                  {user ? 'Fazer Upgrade' : 'Começar Teste'}
+                </Button>
               </Card>
               <Card className="p-8 flex flex-col shadow-lg border-2 border-blue-600 relative">
                 <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold">MAIS POPULAR</div>
@@ -214,7 +230,9 @@ const Index = () => {
                     </li>
                   </ul>
                 </CardContent>
-                <Button className="mt-8 w-full bg-blue-600 hover:bg-blue-700">Começar Teste</Button>
+                <Button className="mt-8 w-full bg-blue-600 hover:bg-blue-700" onClick={handlePlanButtonClick}>
+                  {user ? 'Fazer Upgrade' : 'Começar Teste'}
+                </Button>
               </Card>
               <Card className="p-8 flex flex-col shadow-lg">
                 <CardHeader className="p-0 mb-6"><CardTitle>Enterprise</CardTitle></CardHeader>
@@ -246,7 +264,9 @@ const Index = () => {
                     </li>
                   </ul>
                 </CardContent>
-                <Button variant="outline" className="mt-8 w-full">Começar Teste</Button>
+                <Button variant="outline" className="mt-8 w-full" onClick={handlePlanButtonClick}>
+                  {user ? 'Fazer Upgrade' : 'Começar Teste'}
+                </Button>
               </Card>
             </div>
           </div>
@@ -281,8 +301,9 @@ const Index = () => {
             <Button
               size="lg"
               className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-10 py-7 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105"
+              onClick={() => navigate(user ? '/upgrade' : '/register')}
             >
-              Começar Teste Grátis Agora
+              {user ? 'Ver Planos' : 'Começar Teste Grátis Agora'}
             </Button>
             <p className="mt-6 text-sm text-blue-200 flex items-center justify-center"><ShieldCheck className="h-4 w-4 mr-2" /> Garantia de 30 dias e cancelamento fácil.</p>
           </div>
@@ -296,6 +317,7 @@ const Index = () => {
         </div>
       </footer>
     </div>
+    </TooltipProvider>
   );
 };
 

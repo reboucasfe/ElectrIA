@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { LayoutDashboard, User, Settings, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,7 +13,9 @@ const MobileSidebar = () => {
   return (
     <aside className="flex flex-col h-full bg-gray-50">
       <div className="p-4 border-b">
-        <h2 className="text-xl font-bold">EletroProposta IA</h2>
+        <Link to="/">
+          <h2 className="text-xl font-bold">EletroProposta IA</h2>
+        </Link>
       </div>
       <nav className="flex-1 p-4 space-y-2">
         {navItems.map((item) => (
