@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { showError, showSuccess } from '@/utils/toast';
-import { CreditCard, Pix, CheckCircle } from 'lucide-react';
+import { CreditCard, QrCode, CheckCircle } from 'lucide-react'; // 'Pix' foi substituído por 'QrCode'
 
 const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
@@ -51,7 +51,7 @@ const PaymentPage = () => {
                 <div className="flex items-center space-x-2 border p-4 rounded-md cursor-pointer hover:bg-gray-50">
                   <RadioGroupItem value="pix" id="pix" />
                   <Label htmlFor="pix" className="flex items-center gap-2 text-base font-normal cursor-pointer">
-                    <Pix className="h-5 w-5" /> Pix
+                    <QrCode className="h-5 w-5" /> Pix
                   </Label>
                 </div>
               </RadioGroup>
