@@ -20,6 +20,8 @@ const PaymentPage = () => {
   const { planId, billingCycle } = (location.state || {}) as { planId?: string, billingCycle?: string };
   const { user } = useAuth(); // Obter o usuário logado
 
+  const isNewUser = user?.user_metadata?.payment_status === 'pending';
+
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -59,13 +61,21 @@ const PaymentPage = () => {
     }
   };
 
+  const handleSelectAnotherPlan = () => {
+    if (isNewUser) {
+      navigate('/'); // Redireciona para a página inicial para novos usuários
+    } else {
+      navigate('/upgrade'); // Redireciona para a página de upgrade para usuários existentes
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle className="text-2xl">Finalizar Pagamento</CardTitle>
           <CardDescription>
-            Você está {planId === 'essencial' ? 'renovando' : 'fazendo upgrade para'} o <span className="font-semibold">{getPlanTitle(planId)}</span> ({billingCycle === 'annual' ? 'Anual' : 'Mensal'}).
+            Você está {isNewUser ? 'iniciando' : (planId === 'essencial' ? 'renovando' : 'fazendo upgrade para')} o <span className="font-semibold">{getPlanTitle(planId)}</span> ({billingCycle === 'annual' ? 'Anual' : 'Mensal'}).
             Escolha seu método de pagamento e conclua a compra.
           </CardDescription>
         </CardHeader>
@@ -135,7 +145,7 @@ const PaymentPage = () => {
               type="button" 
               variant="outline" 
               className="w-full mt-2" 
-              onClick={() => navigate('/upgrade')}
+              onClick={handleSelectAnotherPlan}
               disabled={loading}
             >
               Selecionar Outro Plano
