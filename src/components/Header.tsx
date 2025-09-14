@@ -8,18 +8,18 @@ import { useMemo } from 'react';
 
 interface HeaderProps {
   onOpenRegisterModal?: (planId?: string, billingCycle?: 'monthly' | 'annual') => void;
+  onOpenLoginModal?: () => void; // Nova prop para abrir o modal de login
 }
 
-export const Header = ({ onOpenRegisterModal }: HeaderProps) => {
+export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation(); // Adicionado useLocation
+  const location = useLocation();
 
   const isPaid = useMemo(() => user?.user_metadata?.payment_status === 'paid', [user]);
 
   const handleSignOut = async () => {
     await signOut();
-    // Redireciona para a página inicial se estiver na página de pagamento, caso contrário, para o login
     if (location.pathname === '/payment') {
       navigate('/');
     } else {
@@ -37,6 +37,14 @@ export const Header = ({ onOpenRegisterModal }: HeaderProps) => {
 
   const handleFinalizeSubscriptionClick = () => {
     navigate('/payment');
+  };
+
+  const handleLoginClick = () => { // Nova função para o clique do botão Login
+    if (onOpenLoginModal) {
+      onOpenLoginModal();
+    } else {
+      navigate('/login'); // Fallback se a prop não for fornecida
+    }
   };
 
   return (
@@ -66,7 +74,7 @@ export const Header = ({ onOpenRegisterModal }: HeaderProps) => {
             )
           ) : ( // Usuário NÃO está logado
             <>
-              <Button variant="ghost" onClick={() => navigate('/login')}>Login</Button>
+              <Button variant="ghost" onClick={handleLoginClick}>Login</Button> {/* Usar handleLoginClick */}
               <Button onClick={handleStartNowClick} className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
             </>
           )}

@@ -21,6 +21,7 @@ import Settings from "./pages/Settings";
 import Upgrade from "./pages/Upgrade";
 import WhatsAppButton from "./components/WhatsAppButton";
 import RegisterModal from "./components/RegisterModal";
+import LoginModal from "./components/LoginModal"; // Importar LoginModal
 import PaymentPage from "./pages/PaymentPage";
 
 const queryClient = new QueryClient();
@@ -53,12 +54,17 @@ const App = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [selectedPlanIdForRegister, setSelectedPlanIdForRegister] = useState<string | undefined>(undefined);
   const [selectedBillingCycleForRegister, setSelectedBillingCycleForRegister] = useState<'monthly' | 'annual' | undefined>(undefined);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // Novo estado para o LoginModal
 
   const handleOpenRegisterModal = (planId?: string, billingCycle?: 'monthly' | 'annual') => {
     console.log("App.tsx: handleOpenRegisterModal received planId:", planId, "and billingCycle:", billingCycle);
     setSelectedPlanIdForRegister(planId);
     setSelectedBillingCycleForRegister(billingCycle);
     setIsRegisterModalOpen(true);
+  };
+
+  const handleOpenLoginModal = () => { // Nova função para abrir o LoginModal
+    setIsLoginModalOpen(true);
   };
 
   if (!isSupabaseConfigured) {
@@ -77,7 +83,7 @@ const App = () => {
             <Route path="/" element={<Index onOpenRegisterModal={handleOpenRegisterModal} />} />
             
             {/* Auth Routes with Header */}
-            <Route element={<AuthLayout onOpenRegisterModal={handleOpenRegisterModal} />}>
+            <Route element={<AuthLayout onOpenRegisterModal={handleOpenRegisterModal} onOpenLoginModal={handleOpenLoginModal} />}>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/update-password" element={<UpdatePassword />} />
@@ -104,6 +110,10 @@ const App = () => {
             onClose={() => setIsRegisterModalOpen(false)}
             selectedPlanId={selectedPlanIdForRegister}
             selectedBillingCycle={selectedBillingCycleForRegister}
+          />
+          <LoginModal // Renderizar o LoginModal
+            isOpen={isLoginModalOpen}
+            onClose={() => setIsLoginModalOpen(false)}
           />
         </AuthProvider>
       </BrowserRouter>
