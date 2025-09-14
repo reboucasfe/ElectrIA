@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { RiWhatsappLine } from "react-icons/ri";
+import { BsWhatsapp } from "react-icons/bs";
 
 const WhatsAppButton = () => {
   // IMPORTANTE: Substitua este número pelo seu número de WhatsApp com o código do país.
@@ -9,27 +8,21 @@ const WhatsAppButton = () => {
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-50"
-          aria-label="Fale conosco no WhatsApp"
-        >
-          <Button
-            size="icon"
-            className="bg-green-500 hover:bg-green-600 text-white rounded-full h-16 w-16 shadow-lg flex items-center justify-center"
-          >
-            <RiWhatsappLine className="h-8 w-8" />
-          </Button>
-        </a>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>Dúvidas? Fale conosco!</p>
-      </TooltipContent>
-    </Tooltip>
+    <a
+      href={whatsappUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="fixed bottom-6 right-6 z-50"
+      aria-label="Fale com um especialista no WhatsApp"
+    >
+      <Button
+        size="lg"
+        className="bg-green-500 hover:bg-green-600 text-white rounded-full h-16 px-6 shadow-lg flex items-center justify-center gap-3"
+      >
+        <BsWhatsapp className="h-6 w-6" />
+        <span className="font-semibold">Fale com um especialista</span>
+      </Button>
+    </a>
   );
 };
 
