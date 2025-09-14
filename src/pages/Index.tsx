@@ -28,7 +28,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => { // Re
       const element = document.getElementById(id);
       if (element) {
         setTimeout(() => {
-          element.scrollIntoView({ behavior: "smooth", block: "start" }); // Correção aqui
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 100);
       }
     }
@@ -238,7 +238,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => { // Re
                       <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Suporte via email</span>
                       <Tooltip>
                         <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
-                        <TooltipContent><p>Receba ajuda e tire suas dúvidas com nossa equipe de suporte através de email.</p></p></TooltipContent>
+                        <TooltipContent><p>Receba ajuda e tire suas dúvidas com nossa equipe de suporte através de email.</p></TooltipContent>
                       </Tooltip>
                     </li>
                   </ul>
