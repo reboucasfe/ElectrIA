@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle } from "lucide-react";
 
 const Index = () => {
-  const [billingCycle, setBillingCycle] = useState('monthly');
+  const [billingCycle, setBillingCycle] = useState('annual');
 
   const prices = {
     monthly: {
@@ -16,9 +16,9 @@ const Index = () => {
       enterprise: 347,
     },
     annual: {
-      basic: Math.round(127 * 0.75),
-      professional: Math.round(197 * 0.75),
-      enterprise: Math.round(347 * 0.75),
+      basic: 97,
+      professional: 147,
+      enterprise: 247,
     }
   };
 
