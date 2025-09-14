@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isPaid = useMemo(() => user?.user_metadata?.payment_status === 'paid', [user]);
+
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.substring(1);
@@ -38,37 +40,48 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
       premium: 347,
     },
     monthly: {
-      essencial: Math.round(127 * 1.25), // 25% acima do anual
-      professional: Math.round(147 * 1.25), // 25% acima do anual
-      premium: Math.round(347 * 1.25), // 25% acima do anual
+      essencial: Math.round(127 * 1.25),
+      professional: Math.round(147 * 1.25),
+      premium: Math.round(347 * 1.25),
     }
   };
 
   const displayPrice = prices[billingCycle];
 
   const handlePlanButtonClick = (planId: string) => {
-    console.log("Index.tsx: handlePlanButtonClick called with planId:", planId, "and billingCycle:", billingCycle);
-    if (user) {
+    if (isPaid) {
       navigate('/upgrade');
+    } else if (user && !isPaid) {
+      navigate('/payment', { state: { planId, billingCycle } });
     } else {
-      onOpenRegisterModal(planId, billingCycle); // Pass planId and billingCycle
+      onOpenRegisterModal(planId, billingCycle);
     }
   };
 
   const handleHeroButtonClick = () => {
-    if (user) {
+    if (isPaid) {
       navigate('/dashboard');
+    } else if (user && !isPaid) {
+      navigate('/payment');
     } else {
-      onOpenRegisterModal(); // Open modal for registration without specific plan
+      onOpenRegisterModal();
     }
   };
 
   const handleFinalCTAClick = () => {
-    if (user) {
+    if (isPaid) {
       navigate('/upgrade');
+    } else if (user && !isPaid) {
+      navigate('/payment');
     } else {
-      onOpenRegisterModal(); // Open modal for registration without specific plan
+      onOpenRegisterModal();
     }
+  };
+
+  const getButtonText = (upgradeText: string, defaultText: string) => {
+    if (isPaid) return upgradeText;
+    if (user && !isPaid) return "Finalizar Assinatura";
+    return defaultText;
   };
 
   return (
@@ -93,7 +106,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
                   className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 w-full sm:w-auto"
                   onClick={handleHeroButtonClick}
                 >
-                  {user ? 'Ir para o Dashboard' : 'Começar Agora'} <ArrowRight className="ml-2 h-5 w-5" />
+                  {getButtonText('Ir para o Dashboard', 'Começar Agora')} <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
               <p className="mt-6 text-sm text-gray-500">Confiado por mais de 500 eletricistas em todo o Brasil.</p>
@@ -230,7 +243,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
                   </ul>
                 </CardContent>
                 <Button variant="outline" className="mt-8 w-full" onClick={() => handlePlanButtonClick('essencial')}>
-                  {user ? 'Fazer Upgrade' : 'Começar Agora'}
+                  {getButtonText('Fazer Upgrade', 'Começar Agora')}
                 </Button>
               </Card>
               <Card className="p-8 flex flex-col shadow-lg border-2 border-blue-600 relative">
@@ -265,7 +278,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
                   </ul>
                 </CardContent>
                 <Button className="mt-8 w-full bg-blue-600 hover:bg-blue-700" onClick={() => handlePlanButtonClick('professional')}>
-                  {user ? 'Fazer Upgrade' : 'Começar Agora'}
+                  {getButtonText('Fazer Upgrade', 'Começar Agora')}
                 </Button>
               </Card>
               <Card className="p-8 flex flex-col shadow-lg">
@@ -299,7 +312,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
                   </ul>
                 </CardContent>
                 <Button variant="outline" className="mt-8 w-full" onClick={() => handlePlanButtonClick('premium')}>
-                  {user ? 'Fazer Upgrade' : 'Começar Agora'}
+                  {getButtonText('Fazer Upgrade', 'Começar Agora')}
                 </Button>
               </Card>
             </div>
@@ -337,7 +350,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
               className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-10 py-7 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105"
               onClick={handleFinalCTAClick}
             >
-              {user ? 'Ver Planos' : 'Começar Agora'}
+              {getButtonText('Ver Planos', 'Começar Agora')}
             </Button>
             <p className="mt-6 text-sm text-blue-200 flex items-center justify-center"><ShieldCheck className="h-4 w-4 mr-2" /> Garantia de 30 dias e cancelamento fácil.</p>
           </div>
