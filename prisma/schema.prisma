@@ -10,4 +10,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Models will be added here later
+// Placeholder model to allow `prisma generate` to succeed.
+// You can replace this with your actual data models later.
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+}
