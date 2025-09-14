@@ -21,7 +21,7 @@ const WhatsAppButton = () => {
             size="icon"
             className="bg-green-500 hover:bg-green-600 text-white rounded-full h-14 w-14 shadow-lg flex items-center justify-center p-0"
           >
-            <img src="/whatsapp-icon.png" alt="WhatsApp" className="h-full w-full object-contain p-2" />
+            <img src="/whatsapp-icon.png" alt="WhatsApp" className="h-full w-full object-contain" /> {/* Removido o 'p-2' */}
           </Button>
         </a>
       </TooltipTrigger>
