@@ -266,7 +266,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => { // Re
                       <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Dashboard de Vendas</span>
                       <Tooltip>
                         <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
-                        <TooltipContent><p>Acompanhe o status de todas as suas propostas (enviadas, visualizadas, aceitas) em um painel visual.</p></p></TooltipContent>
+                        <TooltipContent><p>Acompanhe o status de todas as suas propostas (enviadas, visualizadas, aceitas) em um painel visual.</p></TooltipContent>
                       </Tooltip>
                     </li>
                     <li className="flex items-center justify-between">
