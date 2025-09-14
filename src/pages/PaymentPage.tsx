@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Importar useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,16 +9,16 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { showError, showSuccess } from '@/utils/toast';
 import { CreditCard, QrCode, CheckCircle } from 'lucide-react';
-import { supabase } from '@/lib/supabaseClient'; // Importar supabase
-import { useAuth } from '@/contexts/AuthContext'; // Importar useAuth
+import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/contexts/AuthContext';
 
 const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('creditCard');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // Hook para acessar o estado da navegação
+  const location = useLocation();
   const { planId, billingCycle } = (location.state || {}) as { planId?: string, billingCycle?: string };
-  const { user } = useAuth(); // Obter o usuário logado
+  const { user } = useAuth();
 
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
