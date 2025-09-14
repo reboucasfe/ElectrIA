@@ -87,6 +87,13 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
     setLoading(false);
   };
 
+  const handleOverlayMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Fecha o modal apenas se o clique for diretamente no overlay (fundo)
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   if (!isOpen) {
     return null;
   }
@@ -94,11 +101,10 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm animate-in fade-in-0"
-      onClick={onClose}
+      onMouseDown={handleOverlayMouseDown}
     >
       <div
         className="w-full max-w-md p-6 bg-white rounded-lg shadow-xl"
-        onClick={(e) => e.stopPropagation()}
       >
         <div className="text-center">
           <h2 className="text-2xl font-bold">Criar conta</h2>
