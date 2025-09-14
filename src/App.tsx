@@ -82,7 +82,7 @@ const App = () => {
           <Sonner />
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Index onOpenRegisterModal={handleOpenRegisterModal} />} />
+            <Route path="/" element={<Index onOpenRegisterModal={handleOpenRegisterModal} onOpenLoginModal={handleOpenLoginModal} />} />
             
             {/* Auth Routes with Header */}
             <Route element={<AuthLayout onOpenRegisterModal={handleOpenRegisterModal} onOpenLoginModal={handleOpenLoginModal} />}>

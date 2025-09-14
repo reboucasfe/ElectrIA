@@ -11,9 +11,10 @@ import { Header } from "@/components/Header";
 
 interface IndexProps {
   onOpenRegisterModal: (planId?: string, billingCycle?: 'monthly' | 'annual') => void;
+  onOpenLoginModal: () => void; // Adicionada a prop onOpenLoginModal
 }
 
-const Index = ({ onOpenRegisterModal }: IndexProps) => {
+const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => { // Recebendo a prop
   const [billingCycle, setBillingCycle] = useState<'annual' | 'monthly'>('annual');
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
   return (
     <TooltipProvider>
     <div className="bg-white text-gray-800">
-      <Header onOpenRegisterModal={onOpenRegisterModal} />
+      <Header onOpenRegisterModal={onOpenRegisterModal} onOpenLoginModal={onOpenLoginModal} /> {/* Passando a prop */}
 
       <main>
         {/* Hero Section */}
@@ -265,7 +266,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
                       <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Dashboard de Vendas</span>
                       <Tooltip>
                         <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
-                        <TooltipContent><p>Acompanhe o status de todas as suas propostas (enviadas, visualizadas, aceitas) em um painel visual.</p></TooltipContent>
+                        <TooltipContent><p>Acompanhe o status de todas as suas propostas (enviadas, visualizadas, aceitas) em um painel visual.</p></p></TooltipContent>
                       </Tooltip>
                     </li>
                     <li className="flex items-center justify-between">
