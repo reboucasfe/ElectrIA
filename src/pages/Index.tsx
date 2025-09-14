@@ -16,9 +16,9 @@ const Index = () => {
       enterprise: 347,
     },
     annual: {
-      basic: Math.round(127 * 0.75),
-      professional: Math.round(197 * 0.75),
-      enterprise: Math.round(347 * 0.75),
+      basic: 97,
+      professional: 147,
+      enterprise: 247,
     }
   };
 
