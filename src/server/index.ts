@@ -1,6 +1,12 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+if (!process.env.DATABASE_URL) {
+  console.error("FATAL ERROR: DATABASE_URL is not defined in the environment variables.");
+  console.error("Please ensure you have a .env file with the DATABASE_URL from your Supabase project.");
+  process.exit(1); // Stop the server immediately if the URL is missing
+}
+
 import express from 'express';
 import cors from 'cors';
 import prisma from '../lib/prisma';
