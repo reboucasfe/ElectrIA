@@ -139,7 +139,7 @@ const PaymentPage = () => {
               type="button" 
               variant="outline" 
               className="w-full mt-2" 
-              onClick={() => navigate('/')} {/* Alterado para a página inicial */}
+              onClick={() => navigate('/')}
               disabled={loading}
             >
               Selecionar Outro Plano
