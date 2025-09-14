@@ -8,12 +8,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Badge } from "@/components/ui/badge";
 import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle } from "lucide-react";
 import { Header } from "@/components/Header";
+import RegisterModal from "@/components/RegisterModal"; // Import the new modal
 
 const Index = () => {
   const [billingCycle, setBillingCycle] = useState('annual');
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false); // State for modal
 
   useEffect(() => {
     if (location.hash) {
@@ -46,7 +48,23 @@ const Index = () => {
     if (user) {
       navigate('/upgrade');
     } else {
-      navigate('/register');
+      setIsRegisterModalOpen(true); // Open modal for registration
+    }
+  };
+
+  const handleHeroButtonClick = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      setIsRegisterModalOpen(true); // Open modal for registration
+    }
+  };
+
+  const handleFinalCTAClick = () => {
+    if (user) {
+      navigate('/upgrade');
+    } else {
+      setIsRegisterModalOpen(true); // Open modal for registration
     }
   };
 
@@ -70,7 +88,7 @@ const Index = () => {
                 <Button
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 w-full sm:w-auto"
-                  onClick={() => navigate(user ? '/dashboard' : '/register')}
+                  onClick={handleHeroButtonClick} // Use new handler
                 >
                   {user ? 'Ir para o Dashboard' : 'Começar Agora'} <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -314,7 +332,7 @@ const Index = () => {
             <Button
               size="lg"
               className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-10 py-7 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105"
-              onClick={() => navigate(user ? '/upgrade' : '/register')}
+              onClick={handleFinalCTAClick} // Use new handler
             >
               {user ? 'Ver Planos' : 'Começar Teste Grátis Agora'}
             </Button>
@@ -329,6 +347,8 @@ const Index = () => {
           <p>&copy; {new Date().getFullYear()} EletroProposta IA. Todos os direitos reservados.</p>
         </div>
       </footer>
+
+      <RegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />
     </div>
     </TooltipProvider>
   );

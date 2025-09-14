@@ -29,8 +29,8 @@ const Register = () => {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle className="text-2xl">Sign Up</CardTitle>
-        <CardDescription>Enter your information to create an account</CardDescription>
+        <CardTitle className="text-2xl">Cadastre-se</CardTitle>
+        <CardDescription>Insira suas informações para criar uma conta</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleRegister}>
@@ -47,7 +47,7 @@ const Register = () => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Senha</Label>
               <Input 
                 id="password" 
                 type="password" 
@@ -57,12 +57,12 @@ const Register = () => {
               />
             </div>
             <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? 'Criando conta...' : 'Criar Conta'}
             </Button>
           </div>
         </form>
         <div className="mt-4 text-center text-sm">
-          Already have an account?{' '}
+          Já tem uma conta?{' '}
           <Link to="/login" className="underline">
             Login
           </Link>
