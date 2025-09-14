@@ -27,7 +27,7 @@ const WhatsAppButton = () => {
         </a>
       </TooltipTrigger>
       <TooltipContent>
-        <p>Dúvidas? Fale conosco!</p>
+        <p>Dúvidas? Fale com um especialista!</p>
       </TooltipContent>
     </Tooltip>
   );
