@@ -10,11 +10,11 @@ import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldC
 import { Header } from "@/components/Header";
 
 interface IndexProps {
-  onOpenRegisterModal: () => void;
+  onOpenRegisterModal: (planId?: string, billingCycle?: 'monthly' | 'annual') => void;
 }
 
 const Index = ({ onOpenRegisterModal }: IndexProps) => {
-  const [billingCycle, setBillingCycle] = useState('annual');
+  const [billingCycle, setBillingCycle] = useState<'annual' | 'monthly'>('annual');
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,11 +46,11 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
 
   const displayPrice = prices[billingCycle];
 
-  const handlePlanButtonClick = () => {
+  const handlePlanButtonClick = (planId: string) => {
     if (user) {
       navigate('/upgrade');
     } else {
-      onOpenRegisterModal(); // Open modal for registration
+      onOpenRegisterModal(planId, billingCycle); // Pass planId and billingCycle
     }
   };
 
@@ -58,7 +58,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
     if (user) {
       navigate('/dashboard');
     } else {
-      onOpenRegisterModal(); // Open modal for registration
+      onOpenRegisterModal(); // Open modal for registration without specific plan
     }
   };
 
@@ -66,7 +66,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
     if (user) {
       navigate('/upgrade');
     } else {
-      onOpenRegisterModal(); // Open modal for registration
+      onOpenRegisterModal(); // Open modal for registration without specific plan
     }
   };
 
@@ -228,7 +228,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
                     </li>
                   </ul>
                 </CardContent>
-                <Button variant="outline" className="mt-8 w-full" onClick={handlePlanButtonClick}>
+                <Button variant="outline" className="mt-8 w-full" onClick={() => handlePlanButtonClick('essencial')}>
                   {user ? 'Fazer Upgrade' : 'Começar Agora'}
                 </Button>
               </Card>
@@ -263,7 +263,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
                     </li>
                   </ul>
                 </CardContent>
-                <Button className="mt-8 w-full bg-blue-600 hover:bg-blue-700" onClick={handlePlanButtonClick}>
+                <Button className="mt-8 w-full bg-blue-600 hover:bg-blue-700" onClick={() => handlePlanButtonClick('professional')}>
                   {user ? 'Fazer Upgrade' : 'Começar Agora'}
                 </Button>
               </Card>
@@ -297,7 +297,7 @@ const Index = ({ onOpenRegisterModal }: IndexProps) => {
                     </li>
                   </ul>
                 </CardContent>
-                <Button variant="outline" className="mt-8 w-full" onClick={handlePlanButtonClick}>
+                <Button variant="outline" className="mt-8 w-full" onClick={() => handlePlanButtonClick('premium')}>
                   {user ? 'Fazer Upgrade' : 'Começar Agora'}
                 </Button>
               </Card>

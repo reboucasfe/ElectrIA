@@ -51,6 +51,14 @@ const SupabaseSetupMessage = () => (
 
 const App = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [selectedPlanIdForRegister, setSelectedPlanIdForRegister] = useState<string | undefined>(undefined);
+  const [selectedBillingCycleForRegister, setSelectedBillingCycleForRegister] = useState<'monthly' | 'annual' | undefined>(undefined);
+
+  const handleOpenRegisterModal = (planId?: string, billingCycle?: 'monthly' | 'annual') => {
+    setSelectedPlanIdForRegister(planId);
+    setSelectedBillingCycleForRegister(billingCycle);
+    setIsRegisterModalOpen(true);
+  };
 
   if (!isSupabaseConfigured) {
     return <SupabaseSetupMessage />;
@@ -65,10 +73,10 @@ const App = () => {
           <Sonner />
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Index onOpenRegisterModal={() => setIsRegisterModalOpen(true)} />} />
+            <Route path="/" element={<Index onOpenRegisterModal={handleOpenRegisterModal} />} />
             
             {/* Auth Routes with Header */}
-            <Route element={<AuthLayout onOpenRegisterModal={() => setIsRegisterModalOpen(true)} />}>
+            <Route element={<AuthLayout onOpenRegisterModal={handleOpenRegisterModal} />}>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/update-password" element={<UpdatePassword />} />
@@ -89,7 +97,12 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
           <WhatsAppButton />
-          <RegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />
+          <RegisterModal
+            isOpen={isRegisterModalOpen}
+            onClose={() => setIsRegisterModalOpen(false)}
+            selectedPlanId={selectedPlanIdForRegister}
+            selectedBillingCycle={selectedBillingCycleForRegister}
+          />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

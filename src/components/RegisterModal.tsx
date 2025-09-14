@@ -37,9 +37,11 @@ type RegisterFormValues = z.infer<typeof registerFormSchema>;
 interface RegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
+  selectedPlanId?: string; // New prop
+  selectedBillingCycle?: 'monthly' | 'annual'; // New prop
 }
 
-const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
+const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }: RegisterModalProps) => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -95,7 +97,12 @@ const RegisterModal = ({ isOpen, onClose }: RegisterModalProps) => {
       showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.');
       reset();
       onClose();
-      navigate('/upgrade'); // Redireciona para a página de upgrade
+      // Redirect to payment page with selected plan details
+      if (selectedPlanId && selectedBillingCycle) {
+        navigate('/payment', { state: { planId: selectedPlanId, billingCycle: selectedBillingCycle } });
+      } else {
+        navigate('/upgrade'); // Fallback if no plan was pre-selected
+      }
     }
     setLoading(false);
   };
