@@ -263,7 +263,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     setValue('selectedServices', newServices);
   };
 
-  const saveProposalToSupabase = async (data: ProposalFormValues, newStatus: string = 'draft', pdfGenerated: boolean = false) => {
+  const saveProposalToSupabase = async (data: ProposalFormValues, newStatus: string = 'draft') => {
     if (!user) {
       showError("Você precisa estar logado para salvar uma proposta.");
       return null;
@@ -287,8 +287,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
       payment_methods: data.paymentMethods,
       validity_days: data.validityDays,
       status: newStatus,
-      pdf_generated_at: pdfGenerated ? new Date().toISOString() : null,
-      sent_at: newStatus === 'sent' ? new Date().toISOString() : null,
+      // pdf_generated_at e sent_at serão definidos apenas no modal de preview
       created_at: data.created_at, // Garante que created_at seja salvo
     };
 
@@ -310,7 +309,6 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     } else {
       console.log("saveProposalToSupabase: Proposta salva com sucesso:", result.data);
       showSuccess(`Proposta ${proposalId ? 'atualizada' : 'salva'} com sucesso!`);
-      // REMOVIDO: navigate(`/proposals/edit/${result.data.id}`);
       return result.data;
     }
   };
@@ -324,27 +322,16 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
   };
 
   const handleOpenPreviewModal = async (data: ProposalFormValues) => {
-    console.log("handleOpenPreviewModal: Validação do formulário bem-sucedida. Tentando salvar e abrir modal de pré-visualização com dados:", data);
-    const savedProposal = await saveProposalToSupabase(data, proposalId ? initialData.status : 'draft');
-    if (savedProposal) {
-      // Se for uma nova proposta, redireciona para a edição ANTES de abrir o modal
-      if (!proposalId) {
-        navigate(`/proposals/edit/${savedProposal.id}`);
-        // Pequeno delay para garantir que a navegação ocorra antes de abrir o modal
-        await new Promise(resolve => setTimeout(resolve, 100)); 
-      }
-      console.log("handleOpenPreviewModal: Proposta salva, preparando dados para pré-visualização.");
-      setPreviewData({
-        ...data,
-        id: savedProposal.id, 
-        status: savedProposal.status,
-        proposalNumber: savedProposal.proposal_number, // Garante que o número da proposta esteja no previewData
-        created_at: savedProposal.created_at, // Garante que created_at esteja no previewData
-      });
-      setIsPreviewModalOpen(true);
-    } else {
-      console.error("handleOpenPreviewModal: Falha ao salvar proposta, não é possível abrir o modal de pré-visualização.");
-    }
+    console.log("handleOpenPreviewModal: Validação do formulário bem-sucedida. Preparando dados para pré-visualização com dados:", data);
+    // Não salva a proposta aqui. Apenas prepara os dados para o modal.
+    setPreviewData({
+      ...data,
+      id: proposalId, // Passa o ID existente se estiver editando, senão é undefined
+      status: initialData?.status || 'draft', // Usa o status existente ou 'draft' para a pré-visualização
+      proposalNumber: data.proposalNumber,
+      created_at: data.created_at,
+    });
+    setIsPreviewModalOpen(true);
   };
 
   const handleServiceModalClose = () => {
@@ -360,23 +347,13 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     setIsServiceModalOpen(true);
   };
 
-  const handlePdfGeneratedAndSent = async (proposalId: string) => {
-    setLoading(true);
-    console.log("handlePdfGeneratedAndSent: Atualizando status da proposta para 'enviada' após geração de PDF.");
-    const { error } = await supabase
-      .from('proposals')
-      .update({ status: 'sent', pdf_generated_at: new Date().toISOString(), sent_at: new Date().toISOString() })
-      .eq('id', proposalId);
-
-    if (error) {
-      console.error("handlePdfGeneratedAndSent: Erro ao atualizar status da proposta:", error);
-      showError(getTranslatedErrorMessage(error.message));
-    } else {
-      showSuccess("Status da proposta atualizado para 'Enviada'!");
-    }
-    setLoading(false);
+  const handlePdfGeneratedAndSent = async (savedProposalId: string) => {
+    // Esta função é chamada pelo ProposalPreviewModal *depois* que ele salvou/atualizou a proposta
+    // e gerou o PDF. Ela recebe o ID real da proposta salva.
+    setLoading(false); // Garante que o loading seja desativado
     setIsPreviewModalOpen(false);
-    navigate('/proposals');
+    navigate(`/proposals/edit/${savedProposalId}`); // Navega para a página de edição da proposta salva
+    showSuccess("Proposta marcada como 'Enviada' e PDF gerado!");
   };
 
   return (

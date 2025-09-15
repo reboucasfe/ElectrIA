@@ -12,6 +12,7 @@ import { Service } from '@/components/dashboard/ServiceFormModal';
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 import { cn } from '@/lib/utils'; // Importar cn para combinar classes
 import { formatProposalNumber } from '@/utils/proposalUtils'; // Importar a nova função
+import { supabase } from '@/lib/supabaseClient'; // Importar supabase
 
 interface SelectedService extends Service {
   uniqueId: string;
@@ -78,20 +79,77 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
 
   const handleGeneratePdf = async () => {
     console.log("handleGeneratePdf: Iniciando a geração do PDF...");
-    if (!proposalData || !proposalData.id) {
-      showError("Nenhum dado de proposta ou ID para gerar PDF.");
-      console.error("handleGeneratePdf: Nenhum dado de proposta ou ID disponível.");
+    if (!proposalData) {
+      showError("Nenhum dado de proposta para gerar PDF.");
+      console.error("handleGeneratePdf: Nenhum dado de proposta disponível.");
       return;
     }
-    setIsGeneratingPdf(true);
-    if (!proposalPdfRef.current) {
-      showError("Erro: Conteúdo do PDF não encontrado.");
-      console.error("handleGeneratePdf: proposalPdfRef.current é nulo.");
-      setIsGeneratingPdf(false);
+    if (!user) {
+      showError("Você precisa estar logado para gerar e enviar uma proposta.");
       return;
     }
 
+    setIsGeneratingPdf(true);
+
     try {
+      let currentProposalId = proposalData.id;
+      let currentProposalNumber = proposalData.proposalNumber;
+      let currentCreatedAt = proposalData.created_at;
+
+      // Step 1: Save/Update the proposal in Supabase
+      const proposalPayload = {
+        user_id: user.id,
+        proposal_number: proposalData.proposalNumber,
+        client_name: proposalData.clientName,
+        client_email: proposalData.clientEmail || null,
+        client_phone: proposalData.clientPhone || null,
+        proposal_title: proposalData.proposalTitle,
+        proposal_description: proposalData.proposalDescription || null,
+        selected_services: proposalData.selectedServices,
+        notes: proposalData.notes || null,
+        payment_methods: proposalData.paymentMethods,
+        validity_days: proposalData.validityDays,
+        status: 'sent', // Always set to 'sent' when generating PDF
+        pdf_generated_at: new Date().toISOString(),
+        sent_at: new Date().toISOString(),
+        created_at: proposalData.created_at || new Date().toISOString(), // Ensure created_at is set
+      };
+
+      let result;
+      if (currentProposalId) {
+        console.log("handleGeneratePdf: Atualizando proposta existente com ID:", currentProposalId);
+        result = await supabase.from('proposals').update(proposalPayload).eq('id', currentProposalId).select().single();
+      } else {
+        console.log("handleGeneratePdf: Inserindo nova proposta.");
+        result = await supabase.from('proposals').insert([proposalPayload]).select().single();
+        if (result.data) {
+          currentProposalId = result.data.id;
+          currentProposalNumber = result.data.proposal_number;
+          currentCreatedAt = result.data.created_at;
+        }
+      }
+
+      if (result.error) {
+        console.error("handleGeneratePdf: Erro do Supabase ao salvar/atualizar proposta:", result.error);
+        showError(getTranslatedErrorMessage(result.error.message));
+        setIsGeneratingPdf(false);
+        return;
+      }
+
+      if (!currentProposalId) {
+        showError("Erro: ID da proposta não disponível após salvar.");
+        setIsGeneratingPdf(false);
+        return;
+      }
+
+      // Step 2: Generate PDF
+      if (!proposalPdfRef.current) {
+        showError("Erro: Conteúdo do PDF não encontrado.");
+        console.error("handleGeneratePdf: proposalPdfRef.current é nulo.");
+        setIsGeneratingPdf(false);
+        return;
+      }
+
       console.log("handleGeneratePdf: Capturando conteúdo com html2canvas...");
       const canvas = await html2canvas(proposalPdfRef.current, { scale: 2, useCORS: true });
       console.log("handleGeneratePdf: Captura com html2canvas concluída.");
@@ -116,10 +174,12 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
       pdf.save(`proposta-${proposalData.clientName.replace(/\s/g, '-')}-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
       showSuccess("PDF da proposta gerado com sucesso!");
       console.log("handleGeneratePdf: PDF salvo com sucesso.");
-      onPdfGeneratedAndSent(proposalData.id);
+
+      // Step 3: Notify parent component
+      onPdfGeneratedAndSent(currentProposalId); // Pass the actual ID
     } catch (error: any) {
       console.error("handleGeneratePdf: Erro ao gerar PDF:", error);
-      showError(getTranslatedErrorMessage(error.message || "Erro desconhecido ao gerar PDF.")); // Usando a função de tradução
+      showError(getTranslatedErrorMessage(error.message || "Erro desconhecido ao gerar PDF."));
     } finally {
       setIsGeneratingPdf(false);
     }
