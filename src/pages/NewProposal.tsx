@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import ProposalForm from '@/components/proposals/ProposalForm'; // Importa o novo componente
 
 const NewProposal = () => {
   const navigate = useNavigate();
@@ -21,20 +21,7 @@ const NewProposal = () => {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Formulário de Nova Proposta</CardTitle>
-          <CardDescription>
-            (O formulário para criar uma nova proposta será implementado aqui.)
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-gray-500 py-8">
-            Em breve, você poderá usar a IA para gerar propostas rapidamente!
-          </p>
-          <Button onClick={() => alert('Funcionalidade em desenvolvimento!')} className="bg-blue-600 hover:bg-blue-700">Gerar Proposta com IA</Button>
-        </CardContent>
-      </Card>
+      <ProposalForm /> {/* Renderiza o formulário aqui */}
     </div>
   );
 };
