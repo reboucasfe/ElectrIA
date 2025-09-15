@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -46,6 +46,13 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const proposalPdfRef = useRef<HTMLDivElement>(null);
 
+  // Adiciona um log quando o modal abre
+  useEffect(() => {
+    if (isOpen) {
+      console.log("ProposalPreviewModal: Modal está aberto. Dados da proposta:", proposalData);
+    }
+  }, [isOpen, proposalData]);
+
   const proposalTotal = useMemo(() => {
     return proposalData?.selectedServices.reduce((sum, service) => sum + service.calculated_total, 0) || 0;
   }, [proposalData]);
@@ -61,19 +68,24 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
   const userPixKey = user?.user_metadata?.pix_key || 'Não informado';
 
   const handleGeneratePdf = async () => {
+    console.log("handleGeneratePdf: Iniciando a geração do PDF...");
     if (!proposalData) {
       showError("Nenhum dado de proposta para gerar PDF.");
+      console.error("handleGeneratePdf: Nenhum dado de proposta disponível.");
       return;
     }
     setIsGeneratingPdf(true);
     if (!proposalPdfRef.current) {
       showError("Erro: Conteúdo do PDF não encontrado.");
+      console.error("handleGeneratePdf: proposalPdfRef.current é nulo.");
       setIsGeneratingPdf(false);
       return;
     }
 
     try {
+      console.log("handleGeneratePdf: Capturando conteúdo com html2canvas...");
       const canvas = await html2canvas(proposalPdfRef.current, { scale: 2 });
+      console.log("handleGeneratePdf: Captura com html2canvas concluída.");
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgWidth = 210;
@@ -94,9 +106,10 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
 
       pdf.save(`proposta-${proposalData.clientName.replace(/\s/g, '-')}-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
       showSuccess("PDF da proposta gerado com sucesso!");
+      console.log("handleGeneratePdf: PDF salvo com sucesso.");
       onClose(); // Fecha o modal após gerar o PDF
     } catch (error: any) {
-      console.error("Erro ao gerar PDF:", error);
+      console.error("handleGeneratePdf: Erro ao gerar PDF:", error);
       showError(`Erro ao gerar PDF: ${error.message || "Verifique o console para mais detalhes."}`);
     } finally {
       setIsGeneratingPdf(false);
@@ -149,7 +162,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
                   </thead>
                   <tbody>
                     {proposalData.selectedServices.map((service, index) => (
-                      <tr key={index}>
+                      <tr key={service.uniqueId}>
                         <td className="border p-2">{service.name}</td>
                         <td className="border p-2 text-center">{service.quantity}</td>
                         <td className="border p-2 text-right">
