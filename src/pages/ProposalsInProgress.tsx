@@ -77,11 +77,15 @@ const ProposalsInProgress = () => {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'draft':
-        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">Rascunho</span>;
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">Em Edição</span>;
       case 'sent':
         return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">Enviada</span>;
       case 'pending':
         return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Pendente</span>;
+      case 'accepted':
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Aceita</span>;
+      case 'rejected':
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">Rejeitada</span>;
       default:
         return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">Desconhecido</span>;
     }

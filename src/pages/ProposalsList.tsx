@@ -78,7 +78,7 @@ const ProposalsList = () => {
     } else if (proposalFilterStatus === 'accepted') {
       return 'Propostas Aceitas';
     } else if (proposalFilterStatus === 'draft') {
-      return 'Rascunhos de Propostas';
+      return 'Propostas Em Edição';
     }
     return 'Todas as Propostas';
   };
@@ -105,18 +105,20 @@ const ProposalsList = () => {
     return services.reduce((sum, service) => sum + service.calculated_total, 0);
   };
 
-  const getStatusLabel = (status: string, pdfGeneratedAt: string | undefined) => {
+  const getStatusLabel = (status: string) => {
     switch (status) {
       case 'draft':
-        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">Rascunho</span>;
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">Em Edição</span>;
       case 'sent':
         return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">Enviada</span>;
+      case 'pending':
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Pendente</span>;
       case 'accepted':
         return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Aceita</span>;
       case 'rejected':
         return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">Rejeitada</span>;
       default:
-        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Pendente</span>;
+        return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">Desconhecido</span>;
     }
   };
 
@@ -232,7 +234,7 @@ const ProposalsList = () => {
                     <TableCell className="font-medium">{formatProposalNumber(proposal.proposal_number, proposal.created_at)}</TableCell> {/* Exibe o número da proposta formatado */}
                     <TableCell>{proposal.client_name}</TableCell>
                     <TableCell>{proposal.proposal_title}</TableCell>
-                    <TableCell>{getStatusLabel(proposal.status, proposal.pdf_generated_at)}</TableCell>
+                    <TableCell>{getStatusLabel(proposal.status)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(calculateProposalTotal(proposal.selected_services))}</TableCell>
                     <TableCell>{new Date(proposal.created_at).toLocaleDateString('pt-BR')}</TableCell>
                     <TableCell className="text-right">
@@ -270,7 +272,7 @@ const ProposalsList = () => {
             <p className="text-center text-gray-500 py-8">
               Nenhuma proposta {proposalFilterStatus === 'sent' ? 'enviada ou pendente' :
                                proposalFilterStatus === 'accepted' ? 'aceita' :
-                               proposalFilterStatus === 'draft' ? 'em rascunho' :
+                               proposalFilterStatus === 'draft' ? 'em edição' :
                                ''} encontrada.
             </p>
           )}

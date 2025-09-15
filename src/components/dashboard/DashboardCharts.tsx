@@ -40,8 +40,8 @@ const DashboardCharts = ({ proposals, loading }: DashboardChartsProps) => {
     const acceptedCount = proposals.filter(p => p.status === 'accepted').length;
 
     return [
-      { name: 'Rascunhos', value: draftCount, fill: '#60A5FA' }, // blue-400
-      { name: 'Enviadas', value: sentCount, fill: '#3B82F6' }, // blue-500
+      { name: 'Em Edição', value: draftCount, fill: '#60A5FA' }, // blue-400
+      { name: 'Enviadas/Pendentes', value: sentCount, fill: '#3B82F6' }, // blue-500
       { name: 'Aceitas', value: acceptedCount, fill: '#2563EB' }, // blue-600
     ];
   }, [proposals]);
@@ -82,14 +82,15 @@ const DashboardCharts = ({ proposals, loading }: DashboardChartsProps) => {
   const statusBreakdownData = React.useMemo(() => {
     const statusCounts: { [key: string]: number } = {};
     proposals.forEach(p => {
-      const statusKey = p.status === 'sent' || p.status === 'pending' ? 'Enviadas/Pendentes' :
+      const statusKey = p.status === 'draft' ? 'Em Edição' :
+                         p.status === 'sent' || p.status === 'pending' ? 'Enviadas/Pendentes' :
                          p.status === 'accepted' ? 'Aceitas' :
                          p.status === 'rejected' ? 'Rejeitadas' :
-                         'Rascunhos';
+                         'Outros';
       statusCounts[statusKey] = (statusCounts[statusKey] || 0) + 1;
     });
 
-    const COLORS = ['#2563EB', '#10B981', '#EF4444', '#6B7280']; // blue, green, red, gray
+    const COLORS = ['#60A5FA', '#3B82F6', '#10B981', '#EF4444', '#6B7280']; // blue-400, blue-500, green, red, gray
 
     return Object.keys(statusCounts).map((status, index) => ({
       name: status,
@@ -116,7 +117,7 @@ const DashboardCharts = ({ proposals, loading }: DashboardChartsProps) => {
       <Card className="md:col-span-1">
         <CardHeader>
           <CardTitle>Funil de Conversão</CardTitle>
-          <CardDescription>Jornada das propostas: rascunho, enviadas e aceitas.</CardDescription>
+          <CardDescription>Jornada das propostas: em edição, enviadas/pendentes e aceitas.</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={250}>
