@@ -188,6 +188,15 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                   <p className="text-gray-600">Tenha uma visão clara de todas as suas propostas em um só lugar.</p>
                 </CardContent>
               </Card>
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                <CardHeader className="p-0 mb-4 text-center">
+                  <Users className="h-8 w-8 text-red-500 mb-2 mx-auto" />
+                  <CardTitle className="text-xl font-semibold">Dificuldade em organizar histórico de clientes</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0 text-center">
+                  <p className="text-gray-600">Mantenha todos os dados e interações com seus clientes centralizados e acessíveis.</p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
