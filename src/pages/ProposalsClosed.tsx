@@ -18,6 +18,7 @@ import { formatProposalNumber } from '@/utils/proposalUtils'; // Importar a nova
 interface Proposal {
   id: string;
   proposal_number?: number; // Adicionado número da proposta
+  revision_number?: number; // Adicionado número da revisão
   client_name: string;
   status: 'draft' | 'sent' | 'accepted' | 'pending' | 'rejected';
   selected_services: Array<{ calculated_total: number }>;
@@ -95,6 +96,7 @@ const ProposalsClosed = () => {
     setSelectedProposalForPreview({
       id: proposal.id,
       proposalNumber: proposal.proposal_number, // Passa o número da proposta
+      revisionNumber: proposal.revision_number, // Passa o número da revisão
       clientName: proposal.client_name,
       clientEmail: proposal.client_email,
       clientPhone: proposal.client_phone,
@@ -195,7 +197,7 @@ const ProposalsClosed = () => {
               <TableBody>
                 {proposals.map((proposal) => (
                   <TableRow key={proposal.id}>
-                    <TableCell className="font-medium">{formatProposalNumber(proposal.proposal_number, proposal.created_at)}</TableCell> {/* Exibe o número da proposta formatado */}
+                    <TableCell className="font-medium">{formatProposalNumber(proposal.proposal_number, proposal.created_at, proposal.revision_number)}</TableCell> {/* Exibe o número da proposta formatado */}
                     <TableCell>{proposal.client_name}</TableCell>
                     <TableCell>{proposal.proposal_title}</TableCell>
                     <TableCell>{getStatusLabel(proposal.status)}</TableCell>

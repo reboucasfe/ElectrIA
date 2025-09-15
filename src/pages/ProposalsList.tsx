@@ -28,6 +28,7 @@ import { addDays, subDays, isWithinInterval, parseISO } from 'date-fns';
 interface Proposal {
   id: string;
   proposal_number?: number;
+  revision_number?: number; // Adicionado número da revisão
   client_name: string;
   status: 'draft' | 'sent' | 'accepted' | 'pending' | 'rejected';
   selected_services: Array<{ calculated_total: number }>;
@@ -167,6 +168,7 @@ const ProposalsList = () => {
     setSelectedProposalForPreview({
       id: proposal.id,
       proposalNumber: proposal.proposal_number,
+      revisionNumber: proposal.revision_number, // Passa o número da revisão
       clientName: proposal.client_name,
       clientEmail: proposal.client_email,
       clientPhone: proposal.client_phone,
@@ -288,7 +290,7 @@ const ProposalsList = () => {
               <TableBody>
                 {proposals.map((proposal) => (
                   <TableRow key={proposal.id}>
-                    <TableCell className="font-medium">{formatProposalNumber(proposal.proposal_number, proposal.created_at)}</TableCell>
+                    <TableCell className="font-medium">{formatProposalNumber(proposal.proposal_number, proposal.created_at, proposal.revision_number)}</TableCell>
                     <TableCell>{proposal.client_name}</TableCell>
                     <TableCell>{proposal.proposal_title}</TableCell>
                     <TableCell>{getStatusLabel(proposal.status)}</TableCell>

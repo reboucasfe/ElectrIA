@@ -24,6 +24,7 @@ interface SelectedService extends Service {
 interface ProposalFormValues {
   id?: string;
   proposalNumber?: number;
+  revisionNumber?: number; // Adicionado para o número da revisão
   clientName: string;
   clientEmail?: string;
   clientPhone?: string;
@@ -108,7 +109,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
           )}
           <h1 className="text-4xl font-bold text-blue-700 mb-2">{proposalData.proposalTitle}</h1>
           {proposalData.proposalNumber && (
-            <p className="text-xl text-gray-700 mb-1">Proposta Nº: {formatProposalNumber(proposalData.proposalNumber, proposalData.created_at)}</p>
+            <p className="text-xl text-gray-700 mb-1">Proposta Nº: {formatProposalNumber(proposalData.proposalNumber, proposalData.created_at, proposalData.revisionNumber)}</p>
           )}
           <p className="text-xl text-gray-700">{companyName}</p>
         </div>
@@ -347,6 +348,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
       const proposalPayload = {
         user_id: user.id,
         proposal_number: proposalData.proposalNumber,
+        revision_number: proposalData.revisionNumber, // Inclui o número da revisão
         client_name: proposalData.clientName,
         client_email: proposalData.clientEmail || null,
         client_phone: proposalData.clientPhone || null,

@@ -26,7 +26,7 @@ import ServiceFormModal, { Service } from '@/components/dashboard/ServiceFormMod
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
-import { formatProposalNumber } from '@/utils/proposalUtils'; // Importar a nova função
+import { formatProposalNumber } from '@/utils/proposalUtils';
 
 import ProposalPreviewModal from './ProposalPreviewModal';
 
@@ -39,6 +39,7 @@ interface SelectedService extends Service {
 
 const proposalFormSchema = z.object({
   proposalNumber: z.number().optional(), // Armazena o número sequencial bruto (inteiro)
+  revisionNumber: z.number().default(0), // Novo campo para o número da revisão
   clientName: z.string().min(1, { message: "Nome do cliente é obrigatório." }),
   clientEmail: z.string().email({ message: "E-mail do cliente inválido." }).optional().or(z.literal('')),
   clientPhone: z.string()
@@ -81,6 +82,37 @@ interface ProposalFormProps {
   proposalId?: string; // ID da proposta se estiver editando
 }
 
+// Helper para comparar objetos e gerar um resumo de mudanças
+const getChangesSummary = (oldData: ProposalFormValues, newData: ProposalFormValues) => {
+  const changes: { [key: string]: { old: any; new: any } | string } = {};
+  const changedFields: string[] = [];
+
+  const fieldsToCompare: Array<keyof ProposalFormValues> = [
+    'clientName', 'clientEmail', 'clientPhone', 'proposalTitle',
+    'proposalDescription', 'notes', 'validityDays', 'paymentMethods'
+  ];
+
+  fieldsToCompare.forEach(field => {
+    if (JSON.stringify(oldData[field]) !== JSON.stringify(newData[field])) {
+      changedFields.push(field);
+      changes[field] = { old: oldData[field], new: newData[field] };
+    }
+  });
+
+  // Comparação de selectedServices é mais complexa, apenas indicamos que mudou
+  if (JSON.stringify(oldData.selectedServices) !== JSON.stringify(newData.selectedServices)) {
+    changedFields.push('selectedServices');
+    changes.selectedServices = "Serviços incluídos foram alterados.";
+  }
+
+  const summary = changedFields.length > 0
+    ? `Campos alterados: ${changedFields.map(f => f.replace(/([A-Z])/g, ' $1').trim()).join(', ')}.`
+    : "Nenhuma alteração significativa.";
+
+  return { summary, details: changes };
+};
+
+
 const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -96,6 +128,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     resolver: zodResolver(proposalFormSchema),
     defaultValues: {
       proposalNumber: undefined, // Valor padrão para o número da proposta
+      revisionNumber: 0, // Valor padrão para o número da revisão
       clientName: '',
       clientEmail: '',
       clientPhone: '',
@@ -158,6 +191,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
       if (initialData) {
         reset({
           proposalNumber: initialData.proposal_number, // Carrega o número da proposta existente (inteiro)
+          revisionNumber: initialData.revision_number || 0, // Carrega o número da revisão existente
           clientName: initialData.client_name,
           clientEmail: initialData.client_email || '',
           clientPhone: initialData.client_phone || '',
@@ -182,6 +216,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
           paymentMethods: user?.user_metadata?.accepted_payment_methods || [],
           validityDays: 7,
           created_at: new Date().toISOString(), // Define a data de criação para a nova proposta
+          revisionNumber: 0, // Nova proposta começa com revisão 0
         });
 
         // Gerar novo número de proposta apenas para novas propostas
@@ -279,10 +314,32 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     console.log("saveProposalToSupabase: Iniciando salvamento/atualização da proposta...");
     console.log("saveProposalToSupabase: Dados a serem salvos:", data);
 
+    let currentRevisionNumber = data.revisionNumber;
+    let changesSummary = { summary: "Proposta criada.", details: {} };
+
+    if (proposalId) {
+      // Fetch old data to compare for revision history
+      const { data: oldProposal, error: fetchError } = await supabase
+        .from('proposals')
+        .select('*')
+        .eq('id', proposalId)
+        .single();
+
+      if (fetchError) {
+        showError(getTranslatedErrorMessage(fetchError.message));
+        setLoading(false);
+        return null;
+      }
+
+      // Increment revision number for existing proposals
+      currentRevisionNumber = (oldProposal?.revision_number || 0) + 1;
+      changesSummary = getChangesSummary(oldProposal as ProposalFormValues, data);
+    }
 
     const proposalPayload = {
       user_id: user.id,
-      proposal_number: data.proposalNumber, // Inclui o número da proposta (inteiro)
+      proposal_number: data.proposalNumber,
+      revision_number: currentRevisionNumber, // Inclui o número da revisão
       client_name: data.clientName,
       client_email: data.clientEmail || null,
       client_phone: data.clientPhone || null,
@@ -293,8 +350,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
       payment_methods: data.paymentMethods,
       validity_days: data.validityDays,
       status: newStatus,
-      // pdf_generated_at e sent_at serão definidos apenas no modal de preview
-      created_at: data.created_at, // Garante que created_at seja salvo
+      created_at: data.created_at,
     };
 
     let result;
@@ -306,15 +362,28 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
       result = await supabase.from('proposals').insert([proposalPayload]).select().single();
     }
 
-    setLoading(false);
-
     if (result.error) {
       console.error("saveProposalToSupabase: Erro do Supabase ao salvar proposta:", result.error);
       showError(getTranslatedErrorMessage(result.error.message));
+      setLoading(false);
       return null;
     } else {
-      console.log("saveProposalToSupabase: Proposta salva com sucesso:", result.data);
+      // Insert into proposal_revisions if changes were made or it's a new proposal
+      if (proposalId && changesSummary.summary !== "Nenhuma alteração significativa." || !proposalId) {
+        const { error: revisionError } = await supabase.from('proposal_revisions').insert({
+          proposal_id: result.data.id,
+          revision_number: result.data.revision_number,
+          user_id: user.id,
+          changes: changesSummary,
+        });
+        if (revisionError) {
+          console.error("saveProposalToSupabase: Erro ao salvar revisão:", revisionError);
+          showError(getTranslatedErrorMessage(revisionError.message));
+        }
+      }
+
       showSuccess(`Proposta ${proposalId ? 'atualizada' : 'salva'} com sucesso!`);
+      setLoading(false);
       return result.data;
     }
   };
@@ -324,20 +393,27 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     const savedProposal = await saveProposalToSupabase(data, 'draft');
     if (savedProposal && !proposalId) { // Se for uma nova proposta, redireciona para a edição
       navigate(`/proposals/edit/${savedProposal.id}`);
+    } else if (savedProposal && proposalId) {
+      // Se for uma proposta existente, atualiza o estado do formulário com a nova revisão
+      setValue('revisionNumber', savedProposal.revision_number);
     }
   };
 
   const handleOpenPreviewModal = async (data: ProposalFormValues) => {
     console.log("handleOpenPreviewModal: Validação do formulário bem-sucedida. Preparando dados para pré-visualização com dados:", data);
-    // Não salva a proposta aqui. Apenas prepara os dados para o modal.
-    setPreviewData({
-      ...data,
-      id: proposalId, // Passa o ID existente se estiver editando, senão é undefined
-      status: initialData?.status || 'draft', // Usa o status existente ou 'draft' para a pré-visualização
-      proposalNumber: data.proposalNumber,
-      created_at: data.created_at,
-    });
-    setIsPreviewModalOpen(true);
+    // Salva a proposta como rascunho antes de abrir o modal de preview
+    const savedProposal = await saveProposalToSupabase(data, 'draft');
+    if (savedProposal) {
+      setPreviewData({
+        ...data,
+        id: savedProposal.id, // Garante que o ID da proposta salva seja usado
+        status: savedProposal.status,
+        proposalNumber: savedProposal.proposal_number,
+        revisionNumber: savedProposal.revision_number, // Passa o número da revisão atual
+        created_at: savedProposal.created_at,
+      });
+      setIsPreviewModalOpen(true);
+    }
   };
 
   const handleServiceModalClose = () => {
@@ -375,7 +451,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
               <Label htmlFor="proposalNumber">Número da Proposta</Label>
               <Input 
                 id="proposalNumber" 
-                value={formatProposalNumber(watchedFormValues.proposalNumber, watchedFormValues.created_at)} 
+                value={formatProposalNumber(watchedFormValues.proposalNumber, watchedFormValues.created_at, watchedFormValues.revisionNumber)} 
                 disabled 
                 className="bg-gray-100 cursor-not-allowed" 
               />

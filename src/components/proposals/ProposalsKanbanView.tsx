@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 interface Proposal {
   id: string;
   proposal_number?: number;
+  revision_number?: number; // Adicionado número da revisão
   client_name: string;
   status: 'draft' | 'sent' | 'accepted' | 'pending' | 'rejected';
   selected_services: Array<{ calculated_total: number }>;
@@ -183,6 +184,7 @@ const ProposalsKanbanView = () => {
     setSelectedProposalForPreview({
       id: proposal.id,
       proposalNumber: proposal.proposal_number,
+      revisionNumber: proposal.revision_number, // Passa o número da revisão
       clientName: proposal.client_name,
       clientEmail: proposal.client_email,
       clientPhone: proposal.client_phone,
@@ -332,7 +334,7 @@ const ProposalsKanbanView = () => {
                               </DropdownMenu>
                             </div>
                             <CardDescription className="text-sm text-gray-600">
-                              {formatProposalNumber(proposal.proposal_number, proposal.created_at)} - {proposal.client_name}
+                              {formatProposalNumber(proposal.proposal_number, proposal.created_at, proposal.revision_number)} - {proposal.client_name}
                             </CardDescription>
                           </CardHeader>
                           <CardContent className="p-4 pt-0">
