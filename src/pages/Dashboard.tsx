@@ -13,14 +13,14 @@ const Dashboard = () => {
       value: "0", // Alterado para 0
       icon: ClipboardList,
       description: "Dados em breve", // Descrição ajustada
-      action: () => navigate('/proposals-overview?status=sent'), // Ação para navegar
+      action: () => navigate('/proposals?status=sent'), // CORRIGIDO: Navega para ProposalsList com status=sent
     },
     {
       title: "Propostas Aceitas",
       value: "0", // Alterado para 0
       icon: CheckCircle,
       description: "Dados em breve", // Descrição ajustada
-      action: () => navigate('/proposals-overview?status=accepted'), // Ação para navegar
+      action: () => navigate('/proposals?status=accepted'), // CORRIGIDO: Navega para ProposalsList com status=accepted
     },
     {
       title: "Taxa de Conversão",
