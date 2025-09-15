@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -38,6 +38,9 @@ const registerFormSchema = z.object({
   howDidYouHear: z.string().min(1, { message: "Por favor, selecione uma opção." }),
   hasCoupon: z.boolean().default(false).optional(),
   couponCode: z.string().optional(),
+  termsAccepted: z.boolean().refine(val => val === true, {
+    message: "Você deve concordar com os Termos de Uso e Política de Privacidade.",
+  }),
 });
 
 type RegisterFormValues = z.infer<typeof registerFormSchema>;
@@ -47,9 +50,10 @@ interface RegisterModalProps {
   onClose: () => void;
   selectedPlanId?: string;
   selectedBillingCycle?: 'monthly' | 'annual';
+  onOpenLoginModal: () => void; // Adicionada prop para abrir o modal de login
 }
 
-const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }: RegisterModalProps) => {
+const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, onOpenLoginModal }: RegisterModalProps) => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -67,10 +71,12 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
       howDidYouHear: "",
       hasCoupon: false,
       couponCode: "",
+      termsAccepted: false, // Valor padrão para o checkbox
     },
   });
 
   const hasCouponValue = watch('hasCoupon');
+  const termsAcceptedValue = watch('termsAccepted');
 
   useEffect(() => {
     if (isOpen) {
@@ -83,6 +89,10 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
   const onSubmit = async (data: RegisterFormValues) => {
     if (data.password !== data.confirmPassword) {
       showError("As senhas não coincidem.");
+      return;
+    }
+    if (!data.termsAccepted) {
+      showError("Você deve concordar com os Termos de Uso e Política de Privacidade.");
       return;
     }
 
@@ -297,10 +307,38 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle }
             </div>
           )}
 
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="termsAccepted"
+              checked={termsAcceptedValue}
+              onCheckedChange={(checked) => setValue('termsAccepted', checked as boolean)}
+            />
+            <div className="grid gap-1.5 leading-none">
+              <Label htmlFor="termsAccepted" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Ao clicar em “Criar conta”, você concorda com nossos{' '}
+                <Link to="/terms-of-use" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 hover:text-blue-700">
+                  Termos de Uso
+                </Link>{' '}
+                e{' '}
+                <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 hover:text-blue-700">
+                  Política de Privacidade
+                </Link>
+                .
+              </Label>
+              {errors.termsAccepted && <p className="text-sm text-red-500">{errors.termsAccepted.message}</p>}
+            </div>
+          </div>
+
           <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
             {loading ? 'Criando Conta...' : 'Criar Conta'}
           </Button>
         </form>
+        <div className="mt-4 text-center text-sm">
+          Já tem cadastro?{' '}
+          <Link to="#" onClick={() => { onClose(); onOpenLoginModal(); }} className="underline text-blue-600 hover:text-blue-700">
+            Entre com sua conta
+          </Link>
+        </div>
       </div>
     </div>
   );

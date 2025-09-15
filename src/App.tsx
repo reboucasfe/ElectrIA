@@ -24,10 +24,12 @@ import RegisterModal from "./components/RegisterModal";
 import LoginModal from "./components/LoginModal";
 import PaymentPage from "./pages/PaymentPage";
 import ProposalsList from "./pages/ProposalsList";
-import ProposalsOverview from "./pages/ProposalsOverview"; // Importar a nova página
-import NewProposal from "./pages/NewProposal"; // Importar a nova página
-import ProposalsInProgress from "./pages/ProposalsInProgress"; // Importar a nova página
-import ProposalsClosed from "./pages/ProposalsClosed"; // Importar a nova página
+import ProposalsOverview from "./pages/ProposalsOverview";
+import NewProposal from "./pages/NewProposal";
+import ProposalsInProgress from "./pages/ProposalsInProgress";
+import ProposalsClosed from "./pages/ProposalsClosed";
+import TermsOfUse from "./pages/TermsOfUse"; // Importar a nova página
+import PrivacyPolicy from "./pages/PrivacyPolicy"; // Importar a nova página
 
 const queryClient = new QueryClient();
 
@@ -88,6 +90,8 @@ const App = () => {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Index onOpenRegisterModal={handleOpenRegisterModal} onOpenLoginModal={handleOpenLoginModal} />} />
+            <Route path="/terms-of-use" element={<TermsOfUse />} /> {/* Nova rota */}
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} /> {/* Nova rota */}
             
             {/* Auth Routes with Header */}
             <Route element={<AuthLayout onOpenRegisterModal={handleOpenRegisterModal} onOpenLoginModal={handleOpenLoginModal} />}>
@@ -122,6 +126,7 @@ const App = () => {
             onClose={() => setIsRegisterModalOpen(false)}
             selectedPlanId={selectedPlanIdForRegister}
             selectedBillingCycle={selectedBillingCycleForRegister}
+            onOpenLoginModal={handleOpenLoginModal} // Passando a prop
           />
           <LoginModal
             isOpen={isLoginModalOpen}
