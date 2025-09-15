@@ -145,7 +145,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="p-0 mb-4 text-center">
-                  <Clock className="h-8 w-8 text-red-500 mb-2 mx-auto" />
+                  <Clock className="h-8 w-8 text-blue-600 mb-2 mx-auto" />
                   <CardTitle className="text-xl font-semibold">Demora para criar propostas detalhadas</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 text-center">
@@ -154,7 +154,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
               </Card>
               <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="p-0 mb-4 text-center">
-                  <XCircle className="h-8 w-8 text-red-500 mb-2 mx-auto" />
+                  <XCircle className="h-8 w-8 text-blue-600 mb-2 mx-auto" />
                   <CardTitle className="text-xl font-semibold">Perda de clientes por falta de agilidade</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 text-center">
@@ -163,7 +163,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
               </Card>
               <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="p-0 mb-4 text-center">
-                  <FileWarning className="h-8 w-8 text-red-500 mb-2 mx-auto" />
+                  <FileWarning className="h-8 w-8 text-blue-600 mb-2 mx-auto" />
                   <CardTitle className="text-xl font-semibold">Propostas mal formatadas e não profissionais</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 text-center">
@@ -172,7 +172,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
               </Card>
               <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="p-0 mb-4 text-center">
-                  <Calculator className="h-8 w-8 text-red-500 mb-2 mx-auto" />
+                  <Calculator className="h-8 w-8 text-blue-600 mb-2 mx-auto" />
                   <CardTitle className="text-xl font-semibold">Tempo perdido calculando materiais e mão de obra</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 text-center">
@@ -181,7 +181,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
               </Card>
               <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="p-0 mb-4 text-center">
-                  <Eye className="h-8 w-8 text-red-500 mb-2 mx-auto" />
+                  <Eye className="h-8 w-8 text-blue-600 mb-2 mx-auto" />
                   <CardTitle className="text-xl font-semibold">Dificuldade para acompanhar orçamentos enviados</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 text-center">
