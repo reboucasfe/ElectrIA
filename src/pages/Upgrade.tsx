@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -118,12 +120,8 @@ const Upgrade = () => {
             return (
               <Card 
                 key={planId} 
-                className={`p-8 flex flex-col shadow-lg transition-all duration-300 ${isCurrentPlan ? 'border-2 border-blue-600 relative' : 'border-2 border-transparent'} ${isClickable ? 'hover:-translate-y-2 hover:shadow-xl cursor-pointer hover:border-blue-600' : 'cursor-not-allowed bg-gray-50'}`}
-                onClick={() => {
-                  if (isClickable) {
-                    handlePlanActionClick(planId);
-                  }
-                }}
+                className={`p-8 flex flex-col shadow-lg transition-all duration-300 ${isCurrentPlan ? 'border-2 border-blue-600 relative' : 'border-2 border-transparent'} ${isClickable ? 'hover:-translate-y-2 hover:shadow-xl hover:border-blue-600' : 'bg-gray-50'}`}
+                // Removido o onClick do Card para que o botão seja o elemento interativo principal
               >
                 {isCurrentPlan && (
                   <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold">SEU PLANO ATUAL</div>
@@ -150,8 +148,12 @@ const Upgrade = () => {
                 <Button
                   className={`mt-8 w-full ${isClickable ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
                   disabled={!isClickable}
-                  aria-hidden="true"
-                  tabIndex={-1}
+                  // Removido aria-hidden e tabIndex para tornar o botão acessível
+                  onClick={() => {
+                    if (isClickable) {
+                      handlePlanActionClick(planId);
+                    }
+                  }}
                 >
                   {buttonText}
                 </Button>
