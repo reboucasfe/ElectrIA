@@ -98,6 +98,7 @@ const Upgrade = () => {
             const displayPrice = prices[billingCycle][planId as keyof typeof prices.annual];
             const isCurrentPlan = planId === currentUserPlan;
             const isUpgrade = getPlanOrder(planId) > getPlanOrder(currentUserPlan);
+            const isClickable = isCurrentPlan || isUpgrade;
 
             let buttonText = 'Selecionar Plano';
             if (isCurrentPlan) {
@@ -105,12 +106,19 @@ const Upgrade = () => {
             } else if (isUpgrade) {
               buttonText = 'Fazer Upgrade';
             } else {
-              // Downgrade scenario, not explicitly requested, so we'll just disable for now
               buttonText = 'Plano Atual';
             }
 
             return (
-              <Card key={planId} className={`p-8 flex flex-col shadow-lg ${isCurrentPlan ? 'border-2 border-blue-600 relative' : ''}`}>
+              <Card 
+                key={planId} 
+                className={`p-8 flex flex-col shadow-lg transition-all duration-300 ${isCurrentPlan ? 'border-2 border-blue-600 relative' : ''} ${isClickable ? 'hover:-translate-y-2 hover:shadow-xl cursor-pointer' : 'cursor-not-allowed bg-gray-50'}`}
+                onClick={() => {
+                  if (isClickable) {
+                    handlePlanActionClick(planId);
+                  }
+                }}
+              >
                 {isCurrentPlan && (
                   <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold">SEU PLANO ATUAL</div>
                 )}
@@ -134,9 +142,10 @@ const Upgrade = () => {
                   </ul>
                 </CardContent>
                 <Button
-                  className={`mt-8 w-full ${isCurrentPlan || isUpgrade ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
-                  onClick={() => handlePlanActionClick(planId)}
-                  disabled={!isCurrentPlan && !isUpgrade} // Disable if it's a downgrade scenario
+                  className={`mt-8 w-full ${isClickable ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
+                  disabled={!isClickable}
+                  aria-hidden="true"
+                  tabIndex={-1}
                 >
                   {buttonText}
                 </Button>

@@ -335,7 +335,10 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <Card className="p-8 flex flex-col shadow-lg">
+              <Card 
+                className="p-8 flex flex-col shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer"
+                onClick={() => handlePlanButtonClick('essencial')}
+              >
                 <CardHeader className="p-0 mb-6"><CardTitle>Essencial</CardTitle></CardHeader>
                 <CardContent className="p-0 flex-grow">
                   <p className="text-4xl font-bold mb-2">R$ {displayPrice.essencial}<span className="text-lg font-normal text-gray-500">/mês</span></p>
@@ -365,11 +368,14 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                     </li>
                   </ul>
                 </CardContent>
-                <Button variant="outline" className="mt-8 w-full" onClick={() => handlePlanButtonClick('essencial')}>
+                <Button variant="outline" className="mt-8 w-full pointer-events-none">
                   {getButtonText('Fazer Upgrade', 'Começar Agora')}
                 </Button>
               </Card>
-              <Card className="p-8 flex flex-col shadow-lg border-2 border-blue-600 relative">
+              <Card 
+                className="p-8 flex flex-col shadow-lg border-2 border-blue-600 relative transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer"
+                onClick={() => handlePlanButtonClick('professional')}
+              >
                 <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold">MAIS POPULAR</div>
                 <CardHeader className="p-0 mb-6"><CardTitle>Profissional</CardTitle></CardHeader>
                 <CardContent className="p-0 flex-grow">
@@ -400,11 +406,14 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                     </li>
                   </ul>
                 </CardContent>
-                <Button className="mt-8 w-full bg-blue-600 hover:bg-blue-700" onClick={() => handlePlanButtonClick('professional')}>
+                <Button className="mt-8 w-full bg-blue-600 hover:bg-blue-700 pointer-events-none">
                   {getButtonText('Fazer Upgrade', 'Começar Agora')}
                 </Button>
               </Card>
-              <Card className="p-8 flex flex-col shadow-lg">
+              <Card 
+                className="p-8 flex flex-col shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer"
+                onClick={() => handlePlanButtonClick('premium')}
+              >
                 <CardHeader className="p-0 mb-6"><CardTitle>Premium</CardTitle></CardHeader>
                 <CardContent className="p-0 flex-grow">
                   <p className="text-4xl font-bold mb-2">R$ {displayPrice.premium}<span className="text-lg font-normal text-gray-500">/mês</span></p>
@@ -434,7 +443,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                     </li>
                   </ul>
                 </CardContent>
-                <Button variant="outline" className="mt-8 w-full" onClick={() => handlePlanButtonClick('premium')}>
+                <Button variant="outline" className="mt-8 w-full pointer-events-none">
                   {getButtonText('Fazer Upgrade', 'Começar Agora')}
                 </Button>
               </Card>
