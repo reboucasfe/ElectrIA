@@ -105,9 +105,17 @@ const getChangesSummary = (oldData: ProposalFormValues, newData: ProposalFormVal
   ];
 
   const areValuesDifferent = (val1: any, val2: any) => {
-    const normalized1 = val1 === null || val1 === undefined ? '' : val1;
-    const normalized2 = val2 === null || val2 === undefined ? '' : val2;
-    return JSON.stringify(normalized1) !== JSON.stringify(normalized2);
+    // Helper para verificar se um valor é "vazio" (null, undefined, string vazia, array vazio)
+    const isEmpty = (v: any) => 
+      v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0);
+
+    // Se ambos os valores são considerados vazios, eles não são diferentes.
+    if (isEmpty(val1) && isEmpty(val2)) {
+      return false;
+    }
+
+    // Caso contrário, compare suas versões stringificadas para uma verificação definitiva.
+    return JSON.stringify(val1) !== JSON.stringify(val2);
   };
 
   fieldsToCompare.forEach(field => {
