@@ -82,6 +82,18 @@ interface ProposalFormProps {
   proposalId?: string; // ID da proposta se estiver editando
 }
 
+const fieldNameMap: { [key: string]: string } = {
+  clientName: 'Nome do Cliente',
+  clientEmail: 'Email do Cliente',
+  clientPhone: 'Telefone do Cliente',
+  proposalTitle: 'Título da Proposta',
+  proposalDescription: 'Descrição da Proposta',
+  notes: 'Notas Adicionais',
+  validityDays: 'Validade (dias)',
+  paymentMethods: 'Métodos de Pagamento',
+  selectedServices: 'Serviços Incluídos',
+};
+
 // Helper para comparar objetos e gerar um resumo de mudanças
 const getChangesSummary = (oldData: ProposalFormValues, newData: ProposalFormValues) => {
   const changes: { [key: string]: { old: any; new: any } | string } = {};
@@ -106,7 +118,7 @@ const getChangesSummary = (oldData: ProposalFormValues, newData: ProposalFormVal
   }
 
   const summary = changedFields.length > 0
-    ? `Campos alterados: ${changedFields.map(f => f.replace(/([A-Z])/g, ' $1').trim()).join(', ')}.`
+    ? `Campos alterados: ${changedFields.map(f => fieldNameMap[f] || f).join(', ')}.`
     : "Nenhuma alteração significativa.";
 
   return { summary, details: changes };
