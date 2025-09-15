@@ -103,7 +103,7 @@ const Services = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
-                  <TableHead>Tipo de Preço</TableHead>
+                  {/* Removido a coluna 'Tipo de Preço' */}
                   <TableHead className="text-right">Valor</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -112,9 +112,8 @@ const Services = () => {
                 {services.map((service) => (
                   <TableRow key={service.id}>
                     <TableCell className="font-medium">{service.name}</TableCell>
-                    <TableCell>{service.price_type === 'fixed' ? 'Preço Fixo' : 'Por Hora'}</TableCell>
                     <TableCell className="text-right">
-                      {service.price_type === 'fixed' ? formatCurrency(service.fixed_price) : `${formatCurrency(service.hourly_rate)}/h`}
+                      {formatCurrency(service.fixed_price)} {/* Sempre exibe o fixed_price (valor total) */}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>

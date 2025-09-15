@@ -20,36 +20,59 @@ const serviceSchema = z.object({
   price_type: z.enum(['fixed', 'hourly'], { required_error: "Você deve selecionar um tipo de preço." }),
   fixed_price: z.coerce.number().optional(),
   hourly_rate: z.coerce.number().optional(),
-}).refine(data => {
-  if (data.price_type === 'fixed') return data.fixed_price !== undefined && data.fixed_price > 0;
-  return true;
-}, {
-  message: "O preço fixo deve ser maior que zero.",
-  path: ['fixed_price'],
-}).refine(data => {
-  if (data.price_type === 'hourly') return data.hourly_rate !== undefined && data.hourly_rate > 0;
-  return true;
-}, {
-  message: "O valor por hora deve ser maior que zero.",
-  path: ['hourly_rate'],
+  total_hours: z.coerce.number().optional(), // Novo campo para total de horas
+}).superRefine((data, ctx) => { // Usando superRefine para validação condicional complexa
+  if (data.price_type === 'fixed') {
+    if (data.fixed_price === undefined || data.fixed_price <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "O preço fixo deve ser maior que zero.",
+        path: ['fixed_price'],
+      });
+    }
+  } else if (data.price_type === 'hourly') {
+    if (data.hourly_rate === undefined || data.hourly_rate <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "O valor por hora deve ser maior que zero.",
+        path: ['hourly_rate'],
+      });
+    }
+    if (data.total_hours === undefined || data.total_hours <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "O total de horas deve ser maior que zero.",
+        path: ['total_hours'],
+      });
+    }
+  }
+}).transform((data) => { // Transforma para calcular fixed_price se o tipo for 'hourly'
+  if (data.price_type === 'hourly' && data.hourly_rate && data.total_hours) {
+    return {
+      ...data,
+      fixed_price: data.hourly_rate * data.total_hours,
+    };
+  }
+  return data;
 });
 
 type ServiceFormValues = z.infer<typeof serviceSchema>;
-
-interface ServiceFormModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: () => void;
-  service: Service | null;
-}
 
 export interface Service {
   id: string;
   name: string;
   description?: string;
   price_type: 'fixed' | 'hourly';
-  fixed_price?: number;
+  fixed_price?: number; // Agora sempre representará o valor total
   hourly_rate?: number;
+  total_hours?: number; // Novo campo na interface
+}
+
+interface ServiceFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: () => void;
+  service: Service | null;
 }
 
 const ServiceFormModal = ({ isOpen, onClose, onSave, service }: ServiceFormModalProps) => {
@@ -69,8 +92,9 @@ const ServiceFormModal = ({ isOpen, onClose, onSave, service }: ServiceFormModal
           name: service.name,
           description: service.description || '',
           price_type: service.price_type,
-          fixed_price: service.fixed_price || undefined,
+          fixed_price: service.price_type === 'fixed' ? service.fixed_price : undefined, // Apenas se for fixo
           hourly_rate: service.hourly_rate || undefined,
+          total_hours: service.total_hours || undefined,
         });
       } else {
         reset({
@@ -79,6 +103,7 @@ const ServiceFormModal = ({ isOpen, onClose, onSave, service }: ServiceFormModal
           price_type: 'fixed',
           fixed_price: undefined,
           hourly_rate: undefined,
+          total_hours: undefined,
         });
       }
     }
@@ -96,8 +121,9 @@ const ServiceFormModal = ({ isOpen, onClose, onSave, service }: ServiceFormModal
       name: data.name,
       description: data.description,
       price_type: data.price_type,
-      fixed_price: data.price_type === 'fixed' ? data.fixed_price : null,
+      fixed_price: data.fixed_price, // Este será o valor calculado se price_type for 'hourly'
       hourly_rate: data.price_type === 'hourly' ? data.hourly_rate : null,
+      total_hours: data.price_type === 'hourly' ? data.total_hours : null, // Armazena total_hours
     };
 
     let error;
@@ -168,11 +194,18 @@ const ServiceFormModal = ({ isOpen, onClose, onSave, service }: ServiceFormModal
           )}
 
           {priceType === 'hourly' && (
-            <div className="space-y-2 animate-in fade-in-0">
-              <Label htmlFor="hourly_rate">Valor por Hora (R$)</Label>
-              <Input id="hourly_rate" type="number" step="0.01" {...register('hourly_rate')} />
-              {errors.hourly_rate && <p className="text-sm text-red-500">{errors.hourly_rate.message}</p>}
-            </div>
+            <>
+              <div className="space-y-2 animate-in fade-in-0">
+                <Label htmlFor="hourly_rate">Valor por Hora (R$)</Label>
+                <Input id="hourly_rate" type="number" step="0.01" {...register('hourly_rate')} />
+                {errors.hourly_rate && <p className="text-sm text-red-500">{errors.hourly_rate.message}</p>}
+              </div>
+              <div className="space-y-2 animate-in fade-in-0">
+                <Label htmlFor="total_hours">Total de Horas</Label>
+                <Input id="total_hours" type="number" step="0.5" {...register('total_hours')} />
+                {errors.total_hours && <p className="text-sm text-red-500">{errors.total_hours.message}</p>}
+              </div>
+            </>
           )}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose} disabled={loading}>Cancelar</Button>
