@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas'; // Mantido para compatibilidade, mas pdf.html() o usa internamente
 import { showError, showSuccess } from '@/utils/toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Service } from '@/components/dashboard/ServiceFormModal';
@@ -142,7 +142,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
         return;
       }
 
-      // Step 2: Generate PDF
+      // Step 2: Generate PDF using jspdf.html()
       if (!proposalPdfRef.current) {
         showError("Erro: Conteúdo do PDF não encontrado.");
         console.error("handleGeneratePdf: proposalPdfRef.current é nulo.");
@@ -150,33 +150,30 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
         return;
       }
 
-      console.log("handleGeneratePdf: Capturando conteúdo com html2canvas...");
-      const canvas = await html2canvas(proposalPdfRef.current, { scale: 2, useCORS: true });
-      console.log("handleGeneratePdf: Captura com html2canvas concluída.");
-      const imgData = canvas.toDataURL('image/png');
+      console.log("handleGeneratePdf: Gerando PDF com jspdf.html()...");
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210;
-      const pageHeight = 297;
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
 
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      // Define margens (ex: 20mm em todos os lados)
+      const margin = 20; // mm
 
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
+      // Opções para o método html()
+      const options = {
+        callback: function (pdf: jsPDF) {
+          pdf.save(`proposta-${proposalData.clientName.replace(/\s/g, '-')}-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
+          showSuccess("PDF da proposta gerado com sucesso!");
+          console.log("handleGeneratePdf: PDF salvo com sucesso.");
+          onPdfGeneratedAndSent(currentProposalId); // Passa o ID real
+        },
+        margin: [margin, margin, margin, margin], // Top, Right, Bottom, Left
+        autoPaging: 'text', // Tenta quebrar páginas em limites de texto, respeitando page-break-inside
+        html2canvas: {
+          scale: 2, // Escala maior para melhor resolução
+          useCORS: true,
+        },
+      };
 
-      pdf.save(`proposta-${proposalData.clientName.replace(/\s/g, '-')}-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
-      showSuccess("PDF da proposta gerado com sucesso!");
-      console.log("handleGeneratePdf: PDF salvo com sucesso.");
+      pdf.html(proposalPdfRef.current, options);
 
-      // Step 3: Notify parent component
-      onPdfGeneratedAndSent(currentProposalId); // Pass the actual ID
     } catch (error: any) {
       console.error("handleGeneratePdf: Erro ao gerar PDF:", error);
       showError(getTranslatedErrorMessage(error.message || "Erro desconhecido ao gerar PDF."));
