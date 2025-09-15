@@ -5,8 +5,16 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 import MobileSidebar from '@/components/dashboard/MobileSidebar';
+import React from 'react'; // Importar React para usar useEffect
 
 const DashboardLayout = () => {
+  React.useEffect(() => {
+    document.body.style.overflow = 'hidden'; // Esconde a barra de rolagem do body
+    return () => {
+      document.body.style.overflow = ''; // Restaura a barra de rolagem do body ao sair
+    };
+  }, []);
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
