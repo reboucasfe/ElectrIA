@@ -284,7 +284,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
               </div>
             </div>
 
-            <div className="text-center mt-12 pt-6 border-t border-gray-200 no-page-break-inside">
+            <footer className="text-center mt-12 pt-6 border-t border-gray-200 bg-gray-50 p-4 rounded-lg no-page-break-inside">
               <p className="text-gray-700 text-lg mb-2">Atenciosamente,</p>
               <p className="font-bold text-xl text-gray-900">{userFullName}</p>
               <p className="text-gray-700">{companyName}</p>
@@ -292,7 +292,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
               <p className="text-gray-700">Email: {userEmail}</p>
               {userCnpj && <p className="text-gray-700">CNPJ: {userCnpj}</p>}
               {userCompanyCity && <p className="text-gray-700">{userCompanyCity}, Brasil</p>}
-            </div>
+            </footer>
           </div>
         </div>
         <DialogFooter className="p-6 border-t flex justify-end gap-4">
