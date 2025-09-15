@@ -10,6 +10,7 @@ import { showError, showSuccess } from '@/utils/toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Service } from '@/components/dashboard/ServiceFormModal';
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
+import { cn } from '@/lib/utils'; // Importar cn para combinar classes
 
 interface SelectedService extends Service {
   uniqueId: string;
@@ -129,11 +130,11 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
       <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0">
         <DialogHeader className="p-6 border-b">
           <DialogTitle className="text-2xl">Pré-visualização da Proposta</DialogTitle>
-          <DialogDescription>Revise os detalhes da proposta antes de gerar o PDF.</DialogDescription> {/* Adicionado DialogDescription */}
+          <DialogDescription>Revise os detalhes da proposta antes de gerar o PDF.</DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
           <div ref={proposalPdfRef} className="bg-white p-10 shadow-lg rounded-lg text-gray-900 leading-relaxed" style={{ fontFamily: 'Arial, sans-serif' }}>
-            <div className="mb-10 text-center">
+            <div className="mb-10 text-center no-page-break-inside"> {/* Aplicado no-page-break-inside */}
               {user?.user_metadata?.avatar_url && (
                 <img src={user.user_metadata.avatar_url} alt="Logo da Empresa" className="h-20 mx-auto mb-4 object-contain" />
               )}
@@ -144,7 +145,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
               <p className="text-xl text-gray-700">{companyName}</p>
             </div>
 
-            <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50">
+            <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50 no-page-break-inside"> {/* Aplicado no-page-break-inside */}
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Informações do Cliente</h2>
               <p className="mb-2"><strong className="font-medium">Nome:</strong> {proposalData.clientName}</p>
               {proposalData.clientEmail && <p className="mb-2"><strong className="font-medium">Email:</strong> {proposalData.clientEmail}</p>}
@@ -152,14 +153,14 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
             </div>
 
             {proposalData.proposalDescription && (
-              <div className="mb-10 p-6 border border-gray-200 rounded-lg">
+              <div className="mb-10 p-6 border border-gray-200 rounded-lg no-page-break-inside"> {/* Aplicado no-page-break-inside */}
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Descrição da Proposta</h2>
                 <p className="text-gray-700">{proposalData.proposalDescription}</p>
               </div>
             )}
 
             <div className="mb-10">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Serviços Incluídos</h2>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4 no-page-break-inside">Serviços Incluídos</h2>
               {proposalData.selectedServices.length > 0 ? (
                 <table className="w-full border-collapse">
                   <thead>
@@ -172,7 +173,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
                   </thead>
                   <tbody>
                     {proposalData.selectedServices.map((service, index) => (
-                      <tr key={service.uniqueId} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <tr key={service.uniqueId} className={cn(index % 2 === 0 ? 'bg-white' : 'bg-gray-50', 'no-page-break-inside')}>
                         <td className="border border-gray-200 p-3">{service.name}</td>
                         <td className="border border-gray-200 p-3 text-center">{service.quantity}</td>
                         <td className="border border-gray-200 p-3 text-right">
@@ -183,7 +184,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-blue-100 font-bold text-blue-800">
+                    <tr className="bg-blue-100 font-bold text-blue-800 no-page-break-inside"> {/* Aplicado no-page-break-inside */}
                       <td colSpan={3} className="border border-gray-200 p-3 text-right text-xl">Total Geral:</td>
                       <td className="border border-gray-200 p-3 text-right text-xl">{formatCurrency(proposalTotal)}</td>
                     </tr>
@@ -195,13 +196,13 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
             </div>
 
             {proposalData.notes && (
-              <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50">
+              <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50 no-page-break-inside"> {/* Aplicado no-page-break-inside */}
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Notas Adicionais</h2>
                 <p className="text-gray-700">{proposalData.notes}</p>
               </div>
             )}
 
-            <div className="mb-10 p-6 border border-gray-200 rounded-lg">
+            <div className="mb-10 p-6 border border-gray-200 rounded-lg no-page-break-inside"> {/* Aplicado no-page-break-inside */}
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Condições de Pagamento</h2>
               <p className="mb-3"><strong className="font-medium">Validade da Proposta:</strong> {proposalData.validityDays} dias a partir de {new Date().toLocaleDateString('pt-BR')}</p>
               <p className="mb-2"><strong className="font-medium">Meios de Pagamento Aceitos:</strong></p>
@@ -221,7 +222,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
               </div>
             </div>
 
-            <div className="text-center mt-12 pt-6 border-t border-gray-200">
+            <div className="text-center mt-12 pt-6 border-t border-gray-200 no-page-break-inside"> {/* Aplicado no-page-break-inside */}
               <p className="text-gray-700 text-lg mb-2">Atenciosamente,</p>
               <p className="font-bold text-xl text-gray-900">{userFullName}</p>
               <p className="text-gray-700">{companyName}</p>

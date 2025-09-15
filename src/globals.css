@@ -100,3 +100,9 @@
     /* Removido para restaurar a rolagem da landing page */
   }
 }
+
+@layer utilities {
+  .no-page-break-inside {
+    page-break-inside: avoid;
+  }
+}
