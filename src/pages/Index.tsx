@@ -143,7 +143,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
               Nossa ferramenta resolve os maiores desafios dos eletricistas, transformando tempo perdido em vendas fechadas.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <Card className="p-6 shadow-md border border-transparent hover:border-red-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="p-0 mb-4 text-center">
                   <Clock className="h-8 w-8 text-red-500 mb-2 mx-auto" />
                   <CardTitle className="text-xl font-semibold">Demora para criar propostas detalhadas</CardTitle>
@@ -152,7 +152,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                   <p className="text-gray-600">Gaste menos tempo com burocracia e mais tempo com o que realmente importa.</p>
                 </CardContent>
               </Card>
-              <Card className="p-6 shadow-md border border-transparent hover:border-red-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="p-0 mb-4 text-center">
                   <XCircle className="h-8 w-8 text-red-500 mb-2 mx-auto" />
                   <CardTitle className="text-xl font-semibold">Perda de clientes por falta de agilidade</CardTitle>
@@ -161,7 +161,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                   <p className="text-gray-600">Responda rapidamente e feche negócios antes da concorrência.</p>
                 </CardContent>
               </Card>
-              <Card className="p-6 shadow-md border border-transparent hover:border-red-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="p-0 mb-4 text-center">
                   <FileWarning className="h-8 w-8 text-red-500 mb-2 mx-auto" />
                   <CardTitle className="text-xl font-semibold">Propostas mal formatadas e não profissionais</CardTitle>
@@ -170,7 +170,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                   <p className="text-gray-600">Impressione com documentos claros, organizados e com sua marca.</p>
                 </CardContent>
               </Card>
-              <Card className="p-6 shadow-md border border-transparent hover:border-red-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="p-0 mb-4 text-center">
                   <Calculator className="h-8 w-8 text-red-500 mb-2 mx-auto" />
                   <CardTitle className="text-xl font-semibold">Tempo perdido calculando materiais e mão de obra</CardTitle>
@@ -179,7 +179,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                   <p className="text-gray-600">Deixe a IA fazer os cálculos complexos em segundos.</p>
                 </CardContent>
               </Card>
-              <Card className="p-6 shadow-md border border-transparent hover:border-red-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="p-0 mb-4 text-center">
                   <Eye className="h-8 w-8 text-red-500 mb-2 mx-auto" />
                   <CardTitle className="text-xl font-semibold">Dificuldade para acompanhar orçamentos enviados</CardTitle>
@@ -226,12 +226,60 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
               Tudo que Você Precisa em Uma Ferramenta
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-              <div className="text-left"><Bot className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">IA Especializada</h3><p className="text-gray-600">Treinada para entender termos técnicos de serviços elétricos.</p></div>
-              <div className="text-left"><MessageSquare className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">Integração com WhatsApp</h3><p className="text-gray-600">Conecte seu número e automatize o atendimento.</p></div>
-              <div className="text-left"><BarChart3 className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">Cálculo Automático</h3><p className="text-gray-600">Calcule custos de materiais e mão de obra instantaneamente.</p></div>
-              <div className="text-left"><ClipboardList className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">Templates de Proposta</h3><p className="text-gray-600">Use nossos templates ou crie os seus com sua marca.</p></div>
-              <div className="text-left"><Users className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">Dashboard de Vendas</h3><p className="text-gray-600">Acompanhe o status de cada proposta enviada.</p></div>
-              <div className="text-left"><Zap className="h-8 w-8 text-blue-600 mb-4" /><h3 className="text-xl font-semibold mb-2">Catálogo de Serviços</h3><p className="text-gray-600">Cadastre seus serviços e preços para agilizar os cálculos.</p></div>
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                <CardHeader className="p-0 mb-4 text-center">
+                  <Bot className="h-8 w-8 text-blue-600 mb-2 mx-auto" />
+                  <CardTitle className="text-xl font-semibold">IA Especializada</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0 text-center">
+                  <p className="text-gray-600">Treinada para entender termos técnicos de serviços elétricos.</p>
+                </CardContent>
+              </Card>
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                <CardHeader className="p-0 mb-4 text-center">
+                  <MessageSquare className="h-8 w-8 text-blue-600 mb-2 mx-auto" />
+                  <CardTitle className="text-xl font-semibold">Integração com WhatsApp</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0 text-center">
+                  <p className="text-gray-600">Conecte seu número e automatize o atendimento.</p>
+                </CardContent>
+              </Card>
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                <CardHeader className="p-0 mb-4 text-center">
+                  <BarChart3 className="h-8 w-8 text-blue-600 mb-2 mx-auto" />
+                  <CardTitle className="text-xl font-semibold">Cálculo Automático</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0 text-center">
+                  <p className="text-gray-600">Calcule custos de materiais e mão de obra instantaneamente.</p>
+                </CardContent>
+              </Card>
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                <CardHeader className="p-0 mb-4 text-center">
+                  <ClipboardList className="h-8 w-8 text-blue-600 mb-2 mx-auto" />
+                  <CardTitle className="text-xl font-semibold">Templates de Proposta</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0 text-center">
+                  <p className="text-gray-600">Use nossos templates ou crie os seus com sua marca.</p>
+                </CardContent>
+              </Card>
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                <CardHeader className="p-0 mb-4 text-center">
+                  <Users className="h-8 w-8 text-blue-600 mb-2 mx-auto" />
+                  <CardTitle className="text-xl font-semibold">Dashboard de Vendas</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0 text-center">
+                  <p className="text-gray-600">Acompanhe o status de cada proposta enviada.</p>
+                </CardContent>
+              </Card>
+              <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                <CardHeader className="p-0 mb-4 text-center">
+                  <Zap className="h-8 w-8 text-blue-600 mb-2 mx-auto" />
+                  <CardTitle className="text-xl font-semibold">Catálogo de Serviços</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0 text-center">
+                  <p className="text-gray-600">Cadastre seus serviços e preços para agilizar os cálculos.</p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
