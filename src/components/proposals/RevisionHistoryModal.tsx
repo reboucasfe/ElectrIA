@@ -27,6 +27,7 @@ interface Revision {
     summary: string;
     details: { [key: string]: { old: any; new: any } | string };
   } | null;
+  change_type?: 'content_revision' | 'status_change'; // Novo campo opcional
 }
 
 interface RevisionHistoryModalProps {
@@ -67,7 +68,7 @@ const RevisionHistoryModal = ({ isOpen, onClose, proposalId, proposalSequentialN
       .from('proposal_revisions')
       .select('*')
       .eq('proposal_id', proposalId)
-      .order('revision_number', { ascending: false });
+      .order('created_at', { ascending: false }); // Ordenar por created_at para ver as mais recentes primeiro
 
     if (error) {
       showError(getTranslatedErrorMessage(error.message));
@@ -162,7 +163,11 @@ const RevisionHistoryModal = ({ isOpen, onClose, proposalId, proposalSequentialN
                 <AccordionItem key={revision.id} value={revision.id}>
                   <AccordionTrigger className="hover:no-underline">
                     <div className="flex flex-col items-start text-left">
-                      <span className="font-semibold">Revisão {String(revision.revision_number).padStart(2, '0')}</span>
+                      <span className="font-semibold">
+                        Revisão {String(revision.revision_number).padStart(2, '0')}
+                        {revision.change_type === 'status_change' && <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">Status Alterado</span>}
+                        {revision.change_type === 'content_revision' && <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">Conteúdo Alterado</span>}
+                      </span>
                       <span className="text-sm text-gray-500 font-normal">
                         {format(new Date(revision.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                       </span>

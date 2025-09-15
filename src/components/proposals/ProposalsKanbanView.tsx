@@ -144,11 +144,9 @@ const ProposalsKanbanView = () => {
 
     // Update in Supabase
     try {
-      let currentRevisionNumber = (draggedProposal.revision_number || 0) + 1;
-
+      // DO NOT increment revision_number here for status changes
       const updatePayload: Partial<Proposal> = { 
         status: newStatus,
-        revision_number: currentRevisionNumber, // Incrementa o número da revisão
       };
       if (newStatus === 'accepted') {
         updatePayload.accepted_at = new Date().toISOString();
@@ -174,7 +172,7 @@ const ProposalsKanbanView = () => {
       } else {
         showSuccess(`Proposta "${draggedProposal.proposal_title}" movida para "${columns.find(col => col.id === destinationColumnId)?.title}"!`);
         
-        // Registrar no histórico de revisões
+        // Registrar no histórico de revisões SEM alterar o revision_number da proposta
         if (user && updatedProposal) {
           const changesSummary = {
             summary: `Status da proposta alterado via Kanban de '${oldStatus}' para '${newStatus}'.`,
@@ -184,9 +182,11 @@ const ProposalsKanbanView = () => {
           };
           const { error: revisionError } = await supabase.from('proposal_revisions').insert({
             proposal_id: updatedProposal.id,
-            revision_number: updatedProposal.revision_number,
+            // Use o revision_number *atual* da proposta, pois nenhuma mudança de conteúdo ocorreu
+            revision_number: draggedProposal.revision_number, 
             user_id: user.id,
             changes: changesSummary,
+            change_type: 'status_change', // Novo campo para indicar tipo de mudança
           });
           if (revisionError) {
             console.error("Kanban: Erro ao salvar revisão de status:", revisionError);

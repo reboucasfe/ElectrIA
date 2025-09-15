@@ -491,6 +491,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
           revision_number: result.data.revision_number,
           user_id: user.id,
           changes: changesSummary,
+          change_type: 'content_revision', // Novo campo para indicar tipo de mudança
         });
         if (revisionError) {
           console.error("saveProposalToSupabase: Erro ao salvar revisão:", revisionError);
