@@ -310,23 +310,29 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     } else {
       console.log("saveProposalToSupabase: Proposta salva com sucesso:", result.data);
       showSuccess(`Proposta ${proposalId ? 'atualizada' : 'salva'} com sucesso!`);
-      if (!proposalId) {
-        console.log("saveProposalToSupabase: Nova proposta criada, navegando para edição:", result.data.id);
-        navigate(`/proposals/edit/${result.data.id}`);
-      }
+      // REMOVIDO: navigate(`/proposals/edit/${result.data.id}`);
       return result.data;
     }
   };
 
   const handleSaveDraft = async (data: ProposalFormValues) => {
     console.log("handleSaveDraft: Tentando salvar rascunho com dados:", data);
-    await saveProposalToSupabase(data, 'draft');
+    const savedProposal = await saveProposalToSupabase(data, 'draft');
+    if (savedProposal && !proposalId) { // Se for uma nova proposta, redireciona para a edição
+      navigate(`/proposals/edit/${savedProposal.id}`);
+    }
   };
 
   const handleOpenPreviewModal = async (data: ProposalFormValues) => {
     console.log("handleOpenPreviewModal: Validação do formulário bem-sucedida. Tentando salvar e abrir modal de pré-visualização com dados:", data);
     const savedProposal = await saveProposalToSupabase(data, proposalId ? initialData.status : 'draft');
     if (savedProposal) {
+      // Se for uma nova proposta, redireciona para a edição ANTES de abrir o modal
+      if (!proposalId) {
+        navigate(`/proposals/edit/${savedProposal.id}`);
+        // Pequeno delay para garantir que a navegação ocorra antes de abrir o modal
+        await new Promise(resolve => setTimeout(resolve, 100)); 
+      }
       console.log("handleOpenPreviewModal: Proposta salva, preparando dados para pré-visualização.");
       setPreviewData({
         ...data,
