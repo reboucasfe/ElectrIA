@@ -166,6 +166,7 @@ const ProposalForm = () => {
   };
 
   const handleGeneratePdf = async (data: ProposalFormValues) => {
+    console.log("Attempting to generate PDF..."); // Log para verificar se a função é chamada
     setLoading(true);
     if (!proposalPdfRef.current) {
       showError("Erro: Conteúdo do PDF não encontrado.");
@@ -206,9 +207,10 @@ const ProposalForm = () => {
   const onSubmit = async (data: ProposalFormValues) => {
     setLoading(true);
     console.log("Dados da Proposta:", data);
-    // Aqui você implementaria a lógica para salvar o rascunho ou gerar a proposta com IA
-    // Por enquanto, apenas um toast de sucesso
-    showSuccess("Proposta salva como rascunho (funcionalidade de IA em desenvolvimento)!");
+    // Esta função atualmente apenas simula o salvamento.
+    // Para salvar de verdade, você precisaria de uma tabela 'proposals' no Supabase
+    // e adicionar a lógica de inserção aqui.
+    showSuccess("Proposta salva como rascunho (funcionalidade de salvamento em banco de dados em desenvolvimento)!");
     setLoading(false);
   };
 
@@ -416,7 +418,7 @@ const ProposalForm = () => {
       </div>
 
       {/* Hidden content for PDF generation */}
-      <div ref={proposalPdfRef} className="p-8 bg-white text-gray-900 hidden" style={{ width: '210mm', minHeight: '297mm', fontFamily: 'Arial, sans-serif' }}>
+      <div ref={proposalPdfRef} className="absolute -left-[9999px] p-8 bg-white text-gray-900" style={{ width: '210mm', minHeight: '297mm', fontFamily: 'Arial, sans-serif' }}>
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-blue-700 mb-2">{watchedFormValues.proposalTitle}</h1>
           <p className="text-lg text-gray-700">{companyName}</p>
