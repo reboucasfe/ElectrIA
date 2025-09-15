@@ -94,6 +94,33 @@ const fieldNameMap: { [key: string]: string } = {
   selectedServices: 'Serviços Incluídos',
 };
 
+const compareServices = (oldServices: SelectedService[], newServices: SelectedService[]): string => {
+  const oldMap = new Map((oldServices || []).map(s => [s.uniqueId, s]));
+  const newMap = new Map((newServices || []).map(s => [s.uniqueId, s]));
+  const changes: string[] = [];
+
+  // Checa por serviços removidos e modificados
+  oldMap.forEach((oldService, uniqueId) => {
+    if (!newMap.has(uniqueId)) {
+      changes.push(`- Removido: ${oldService.name}`);
+    } else {
+      const newService = newMap.get(uniqueId)!;
+      if (oldService.quantity !== newService.quantity) {
+        changes.push(`~ Modificado: ${oldService.name} (Qtd: ${oldService.quantity} -> ${newService.quantity})`);
+      }
+    }
+  });
+
+  // Checa por serviços adicionados
+  newMap.forEach((newService, uniqueId) => {
+    if (!oldMap.has(uniqueId)) {
+      changes.push(`+ Adicionado: ${newService.name} (Qtd: ${newService.quantity})`);
+    }
+  });
+
+  return changes.join('\n');
+};
+
 // Helper para comparar objetos e gerar um resumo de mudanças
 const getChangesSummary = (oldData: ProposalFormValues, newData: ProposalFormValues) => {
   const changes: { [key: string]: { old: any; new: any } | string } = {};
@@ -105,16 +132,10 @@ const getChangesSummary = (oldData: ProposalFormValues, newData: ProposalFormVal
   ];
 
   const areValuesDifferent = (val1: any, val2: any) => {
-    // Helper para verificar se um valor é "vazio" (null, undefined, string vazia, array vazio)
-    const isEmpty = (v: any) => 
-      v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0);
-
-    // Se ambos os valores são considerados vazios, eles não são diferentes.
+    const isEmpty = (v: any) => v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0);
     if (isEmpty(val1) && isEmpty(val2)) {
       return false;
     }
-
-    // Caso contrário, compare suas versões stringificadas para uma verificação definitiva.
     return JSON.stringify(val1) !== JSON.stringify(val2);
   };
 
@@ -125,10 +146,11 @@ const getChangesSummary = (oldData: ProposalFormValues, newData: ProposalFormVal
     }
   });
 
-  // Comparação de selectedServices é mais complexa, apenas indicamos que mudou
-  if (areValuesDifferent(oldData.selectedServices, newData.selectedServices)) {
+  // Comparação detalhada de serviços
+  const serviceChangesDescription = compareServices(oldData.selectedServices, newData.selectedServices);
+  if (serviceChangesDescription) {
     changedFields.push('selectedServices');
-    changes.selectedServices = "Serviços incluídos foram alterados.";
+    changes.selectedServices = serviceChangesDescription;
   }
 
   const summary = changedFields.length > 0
