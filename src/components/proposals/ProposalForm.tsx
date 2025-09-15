@@ -104,15 +104,21 @@ const getChangesSummary = (oldData: ProposalFormValues, newData: ProposalFormVal
     'proposalDescription', 'notes', 'validityDays', 'paymentMethods'
   ];
 
+  const areValuesDifferent = (val1: any, val2: any) => {
+    const normalized1 = val1 === null || val1 === undefined ? '' : val1;
+    const normalized2 = val2 === null || val2 === undefined ? '' : val2;
+    return JSON.stringify(normalized1) !== JSON.stringify(normalized2);
+  };
+
   fieldsToCompare.forEach(field => {
-    if (JSON.stringify(oldData[field]) !== JSON.stringify(newData[field])) {
+    if (areValuesDifferent(oldData[field], newData[field])) {
       changedFields.push(field);
       changes[field] = { old: oldData[field], new: newData[field] };
     }
   });
 
   // Comparação de selectedServices é mais complexa, apenas indicamos que mudou
-  if (JSON.stringify(oldData.selectedServices) !== JSON.stringify(newData.selectedServices)) {
+  if (areValuesDifferent(oldData.selectedServices, newData.selectedServices)) {
     changedFields.push('selectedServices');
     changes.selectedServices = "Serviços incluídos foram alterados.";
   }
