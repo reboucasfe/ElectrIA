@@ -25,12 +25,13 @@ import LoginModal from "./components/LoginModal";
 import PaymentPage from "./pages/PaymentPage";
 import ProposalsList from "./pages/ProposalsList";
 import ProposalsOverview from "./pages/ProposalsOverview";
-import ProposalFormPage from "./pages/ProposalFormPage"; // Renomeado de NewProposal
+import ProposalFormPage from "./pages/ProposalFormPage";
 import ProposalsInProgress from "./pages/ProposalsInProgress";
 import ProposalsClosed from "./pages/ProposalsClosed";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Services from "./pages/Services";
+import ProposalsKanbanView from "./components/proposals/ProposalsKanbanView"; // Importar o novo componente Kanban
 
 const queryClient = new QueryClient();
 
@@ -112,10 +113,11 @@ const App = () => {
                 <Route path="/services" element={<Services />} />
                 <Route path="/proposals" element={<ProposalsList />} />
                 <Route path="/proposals-overview" element={<ProposalsOverview />} />
-                <Route path="/proposals/new" element={<ProposalFormPage />} /> {/* Usando ProposalFormPage */}
-                <Route path="/proposals/edit/:id" element={<ProposalFormPage />} /> {/* Nova rota para edição */}
+                <Route path="/proposals/new" element={<ProposalFormPage />} />
+                <Route path="/proposals/edit/:id" element={<ProposalFormPage />} />
                 <Route path="/proposals/in-progress" element={<ProposalsInProgress />} />
                 <Route path="/proposals/closed" element={<ProposalsClosed />} />
+                <Route path="/proposals/kanban" element={<ProposalsKanbanView />} /> {/* Nova rota para o Kanban */}
               </Route>
             </Route>
 

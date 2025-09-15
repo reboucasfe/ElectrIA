@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 const MobileSidebar = () => {
   const navItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { href: '/proposals-overview', icon: FileText, label: 'Propostas' },
+    { href: '/proposals-overview', icon: FileText, label: 'Propostas' }, // Link atualizado
     { href: '/services', icon: Wrench, label: 'Serviços' },
     { href: '/profile', icon: User, label: 'Perfil' },
     { href: '/upgrade', icon: Crown, label: 'Upgrade Plano' },
