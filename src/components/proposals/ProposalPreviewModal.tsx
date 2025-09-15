@@ -4,7 +4,7 @@ import React, { useRef, useState, useMemo, useEffect, useCallback } from 'react'
 import ReactDOM from 'react-dom/client'; // Importar ReactDOM para React 18
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, User, FileText, Wrench, MessageSquare, CreditCard } from 'lucide-react'; // Importar ícones
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { showError, showSuccess } from '@/utils/toast';
@@ -120,7 +120,9 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
       key: "client-info",
       content: (
         <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50 no-page-break-inside">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Informações do Cliente</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+            <User className="h-6 w-6 text-blue-600 mr-3" /> Informações do Cliente
+          </h2>
           <p className="mb-2"><strong className="font-medium">Nome:</strong> {proposalData.clientName}</p>
           {proposalData.clientEmail && <p className="mb-2"><strong className="font-medium">Email:</strong> {proposalData.clientEmail}</p>}
           {proposalData.clientPhone && <p className="mb-2"><strong className="font-medium">WhatsApp:</strong> {proposalData.clientPhone}</p>}
@@ -134,7 +136,9 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
         key: "description",
         content: (
           <div className="mb-10 p-6 border border-gray-200 rounded-lg no-page-break-inside">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Descrição da Proposta</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+              <FileText className="h-6 w-6 text-blue-600 mr-3" /> Descrição da Proposta
+            </h2>
             <p className="text-gray-700" dangerouslySetInnerHTML={{ __html: proposalData.proposalDescription.replace(/\n/g, '<br />') }}></p>
           </div>
         ),
@@ -146,7 +150,9 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
       key: "services",
       content: (
         <div className="mb-10">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4 no-page-break-inside">Serviços Incluídos</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4 no-page-break-inside flex items-center">
+            <Wrench className="h-6 w-6 text-blue-600 mr-3" /> Serviços Incluídos
+          </h2>
           {proposalData.selectedServices.length > 0 ? (
             <table className="w-full border-collapse">
               <thead>
@@ -189,7 +195,9 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
         key: "notes",
         content: (
           <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50 no-page-break-inside">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Notas Adicionais</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+              <MessageSquare className="h-6 w-6 text-blue-600 mr-3" /> Notas Adicionais
+            </h2>
             <p className="text-gray-700" dangerouslySetInnerHTML={{ __html: proposalData.notes.replace(/\n/g, '<br />') }}></p>
           </div>
         ),
@@ -201,7 +209,9 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
       key: "payment-conditions",
       content: (
         <div className="mb-10 p-6 border border-gray-200 rounded-lg no-page-break-inside">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Condições de Pagamento</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+            <CreditCard className="h-6 w-6 text-blue-600 mr-3" /> Condições de Pagamento
+          </h2>
           <p className="mb-3"><strong className="font-medium">Validade da Proposta:</strong> {proposalData.validityDays} dias a partir de {new Date(proposalData.created_at || new Date()).toLocaleDateString('pt-BR')}</p>
           <p className="mb-2"><strong className="font-medium">Meios de Pagamento Aceitos:</strong></p>
           <ul className="list-disc list-inside ml-6 text-gray-700">
