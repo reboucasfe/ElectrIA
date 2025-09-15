@@ -47,6 +47,14 @@ const fieldNameMap: { [key: string]: string } = {
   validityDays: 'Validade (dias)',
   paymentMethods: 'Métodos de Pagamento',
   selectedServices: 'Serviços Incluídos',
+  totalValue: 'Valor Total da Proposta', // Novo campo para o valor total
+};
+
+const formatCurrency = (value: number) => {
+  return value.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
 };
 
 const RevisionHistoryModal = ({ isOpen, onClose, proposalId, proposalSequentialNumber, proposalCreatedAt }: RevisionHistoryModalProps) => {
@@ -76,12 +84,15 @@ const RevisionHistoryModal = ({ isOpen, onClose, proposalId, proposalSequentialN
     }
   }, [isOpen, fetchRevisions]);
 
-  const renderChangeValue = (value: any) => {
+  const renderChangeValue = (value: any, key: string) => {
     if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '') || (Array.isArray(value) && value.length === 0)) {
-      return <span className="text-gray-500 italic">Vazio</span>; // Alterado de "Não definido" para "Vazio"
+      return <span className="text-gray-500 italic">Vazio</span>;
     }
     if (Array.isArray(value)) {
       return value.join(', ');
+    }
+    if (key === 'totalValue' && typeof value === 'number') {
+      return formatCurrency(value);
     }
     if (typeof value === 'string' && value.includes('\n')) {
       return <pre className="whitespace-pre-wrap font-sans text-sm">{value}</pre>;
@@ -109,16 +120,16 @@ const RevisionHistoryModal = ({ isOpen, onClose, proposalId, proposalSequentialN
         {Object.entries(changes.details).map(([key, value]) => (
           <div key={key} className="border-b pb-2">
             <strong className="text-gray-800">{fieldNameMap[key] || key}</strong>
-            {key === 'selectedServices' && typeof value === 'string' ? ( // Specific handling for selectedServices string
+            {key === 'selectedServices' && typeof value === 'string' ? (
               <pre className="whitespace-pre-wrap font-sans text-sm text-gray-600 mt-1">{value}</pre>
-            ) : typeof value === 'string' ? ( // Generic string (e.g., if summary is directly stored here, though it shouldn't be)
+            ) : typeof value === 'string' ? (
               <p className="text-gray-600 mt-1">{value}</p>
-            ) : ( // Object { old, new }
+            ) : (
               <div className="grid grid-cols-[auto,1fr] gap-x-2 mt-1 text-sm">
                 <div className="text-red-600 font-semibold">De:</div>
-                <div className="p-2 rounded-md bg-red-50 border border-red-200">{renderChangeValue(value.old)}</div>
+                <div className="p-2 rounded-md bg-red-50 border border-red-200">{renderChangeValue(value.old, key)}</div>
                 <div className="text-green-700 font-semibold">Para:</div>
-                <div className="p-2 rounded-md bg-green-50 border border-green-200">{renderChangeValue(value.new)}</div>
+                <div className="p-2 rounded-md bg-green-50 border border-green-200">{renderChangeValue(value.new, key)}</div>
               </div>
             )}
           </div>

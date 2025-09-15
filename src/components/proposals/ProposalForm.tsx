@@ -92,6 +92,7 @@ const fieldNameMap: { [key: string]: string } = {
   validityDays: 'Validade (dias)',
   paymentMethods: 'Métodos de Pagamento',
   selectedServices: 'Serviços Incluídos',
+  totalValue: 'Valor Total da Proposta', // Novo campo para o valor total
 };
 
 const compareServices = (oldServices: SelectedService[], newServices: SelectedService[]): string => {
@@ -193,6 +194,15 @@ const getChangesSummary = (oldData: ProposalFormValues, newData: ProposalFormVal
   if (serviceChangesDescription) {
     changedFields.push('selectedServices');
     changes.selectedServices = serviceChangesDescription; // This will be a string with detailed changes
+  }
+
+  // Calculate and compare total values
+  const oldTotal = (oldData.selectedServices || []).reduce((sum, svc) => sum + (svc.calculated_total || 0), 0);
+  const newTotal = (newData.selectedServices || []).reduce((sum, svc) => sum + (svc.calculated_total || 0), 0);
+
+  if (oldTotal !== newTotal) {
+    changedFields.push('totalValue');
+    changes.totalValue = { old: oldTotal, new: newTotal }; // Store raw numbers, format in render
   }
 
   const summary = changedFields.length > 0
