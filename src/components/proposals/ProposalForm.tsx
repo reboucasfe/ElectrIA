@@ -23,6 +23,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import InputMask from 'react-input-mask';
 import { Service } from '@/components/dashboard/ServiceFormModal'; // Importa a interface Service
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'; // Importação adicionada
 
 // Estende a interface Service para incluir a quantidade e o total calculado no formulário
 interface SelectedService extends Service {
