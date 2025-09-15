@@ -28,8 +28,8 @@ const profileSchema = z.object({
   companyName: z.string().optional(),
   whatsapp: z.string()
     .transform((val) => val.replace(/\D/g, '')) // Remove non-digits
-    .refine((val) => val.length === 11, { // Validate raw length for 11 digits (DDD + 9XXXX-XXXX)
-      message: "O número de WhatsApp deve ter 11 dígitos (DDD + 9XXXX-XXXX)."
+    .refine((val) => val.length === 11 || val.length === 0, { // Validate raw length for 11 digits (DDD + 9XXXX-XXXX)
+      message: "O número de WhatsApp deve ter 11 dígitos ou ser deixado em branco."
     })
     .refine((val) => /^\d+$/.test(val), { // Ensure it's only digits after transform
       message: "O número de WhatsApp deve conter apenas dígitos."
@@ -47,6 +47,7 @@ const profileSchema = z.object({
   bankAgency: z.string().optional(),
   pixKey: z.string().optional(),
   acceptedPaymentMethods: z.array(z.string()).optional(), // Array de strings para métodos de pagamento
+  companyCity: z.string().optional(), // Novo campo para cidade da empresa
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -71,6 +72,7 @@ const Profile = () => {
       bankAgency: user?.user_metadata?.bank_agency || '',
       pixKey: user?.user_metadata?.pix_key || '',
       acceptedPaymentMethods: user?.user_metadata?.accepted_payment_methods || [],
+      companyCity: user?.user_metadata?.company_city || '', // Valor padrão para companyCity
     },
   });
 
@@ -169,6 +171,7 @@ const Profile = () => {
         bank_agency: data.bankAgency,
         pix_key: data.pixKey,
         accepted_payment_methods: data.acceptedPaymentMethods,
+        company_city: data.companyCity, // Salva a cidade da empresa
       }
     });
 
@@ -328,6 +331,16 @@ const Profile = () => {
                 )}
               />
               {errors.cnpj && <p className="text-sm text-red-500">{errors.cnpj.message}</p>}
+            </div>
+
+            <div className="space-y-2"> {/* Novo campo para cidade da empresa */}
+              <Label htmlFor="companyCity">Cidade da Empresa (Opcional)</Label>
+              <Input
+                id="companyCity"
+                placeholder="Ex: São Paulo"
+                {...register('companyCity')}
+              />
+              {errors.companyCity && <p className="text-sm text-red-500">{errors.companyCity.message}</p>}
             </div>
 
             <div className="space-y-4 mt-6"> {/* Adicionado mt-6 para espaçamento */}

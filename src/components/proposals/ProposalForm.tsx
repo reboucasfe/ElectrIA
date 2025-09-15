@@ -37,6 +37,7 @@ interface SelectedService extends Service {
 }
 
 const proposalFormSchema = z.object({
+  proposalNumber: z.number().optional(), // Novo campo para o número da proposta
   clientName: z.string().min(1, { message: "Nome do cliente é obrigatório." }),
   clientEmail: z.string().email({ message: "E-mail do cliente inválido." }).optional().or(z.literal('')),
   clientPhone: z.string()
@@ -92,6 +93,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
   const { register, handleSubmit, control, setValue, watch, reset, formState: { errors } } = useForm<ProposalFormValues>({
     resolver: zodResolver(proposalFormSchema),
     defaultValues: {
+      proposalNumber: undefined, // Valor padrão para o número da proposta
       clientName: '',
       clientEmail: '',
       clientPhone: '',
@@ -141,35 +143,58 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     fetchAvailableServices();
   }, [fetchAvailableServices]);
 
-  // Preencher formulário com dados iniciais para edição
+  // Preencher formulário com dados iniciais para edição ou gerar novo número
   useEffect(() => {
-    if (initialData) {
-      reset({
-        clientName: initialData.client_name,
-        clientEmail: initialData.client_email || '',
-        clientPhone: initialData.client_phone || '',
-        proposalTitle: initialData.proposal_title,
-        proposalDescription: initialData.proposal_description || '',
-        selectedServices: initialData.selected_services.map((s: any) => ({ ...s, uniqueId: s.uniqueId || crypto.randomUUID() })), // Garante uniqueId
-        notes: initialData.notes || '',
-        paymentMethods: initialData.payment_methods || [],
-        validityDays: initialData.validity_days,
-      });
-    } else {
-      // Reset para valores padrão ao criar nova proposta
-      reset({
-        clientName: '',
-        clientEmail: '',
-        clientPhone: '',
-        proposalTitle: user?.user_metadata?.company_name ? `Proposta de Serviços - ${user.user_metadata.company_name}` : 'Proposta de Serviços',
-        proposalDescription: '',
-        selectedServices: [],
-        notes: '',
-        paymentMethods: user?.user_metadata?.accepted_payment_methods || [],
-        validityDays: 7,
-      });
-    }
-  }, [initialData, reset, user]);
+    const initializeForm = async () => {
+      if (initialData) {
+        reset({
+          proposalNumber: initialData.proposal_number, // Carrega o número da proposta existente
+          clientName: initialData.client_name,
+          clientEmail: initialData.client_email || '',
+          clientPhone: initialData.client_phone || '',
+          proposalTitle: initialData.proposal_title,
+          proposalDescription: initialData.proposal_description || '',
+          selectedServices: initialData.selected_services.map((s: any) => ({ ...s, uniqueId: s.uniqueId || crypto.randomUUID() })), // Garante uniqueId
+          notes: initialData.notes || '',
+          paymentMethods: initialData.payment_methods || [],
+          validityDays: initialData.validity_days,
+        });
+      } else {
+        // Reset para valores padrão ao criar nova proposta
+        reset({
+          clientName: '',
+          clientEmail: '',
+          clientPhone: '',
+          proposalTitle: user?.user_metadata?.company_name ? `Proposta de Serviços - ${user.user_metadata.company_name}` : 'Proposta de Serviços',
+          proposalDescription: '',
+          selectedServices: [],
+          notes: '',
+          paymentMethods: user?.user_metadata?.accepted_payment_methods || [],
+          validityDays: 7,
+        });
+
+        // Gerar novo número de proposta apenas para novas propostas
+        if (user) {
+          const { data: maxProposal, error } = await supabase
+            .from('proposals')
+            .select('proposal_number')
+            .eq('user_id', user.id)
+            .order('proposal_number', { ascending: false })
+            .limit(1)
+            .single();
+
+          if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
+            showError(getTranslatedErrorMessage(error.message));
+          } else {
+            const nextNumber = (maxProposal?.proposal_number || 0) + 1;
+            setValue('proposalNumber', nextNumber);
+          }
+        }
+      }
+    };
+
+    initializeForm();
+  }, [initialData, reset, user, setValue]);
 
   // Pre-fill payment methods from user profile if creating a new proposal
   useEffect(() => {
@@ -246,6 +271,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
 
     const proposalPayload = {
       user_id: user.id,
+      proposal_number: data.proposalNumber, // Inclui o número da proposta
       client_name: data.clientName,
       client_email: data.clientEmail || null,
       client_phone: data.clientPhone || null,
@@ -300,6 +326,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
         ...data,
         id: savedProposal.id, 
         status: savedProposal.status,
+        proposalNumber: savedProposal.proposal_number, // Garante que o número da proposta esteja no previewData
       });
       setIsPreviewModalOpen(true);
     } else {
@@ -348,6 +375,10 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
             <CardDescription>Detalhes do cliente para quem a proposta será enviada.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="proposalNumber">Número da Proposta</Label>
+              <Input id="proposalNumber" value={watchedFormValues.proposalNumber || ''} disabled className="bg-gray-100 cursor-not-allowed" />
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="clientName">Nome do Cliente</Label>
               <Input id="clientName" placeholder="Nome Completo do Cliente" {...register('clientName')} />

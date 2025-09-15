@@ -19,6 +19,7 @@ interface SelectedService extends Service {
 
 interface ProposalFormValues {
   id?: string;
+  proposalNumber?: number; // Adicionado número da proposta
   clientName: string;
   clientEmail?: string;
   clientPhone?: string;
@@ -70,6 +71,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
   const userBankAccount = user?.user_metadata?.bank_account || 'Não informado';
   const userBankAgency = user?.user_metadata?.bank_agency || 'Não informado';
   const userPixKey = user?.user_metadata?.pix_key || 'Não informado';
+  const userCompanyCity = user?.user_metadata?.company_city || 'Não informada'; // Nova variável para cidade da empresa
 
   const handleGeneratePdf = async () => {
     console.log("handleGeneratePdf: Iniciando a geração do PDF...");
@@ -136,6 +138,9 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
                 <img src={user.user_metadata.avatar_url} alt="Logo da Empresa" className="h-20 mx-auto mb-4 object-contain" />
               )}
               <h1 className="text-4xl font-bold text-blue-700 mb-2">{proposalData.proposalTitle}</h1>
+              {proposalData.proposalNumber && (
+                <p className="text-xl text-gray-700 mb-1">Proposta Nº: {proposalData.proposalNumber}</p>
+              )}
               <p className="text-xl text-gray-700">{companyName}</p>
             </div>
 
@@ -223,6 +228,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
               <p className="text-gray-700">WhatsApp: {userWhatsapp}</p>
               <p className="text-gray-700">Email: {userEmail}</p>
               {userCnpj && <p className="text-gray-700">CNPJ: {userCnpj}</p>}
+              {userCompanyCity && <p className="text-gray-700">{userCompanyCity}, Brasil</p>} {/* Exibe a cidade da empresa */}
             </div>
           </div>
         </div>

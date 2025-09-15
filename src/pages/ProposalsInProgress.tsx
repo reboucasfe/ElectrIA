@@ -16,6 +16,7 @@ import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
 
 interface Proposal {
   id: string;
+  proposal_number?: number; // Adicionado número da proposta
   client_name: string;
   status: 'draft' | 'sent' | 'accepted' | 'pending' | 'rejected';
   selected_services: Array<{ calculated_total: number }>;
@@ -91,6 +92,7 @@ const ProposalsInProgress = () => {
   const handleGeneratePdfClick = (proposal: Proposal) => {
     setSelectedProposalForPreview({
       id: proposal.id,
+      proposalNumber: proposal.proposal_number, // Passa o número da proposta
       clientName: proposal.client_name,
       clientEmail: proposal.client_email,
       clientPhone: proposal.client_phone,
@@ -160,7 +162,7 @@ const ProposalsInProgress = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
+                  <TableHead>Nº Proposta</TableHead> {/* Nova coluna */}
                   <TableHead>Cliente</TableHead>
                   <TableHead>Título</TableHead>
                   <TableHead>Status</TableHead>
@@ -172,7 +174,7 @@ const ProposalsInProgress = () => {
               <TableBody>
                 {proposals.map((proposal) => (
                   <TableRow key={proposal.id}>
-                    <TableCell className="font-medium">{proposal.id.substring(0, 8)}...</TableCell>
+                    <TableCell className="font-medium">{proposal.proposal_number || 'N/A'}</TableCell> {/* Exibe o número da proposta */}
                     <TableCell>{proposal.client_name}</TableCell>
                     <TableCell>{proposal.proposal_title}</TableCell>
                     <TableCell>{getStatusLabel(proposal.status)}</TableCell>
