@@ -217,7 +217,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
             {proposalData.proposalDescription && (
               <div className="mb-10 p-6 border border-gray-200 rounded-lg no-page-break-inside">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Descrição da Proposta</h2>
-                <p className="text-gray-700">{proposalData.proposalDescription}</p>
+                <p className="text-gray-700" dangerouslySetInnerHTML={{ __html: proposalData.proposalDescription.replace(/\n/g, '<br />') }}></p>
               </div>
             )}
 
@@ -260,7 +260,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
             {proposalData.notes && (
               <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50 no-page-break-inside">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Notas Adicionais</h2>
-                <p className="text-gray-700">{proposalData.notes}</p>
+                <p className="text-gray-700" dangerouslySetInnerHTML={{ __html: proposalData.notes.replace(/\n/g, '<br />') }}></p>
               </div>
             )}
 
