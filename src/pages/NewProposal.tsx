@@ -32,7 +32,7 @@ const NewProposal = () => {
           <p className="text-center text-gray-500 py-8">
             Em breve, você poderá usar a IA para gerar propostas rapidamente!
           </p>
-          <Button onClick={() => alert('Funcionalidade em desenvolvimento!')}>Gerar Proposta com IA</Button>
+          <Button onClick={() => alert('Funcionalidade em desenvolvimento!')} className="bg-blue-600 hover:bg-blue-700">Gerar Proposta com IA</Button>
         </CardContent>
       </Card>
     </div>
