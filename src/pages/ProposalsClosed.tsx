@@ -30,6 +30,7 @@ interface Proposal {
   notes?: string;
   payment_methods: string[];
   validity_days: number;
+  accepted_at?: string; // Adicionado accepted_at
 }
 
 const ProposalsClosed = () => {
@@ -134,7 +135,7 @@ const ProposalsClosed = () => {
     setLoading(true);
     const { error } = await supabase
       .from('proposals')
-      .update({ status: 'accepted' })
+      .update({ status: 'accepted', accepted_at: new Date().toISOString() }) // Adiciona accepted_at
       .eq('id', proposalId);
 
     if (error) {

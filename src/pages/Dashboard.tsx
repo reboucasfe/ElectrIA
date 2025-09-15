@@ -1,94 +1,159 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, Users, ClipboardList, CheckCircle } from 'lucide-react';
+import { DollarSign, Users, ClipboardList, CheckCircle, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { showError } from '@/utils/toast';
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { DateRange } from 'react-day-picker';
+import { addDays, subDays, isWithinInterval, parseISO, differenceInDays } from 'date-fns';
+import DashboardCharts from '@/components/dashboard/DashboardCharts'; // Importar o novo componente de gráficos
+
+interface Proposal {
+  id: string;
+  proposal_number?: number;
+  client_name: string;
+  status: 'draft' | 'sent' | 'accepted' | 'pending' | 'rejected';
+  selected_services: Array<{ calculated_total: number }>;
+  created_at: string;
+  pdf_generated_at?: string;
+  proposal_title: string;
+  proposal_description?: string;
+  client_email?: string;
+  client_phone?: string;
+  notes?: string;
+  payment_methods: string[];
+  validity_days: number;
+  sent_at?: string;
+  accepted_at?: string;
+}
+
+const formatCurrency = (value: number) => {
+  return value.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+};
 
 const Dashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [sentCount, setSentCount] = useState<number | null>(null);
-  const [acceptedCount, setAcceptedCount] = useState<number | null>(null);
-  const [kpiLoading, setKpiLoading] = useState(true);
+  const [allProposals, setAllProposals] = useState<Proposal[]>([]);
+  const [loadingProposals, setLoadingProposals] = useState(true);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
+  });
 
-  const fetchKpiData = useCallback(async () => {
+  const fetchAllProposals = useCallback(async () => {
     if (!user?.id) {
-      setKpiLoading(false);
+      setLoadingProposals(false);
       return;
     }
-    setKpiLoading(true);
+    setLoadingProposals(true);
 
-    // Fetch Sent/Pending Proposals Count
-    const { count: sentPendingCount, error: sentError } = await supabase
+    const { data, error } = await supabase
       .from('proposals')
-      .select('id', { count: 'exact' })
+      .select('*')
       .eq('user_id', user.id)
-      .in('status', ['sent', 'pending']);
+      .order('created_at', { ascending: false });
 
-    if (sentError) {
-      showError(getTranslatedErrorMessage(sentError.message));
-      setSentCount(0);
+    if (error) {
+      showError(getTranslatedErrorMessage(error.message));
+      setAllProposals([]);
     } else {
-      setSentCount(sentPendingCount);
+      setAllProposals(data as Proposal[]);
     }
-
-    // Fetch Accepted Proposals Count
-    const { count: acceptedProposalsCount, error: acceptedError } = await supabase
-      .from('proposals')
-      .select('id', { count: 'exact' })
-      .eq('user_id', user.id)
-      .eq('status', 'accepted');
-
-    if (acceptedError) {
-      showError(getTranslatedErrorMessage(acceptedError.message));
-      setAcceptedCount(0);
-    } else {
-      setAcceptedCount(acceptedProposalsCount);
-    }
-
-    setKpiLoading(false);
+    setLoadingProposals(false);
   }, [user]);
 
   useEffect(() => {
     if (!authLoading && user) {
-      fetchKpiData();
+      fetchAllProposals();
     }
-  }, [authLoading, user, fetchKpiData]);
+  }, [authLoading, user, fetchAllProposals]);
 
-  const kpiData = [
-    {
-      title: "Propostas Enviadas",
-      value: kpiLoading ? <Skeleton className="h-6 w-12" /> : (sentCount !== null ? sentCount.toString() : '0'),
-      icon: ClipboardList,
-      description: "Propostas enviadas ou pendentes",
-      action: () => navigate('/proposals?status=sent'),
-    },
-    {
-      title: "Propostas Aceitas",
-      value: kpiLoading ? <Skeleton className="h-6 w-12" /> : (acceptedCount !== null ? acceptedCount.toString() : '0'),
-      icon: CheckCircle,
-      description: "Propostas aceitas pelos clientes",
-      action: () => navigate('/proposals?status=accepted'),
-    },
-    {
-      title: "Taxa de Conversão",
-      value: kpiLoading ? <Skeleton className="h-6 w-12" /> : (sentCount && acceptedCount && sentCount > 0 ? `${((acceptedCount / sentCount) * 100).toFixed(1)}%` : "N/A"),
-      icon: Users,
-      description: "Dados em breve",
-      action: null,
-    },
-    {
-      title: "Valor Total Fechado",
-      value: kpiLoading ? <Skeleton className="h-6 w-20" /> : "R$ 0,00", // Este KPI exigiria agregação de valores, mantido como placeholder
-      icon: DollarSign,
-      description: "Dados em breve",
-      action: null,
-    },
-  ];
+  const filteredProposals = useMemo(() => {
+    if (!dateRange?.from || !dateRange?.to) {
+      return allProposals;
+    }
+    return allProposals.filter(proposal => {
+      const createdAt = parseISO(proposal.created_at);
+      return isWithinInterval(createdAt, { start: dateRange.from!, end: addDays(dateRange.to!, 1) }); // Add 1 day to 'to' to include the whole day
+    });
+  }, [allProposals, dateRange]);
+
+  const kpiData = useMemo(() => {
+    const sentProposals = filteredProposals.filter(p => p.status === 'sent' || p.status === 'pending');
+    const acceptedProposals = filteredProposals.filter(p => p.status === 'accepted');
+
+    const totalSentCount = sentProposals.length;
+    const totalAcceptedCount = acceptedProposals.length;
+
+    const totalSentValue = sentProposals.reduce((sum, p) => sum + p.selected_services.reduce((s, svc) => s + svc.calculated_total, 0), 0);
+    const totalAcceptedValue = acceptedProposals.reduce((sum, p) => sum + p.selected_services.reduce((s, svc) => s + svc.calculated_total, 0), 0);
+
+    const conversionRate = totalSentCount > 0 ? ((totalAcceptedCount / totalSentCount) * 100).toFixed(1) : "0.0";
+    const averageProposalValue = totalSentCount > 0 ? totalSentValue / totalSentCount : 0;
+
+    let totalResponseTime = 0;
+    let responseTimeCount = 0;
+    acceptedProposals.forEach(p => {
+      if (p.sent_at && p.accepted_at) {
+        const sentDate = parseISO(p.sent_at);
+        const acceptedDate = parseISO(p.accepted_at);
+        const diffDays = differenceInDays(acceptedDate, sentDate);
+        if (diffDays >= 0) { // Only count if accepted after or on sent date
+          totalResponseTime += diffDays;
+          responseTimeCount++;
+        }
+      }
+    });
+    const averageResponseTime = responseTimeCount > 0 ? (totalResponseTime / responseTimeCount).toFixed(1) : "N/A";
+
+
+    return [
+      {
+        title: "Propostas Enviadas",
+        value: totalSentCount.toString(),
+        icon: ClipboardList,
+        description: formatCurrency(totalSentValue),
+        action: () => navigate('/proposals?status=sent'),
+      },
+      {
+        title: "Propostas Aceitas",
+        value: totalAcceptedCount.toString(),
+        icon: CheckCircle,
+        description: formatCurrency(totalAcceptedValue),
+        action: () => navigate('/proposals?status=accepted'),
+      },
+      {
+        title: "Taxa de Conversão",
+        value: `${conversionRate}%`,
+        icon: Users,
+        description: "Propostas aceitas / Propostas enviadas",
+        color: parseFloat(conversionRate) >= 50 ? 'text-green-600' : parseFloat(conversionRate) >= 20 ? 'text-yellow-600' : 'text-red-600',
+        action: null,
+      },
+      {
+        title: "Valor Médio da Proposta",
+        value: formatCurrency(averageProposalValue),
+        icon: DollarSign,
+        description: "Valor total / Qtd. propostas enviadas",
+        action: null,
+      },
+      {
+        title: "Tempo Médio de Resposta",
+        value: averageResponseTime !== "N/A" ? `${averageResponseTime} dias` : "N/A",
+        icon: Clock,
+        description: "Do envio à aceitação",
+        action: null,
+      },
+    ];
+  }, [filteredProposals, navigate]);
 
   return (
     <div className="space-y-8">
@@ -97,10 +162,16 @@ const Dashboard = () => {
         <p className="text-gray-500">Bem-vindo de volta, {user?.email}!</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {kpiData.map((kpi) => (
+      {/* Filtro de Período */}
+      <div className="flex justify-end">
+        <DateRangePicker date={dateRange} setDate={setDateRange} />
+      </div>
+
+      {/* KPIs Principais */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {kpiData.map((kpi, index) => (
           <Card
-            key={kpi.title}
+            key={index}
             className={`flex flex-col ${kpi.action ? 'cursor-pointer hover:bg-gray-50 transition-colors' : ''}`}
             onClick={kpi.action || undefined}
           >
@@ -109,22 +180,19 @@ const Dashboard = () => {
               <kpi.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{kpi.value}</div>
+              {loadingProposals ? (
+                <Skeleton className="h-6 w-24" />
+              ) : (
+                <div className={`text-2xl font-bold ${kpi.color || ''}`}>{kpi.value}</div>
+              )}
               <p className="text-xs text-muted-foreground">{kpi.description}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Atividade Recente</CardTitle>
-          <CardDescription>Um resumo das suas propostas mais recentes.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-gray-500 py-8">Gráficos e tabelas de atividade aparecerão aqui em breve.</p>
-        </CardContent>
-      </Card>
+      {/* Gráficos */}
+      <DashboardCharts proposals={filteredProposals} loading={loadingProposals} />
     </div>
   );
 };
