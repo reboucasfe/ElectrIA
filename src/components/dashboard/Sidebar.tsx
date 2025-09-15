@@ -17,7 +17,7 @@ const Sidebar = () => {
       <div className="p-4 border-b">
         <Link to="/#planos" className="flex items-center">
           <Zap className="h-8 w-8 text-blue-600 mr-2" />
-          <span className="text-xl font-bold text-gray-900">EletroProposta IA</span>
+          <span className="text-xl font-bold text-gray-900">EletricIA</span>
         </Link>
       </div>
       <nav className="flex-1 p-4 space-y-2">

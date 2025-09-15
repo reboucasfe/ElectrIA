@@ -1,4 +1,4 @@
-package com.getcapacitor.myapp;
+package com.example.vibrantchameleonbounce;
 
 import static org.junit.Assert.*;
 

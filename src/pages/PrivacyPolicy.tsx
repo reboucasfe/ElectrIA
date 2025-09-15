@@ -16,7 +16,7 @@ const PrivacyPolicy = () => {
       </div>
 
       <div className="prose prose-lg max-w-none">
-        <p>A sua privacidade é de extrema importância para nós da EletroProposta IA. Esta Política de Privacidade descreve como coletamos, usamos, processamos e compartilhamos suas informações pessoais ao utilizar nossa plataforma.</p>
+        <p>A sua privacidade é de extrema importância para nós da EletricIA. Esta Política de Privacidade descreve como coletamos, usamos, processamos e compartilhamos suas informações pessoais ao utilizar nossa plataforma.</p>
 
         <h2>1. Informações que Coletamos</h2>
         <p>Coletamos diferentes tipos de informações para fornecer e melhorar nossos serviços:</p>

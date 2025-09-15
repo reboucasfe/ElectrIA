@@ -447,7 +447,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                       <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Integração API</span>
                       <Tooltip>
                         <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
-                        <TooltipContent><p>Conecte a EletroProposta IA com outras ferramentas que você já usa através da nossa API.</p></TooltipContent>
+                        <TooltipContent><p>Conecte a EletricIA com outras ferramentas que você já usa através da nossa API.</p></TooltipContent>
                       </Tooltip>
                     </li>
                   </ul>
