@@ -25,7 +25,7 @@ import InputMask from 'react-input-mask';
 import ServiceFormModal, { Service } from '@/components/dashboard/ServiceFormModal';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
 
 import ProposalPreviewModal from './ProposalPreviewModal';
 
@@ -116,7 +116,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
       .eq('user_id', user.id);
 
     if (error) {
-      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
+      showError(getTranslatedErrorMessage(error.message));
     } else {
       setAvailableServices(data as Service[]);
     }
@@ -219,6 +219,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     }
 
     setLoading(true);
+    console.log("saveProposalToSupabase: Iniciando salvamento/atualização da proposta...");
 
     const proposalPayload = {
       user_id: user.id,
@@ -238,21 +239,24 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
 
     let result;
     if (proposalId) {
-      // Atualizar proposta existente
+      console.log("saveProposalToSupabase: Atualizando proposta existente com ID:", proposalId);
       result = await supabase.from('proposals').update(proposalPayload).eq('id', proposalId).select().single();
     } else {
-      // Inserir nova proposta
+      console.log("saveProposalToSupabase: Inserindo nova proposta.");
       result = await supabase.from('proposals').insert([proposalPayload]).select().single();
     }
 
     setLoading(false);
 
     if (result.error) {
-      showError(getTranslatedErrorMessage(result.error.message)); // Usando a função de tradução
+      console.error("saveProposalToSupabase: Erro do Supabase ao salvar proposta:", result.error);
+      showError(getTranslatedErrorMessage(result.error.message));
       return null;
     } else {
+      console.log("saveProposalToSupabase: Proposta salva com sucesso:", result.data);
       showSuccess(`Proposta ${proposalId ? 'atualizada' : 'salva'} com sucesso!`);
       if (!proposalId) {
+        console.log("saveProposalToSupabase: Nova proposta criada, navegando para edição:", result.data.id);
         navigate(`/proposals/edit/${result.data.id}`);
       }
       return result.data;
@@ -260,19 +264,23 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
   };
 
   const handleSaveDraft = async (data: ProposalFormValues) => {
+    console.log("handleSaveDraft: Tentando salvar rascunho com dados:", data);
     await saveProposalToSupabase(data, 'draft');
   };
 
   const handleOpenPreviewModal = async (data: ProposalFormValues) => {
-    console.log("ProposalForm: Validação do formulário bem-sucedida. Tentando salvar e abrir modal de pré-visualização com dados:", data);
+    console.log("handleOpenPreviewModal: Validação do formulário bem-sucedida. Tentando salvar e abrir modal de pré-visualização com dados:", data);
     const savedProposal = await saveProposalToSupabase(data, proposalId ? initialData.status : 'draft');
     if (savedProposal) {
+      console.log("handleOpenPreviewModal: Proposta salva, preparando dados para pré-visualização.");
       setPreviewData({
         ...data,
         id: savedProposal.id, 
         status: savedProposal.status,
       });
       setIsPreviewModalOpen(true);
+    } else {
+      console.error("handleOpenPreviewModal: Falha ao salvar proposta, não é possível abrir o modal de pré-visualização.");
     }
   };
 
@@ -291,13 +299,15 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
 
   const handlePdfGeneratedAndSent = async (proposalId: string) => {
     setLoading(true);
+    console.log("handlePdfGeneratedAndSent: Atualizando status da proposta para 'enviada' após geração de PDF.");
     const { error } = await supabase
       .from('proposals')
       .update({ status: 'sent', pdf_generated_at: new Date().toISOString(), sent_at: new Date().toISOString() })
       .eq('id', proposalId);
 
     if (error) {
-      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
+      console.error("handlePdfGeneratedAndSent: Erro ao atualizar status da proposta:", error);
+      showError(getTranslatedErrorMessage(error.message));
     } else {
       showSuccess("Status da proposta atualizado para 'Enviada'!");
     }
