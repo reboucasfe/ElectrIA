@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import * => z from 'zod';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { showError, showSuccess } from '@/utils/toast';
@@ -304,9 +304,8 @@ const ProposalForm = () => {
                 </TableHeader>
                 <TableBody>
                   {watchedServices.map((service, index) => (
-                    <TableRow key={service.uniqueId}> {/* Usando uniqueId como key */}
-                      <TableCell className="font-medium">{service.name}</TableCell>
-                      <TableCell>
+                    <TableRow key={service.uniqueId}>
+                      <TableCell className="font-medium">{service.name}</TableCell><TableCell>
                         <Input
                           type="number"
                           min="1"
@@ -314,12 +313,9 @@ const ProposalForm = () => {
                           onChange={(e) => handleQuantityChange(service.uniqueId, parseInt(e.target.value))}
                           className="w-20 text-center"
                         />
-                      </TableCell>
-                      <TableCell className="text-right">
+                      </TableCell><TableCell className="text-right">
                         {service.price_type === 'fixed' ? formatCurrency(service.fixed_price || 0) : `${formatCurrency(service.hourly_rate || 0)}/h`}
-                      </TableCell>
-                      <TableCell className="text-right">{formatCurrency(service.calculated_total)}</TableCell>
-                      <TableCell className="text-right">
+                      </TableCell><TableCell className="text-right">{formatCurrency(service.calculated_total)}</TableCell><TableCell className="text-right">
                         <Button variant="ghost" size="icon" onClick={() => handleRemoveService(service.uniqueId)}>
                           <Trash2 className="h-4 w-4 text-red-500" />
                         </Button>
