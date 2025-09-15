@@ -47,10 +47,20 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
     navigate('/payment');
   };
 
+  const handleLogoClick = () => {
+    if (!user) { // Apenas se o usuário não estiver logado
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <header className="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link to={user ? "/#planos" : "/"} className="flex items-center">
+        <Link 
+          to={user ? "/#planos" : "/"} 
+          className="flex items-center"
+          onClick={handleLogoClick} // Adicionado onClick para scroll-to-top
+        >
           <Zap className="h-8 w-8 text-blue-600 mr-2" />
           <span className="text-xl font-bold text-gray-900">EletroProposta IA</span>
         </Link>
