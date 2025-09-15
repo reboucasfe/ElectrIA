@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
-import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle } from "lucide-react";
+import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle, Clock, XCircle, FileWarning, Calculator, Eye } from "lucide-react"; // Adicionei ícones relevantes
+
 import { Header } from "@/components/Header";
 
 interface IndexProps {
@@ -128,6 +129,65 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => { // Re
             </div>
             <div className="bg-gray-100 rounded-lg aspect-video flex items-center justify-center">
               <p className="text-gray-400">Visual do Produto Aqui</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Pain Points Section */}
+        <section className="py-20 px-4 bg-white">
+          <div className="container mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Cansado de Perder Clientes por Propostas Demoradas?
+            </h2>
+            <p className="text-lg text-gray-600 mb-16 max-w-2xl mx-auto">
+              Nossa ferramenta resolve os maiores desafios dos eletricistas, transformando tempo perdido em vendas fechadas.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <Card className="p-6 text-left shadow-md">
+                <CardHeader className="p-0 mb-4">
+                  <Clock className="h-8 w-8 text-red-500 mb-2" />
+                  <CardTitle className="text-xl font-semibold">Demora para criar propostas detalhadas</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-gray-600">Gaste menos tempo com burocracia e mais tempo com o que realmente importa.</p>
+                </CardContent>
+              </Card>
+              <Card className="p-6 text-left shadow-md">
+                <CardHeader className="p-0 mb-4">
+                  <XCircle className="h-8 w-8 text-red-500 mb-2" />
+                  <CardTitle className="text-xl font-semibold">Perda de clientes por falta de agilidade</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-gray-600">Responda rapidamente e feche negócios antes da concorrência.</p>
+                </CardContent>
+              </Card>
+              <Card className="p-6 text-left shadow-md">
+                <CardHeader className="p-0 mb-4">
+                  <FileWarning className="h-8 w-8 text-red-500 mb-2" />
+                  <CardTitle className="text-xl font-semibold">Propostas mal formatadas e não profissionais</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-gray-600">Impressione com documentos claros, organizados e com sua marca.</p>
+                </CardContent>
+              </Card>
+              <Card className="p-6 text-left shadow-md">
+                <CardHeader className="p-0 mb-4">
+                  <Calculator className="h-8 w-8 text-red-500 mb-2" />
+                  <CardTitle className="text-xl font-semibold">Tempo perdido calculando materiais e mão de obra</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-gray-600">Deixe a IA fazer os cálculos complexos em segundos.</p>
+                </CardContent>
+              </Card>
+              <Card className="p-6 text-left shadow-md">
+                <CardHeader className="p-0 mb-4">
+                  <Eye className="h-8 w-8 text-red-500 mb-2" />
+                  <CardTitle className="text-xl font-semibold">Dificuldade para acompanhar orçamentos enviados</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-gray-600">Tenha uma visão clara de todas as suas propostas em um só lugar.</p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
