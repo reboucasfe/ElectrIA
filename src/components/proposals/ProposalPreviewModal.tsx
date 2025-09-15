@@ -221,8 +221,8 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
               </div>
             )}
 
-            <div className="mb-10">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4 no-page-break-inside">Serviços Incluídos</h2>
+            <div className="mb-10 no-page-break-inside"> {/* Adicionado no-page-break-inside aqui */}
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Serviços Incluídos</h2>
               {proposalData.selectedServices.length > 0 ? (
                 <table className="w-full border-collapse">
                   <thead>
