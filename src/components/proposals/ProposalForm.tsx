@@ -108,6 +108,14 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
   const watchedServices = watchedFormValues.selectedServices;
   const watchedPaymentMethods = watchedFormValues.paymentMethods;
 
+  // Log para depuração dos erros de validação
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      console.error("ProposalForm: Erros de validação:", errors);
+      showError("Por favor, corrija os erros no formulário.");
+    }
+  }, [errors]);
+
   const fetchAvailableServices = useCallback(async () => {
     if (!user) return;
     const { data, error } = await supabase
@@ -220,6 +228,8 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
 
     setLoading(true);
     console.log("saveProposalToSupabase: Iniciando salvamento/atualização da proposta...");
+    console.log("saveProposalToSupabase: Dados a serem salvos:", data);
+
 
     const proposalPayload = {
       user_id: user.id,
