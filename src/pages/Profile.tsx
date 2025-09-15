@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useForm, Controller } from 'react-hook-form'; // Importar Controller
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { supabase } from '@/lib/supabaseClient';
@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from '@/components/ui/checkbox'; // Importar Checkbox
 import { Upload } from 'lucide-react';
 import InputMask from 'react-input-mask';
 
@@ -33,6 +34,18 @@ const profileSchema = z.object({
       message: "O número de WhatsApp deve conter apenas dígitos."
     }),
   howDidYouHear: z.string().min(1, { message: "Por favor, selecione uma opção." }),
+  // Novos campos para Dados da Empresa
+  cnpj: z.string()
+    .transform((val) => val.replace(/\D/g, '')) // Remove non-digits
+    .refine((val) => val.length === 14 || val.length === 0, { // CNPJ must be 14 digits or empty
+      message: "O CNPJ deve ter 14 dígitos ou ser deixado em branco."
+    })
+    .optional(),
+  bankName: z.string().optional(),
+  bankAccount: z.string().optional(),
+  bankAgency: z.string().optional(),
+  pixKey: z.string().optional(),
+  acceptedPaymentMethods: z.array(z.string()).optional(), // Array de strings para métodos de pagamento
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -43,13 +56,20 @@ const Profile = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.user_metadata?.avatar_url || null);
 
-  const { register, handleSubmit, formState: { errors }, setValue, control } = useForm<ProfileFormValues>({ // Adicionar 'control'
+  const { register, handleSubmit, formState: { errors }, setValue, control } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: user?.user_metadata?.full_name || '',
       companyName: user?.user_metadata?.company_name || '',
       whatsapp: user?.user_metadata?.whatsapp || '',
       howDidYouHear: user?.user_metadata?.how_did_you_hear || '',
+      // Valores padrão para os novos campos
+      cnpj: user?.user_metadata?.cnpj || '',
+      bankName: user?.user_metadata?.bank_name || '',
+      bankAccount: user?.user_metadata?.bank_account || '',
+      bankAgency: user?.user_metadata?.bank_agency || '',
+      pixKey: user?.user_metadata?.pix_key || '',
+      acceptedPaymentMethods: user?.user_metadata?.accepted_payment_methods || [],
     },
   });
 
@@ -141,6 +161,13 @@ const Profile = () => {
         company_name: data.companyName,
         whatsapp: data.whatsapp,
         how_did_you_hear: data.howDidYouHear,
+        // Novos campos para Dados da Empresa
+        cnpj: data.cnpj,
+        bank_name: data.bankName,
+        bank_account: data.bankAccount,
+        bank_agency: data.bankAgency,
+        pix_key: data.pixKey,
+        accepted_payment_methods: data.acceptedPaymentMethods,
       }
     });
 
@@ -265,6 +292,101 @@ const Profile = () => {
             
             <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
               {loading ? 'Salvando...' : 'Salvar Alterações'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* Nova Seção: Dados da Empresa */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Dados da Empresa</CardTitle>
+          <CardDescription>Informações da sua empresa para uso em propostas e pagamentos.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="cnpj">CNPJ (Opcional)</Label>
+              <Controller
+                name="cnpj"
+                control={control}
+                render={({ field }) => (
+                  <InputMask
+                    mask="99.999.999/9999-99"
+                    maskChar="_"
+                    value={field.value}
+                    onChange={(e) => {
+                      field.onChange(e.target.value.replace(/\D/g, ''));
+                    }}
+                    onBlur={field.onBlur}
+                  >
+                    {(inputProps: any) => (
+                      <Input
+                        {...inputProps}
+                        id="cnpj"
+                        type="text"
+                        placeholder="XX.XXX.XXX/XXXX-XX"
+                        className={errors.cnpj ? "border-red-500" : ""}
+                      />
+                    )}
+                  </InputMask>
+                )}
+              />
+              {errors.cnpj && <p className="text-sm text-red-500">{errors.cnpj.message}</p>}
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Dados Bancários para Pagamento</h3>
+              <div className="space-y-2">
+                <Label htmlFor="bankName">Nome do Banco</Label>
+                <Input id="bankName" placeholder="Ex: Banco do Brasil" {...register('bankName')} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="bankAgency">Agência</Label>
+                  <Input id="bankAgency" placeholder="Ex: 0001" {...register('bankAgency')} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bankAccount">Conta</Label>
+                  <Input id="bankAccount" placeholder="Ex: 12345-6" {...register('bankAccount')} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="pixKey">Chave Pix</Label>
+                <Input id="pixKey" placeholder="Ex: seuemail@email.com ou 11999999999" {...register('pixKey')} />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Meios de Pagamento Aceitos</h3>
+              <Controller
+                name="acceptedPaymentMethods"
+                control={control}
+                render={({ field }) => (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {['Cartão de Crédito', 'Boleto Bancário', 'Pix', 'Transferência Bancária'].map((method) => (
+                      <div key={method} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={method.replace(/\s/g, '')}
+                          checked={field.value?.includes(method)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              field.onChange([...(field.value || []), method]);
+                            } else {
+                              field.onChange(field.value?.filter((item) => item !== method));
+                            }
+                          }}
+                        />
+                        <Label htmlFor={method.replace(/\s/g, '')}>{method}</Label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              />
+            </div>
+
+            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
+              {loading ? 'Salvando...' : 'Salvar Dados da Empresa'}
             </Button>
           </form>
         </CardContent>
