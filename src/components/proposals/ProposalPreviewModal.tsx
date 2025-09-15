@@ -166,7 +166,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
                         <td className="border border-gray-200 p-3">{service.name}</td>
                         <td className="border border-gray-200 p-3 text-center">{service.quantity}</td>
                         <td className="border border-gray-200 p-3 text-right">
-                          {service.price_type === 'fixed' ? formatCurrency(service.fixed_price || 0) : `${formatCurrency(service.hourly_rate || 0)}/h`}
+                          {formatCurrency(service.price_type === 'fixed' ? (service.fixed_price || 0) : (service.hourly_rate || 0))}
                         </td>
                         <td className="border border-gray-200 p-3 text-right">{formatCurrency(service.calculated_total)}</td>
                       </tr>
