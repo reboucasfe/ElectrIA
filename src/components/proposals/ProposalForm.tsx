@@ -24,7 +24,8 @@ import { Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import InputMask from 'react-input-mask';
 import ServiceFormModal, { Service } from '@/components/dashboard/ServiceFormModal';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom'; // Adicionado: Importação do useNavigate
+import { useNavigate } from 'react-router-dom';
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 import ProposalPreviewModal from './ProposalPreviewModal';
 
@@ -115,7 +116,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
       .eq('user_id', user.id);
 
     if (error) {
-      showError(`Erro ao carregar serviços: ${error.message}`);
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
       setAvailableServices(data as Service[]);
     }
@@ -247,11 +248,11 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     setLoading(false);
 
     if (result.error) {
-      showError(`Erro ao salvar proposta: ${result.error.message}`);
+      showError(getTranslatedErrorMessage(result.error.message)); // Usando a função de tradução
       return null;
     } else {
       showSuccess(`Proposta ${proposalId ? 'atualizada' : 'salva'} com sucesso!`);
-      if (!proposalId) { // Se for uma nova proposta, navega para a edição dela
+      if (!proposalId) {
         navigate(`/proposals/edit/${result.data.id}`);
       }
       return result.data;
@@ -264,13 +265,11 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
 
   const handleOpenPreviewModal = async (data: ProposalFormValues) => {
     console.log("ProposalForm: Validação do formulário bem-sucedida. Tentando salvar e abrir modal de pré-visualização com dados:", data);
-    const savedProposal = await saveProposalToSupabase(data, proposalId ? initialData.status : 'draft'); // Mantém status ou define como draft
+    const savedProposal = await saveProposalToSupabase(data, proposalId ? initialData.status : 'draft');
     if (savedProposal) {
       setPreviewData({
         ...data,
-        // Garante que o ID da proposta salva seja passado para o modal
         id: savedProposal.id, 
-        // Atualiza o status no previewData para refletir o que foi salvo
         status: savedProposal.status,
       });
       setIsPreviewModalOpen(true);
@@ -286,9 +285,11 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     handleServiceModalClose();
   };
 
+  const handleOpenServiceModal = () => { // Adicionado para abrir o modal de serviço
+    setIsServiceModalOpen(true);
+  };
+
   const handlePdfGeneratedAndSent = async (proposalId: string) => {
-    // Esta função será chamada pelo ProposalPreviewModal após gerar o PDF
-    // e deve atualizar o status da proposta para 'sent' no banco de dados.
     setLoading(true);
     const { error } = await supabase
       .from('proposals')
@@ -296,13 +297,13 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
       .eq('id', proposalId);
 
     if (error) {
-      showError(`Erro ao atualizar status da proposta após PDF: ${error.message}`);
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
       showSuccess("Status da proposta atualizado para 'Enviada'!");
     }
     setLoading(false);
-    setIsPreviewModalOpen(false); // Fecha o modal após a ação completa
-    navigate('/proposals'); // Redireciona para a lista de propostas
+    setIsPreviewModalOpen(false);
+    navigate('/proposals');
   };
 
   return (

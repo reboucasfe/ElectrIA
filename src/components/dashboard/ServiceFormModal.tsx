@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 const serviceSchema = z.object({
   name: z.string().min(3, { message: "O nome do serviço deve ter pelo menos 3 caracteres." }),
@@ -138,7 +139,7 @@ const ServiceFormModal = ({ isOpen, onClose, onSave, service }: ServiceFormModal
     }
 
     if (error) {
-      showError(error.message);
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
       showSuccess(`Serviço ${service ? 'atualizado' : 'criado'} com sucesso!`);
       onSave();

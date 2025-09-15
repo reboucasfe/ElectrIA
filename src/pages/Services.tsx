@@ -11,6 +11,7 @@ import { MoreHorizontal, PlusCircle, Trash2, Edit } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import ServiceFormModal, { Service } from '@/components/dashboard/ServiceFormModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 const formatCurrency = (value: number | null | undefined) => {
   if (value === null || value === undefined) return 'N/A';
@@ -33,7 +34,7 @@ const Services = () => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      showError(error.message);
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
       setServices(data as Service[]);
     }
@@ -65,7 +66,7 @@ const Services = () => {
     const { error } = await supabase.from('services').delete().eq('id', serviceToDelete.id);
 
     if (error) {
-      showError(error.message);
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
       showSuccess('Serviço excluído com sucesso!');
       fetchServices();

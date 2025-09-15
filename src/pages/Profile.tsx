@@ -20,6 +20,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Upload } from 'lucide-react';
 import InputMask from 'react-input-mask';
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 // Esquema de validação para o formulário de perfil
 const profileSchema = z.object({
@@ -140,7 +141,7 @@ const Profile = () => {
         });
 
       if (uploadError) {
-        showError(`Erro ao fazer upload da imagem: ${uploadError.message}`);
+        showError(getTranslatedErrorMessage(uploadError.message)); // Usando a função de tradução
         setLoading(false);
         return;
       }
@@ -172,7 +173,7 @@ const Profile = () => {
     });
 
     if (updateError) {
-      showError(updateError.message);
+      showError(getTranslatedErrorMessage(updateError.message)); // Usando a função de tradução
     } else {
       showSuccess("Perfil atualizado com sucesso!");
       // O AuthContext deve capturar a mudança via onAuthStateChange

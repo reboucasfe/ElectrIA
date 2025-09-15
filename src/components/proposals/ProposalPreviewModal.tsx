@@ -9,6 +9,7 @@ import html2canvas from 'html2canvas';
 import { showError, showSuccess } from '@/utils/toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Service } from '@/components/dashboard/ServiceFormModal';
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 interface SelectedService extends Service {
   uniqueId: string;
@@ -17,7 +18,7 @@ interface SelectedService extends Service {
 }
 
 interface ProposalFormValues {
-  id?: string; // Adiciona o ID da proposta
+  id?: string;
   clientName: string;
   clientEmail?: string;
   clientPhone?: string;
@@ -27,14 +28,14 @@ interface ProposalFormValues {
   notes?: string;
   paymentMethods: string[];
   validityDays: number;
-  status?: string; // Adiciona o status para exibição
+  status?: string;
 }
 
 interface ProposalPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   proposalData: ProposalFormValues | null;
-  onPdfGeneratedAndSent: (proposalId: string) => void; // Nova prop para callback
+  onPdfGeneratedAndSent: (proposalId: string) => void;
 }
 
 const formatCurrency = (value: number) => {
@@ -110,10 +111,10 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
       pdf.save(`proposta-${proposalData.clientName.replace(/\s/g, '-')}-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
       showSuccess("PDF da proposta gerado com sucesso!");
       console.log("handleGeneratePdf: PDF salvo com sucesso.");
-      onPdfGeneratedAndSent(proposalData.id); // Chama o callback para atualizar o status no pai
+      onPdfGeneratedAndSent(proposalData.id);
     } catch (error: any) {
       console.error("handleGeneratePdf: Erro ao gerar PDF:", error);
-      showError(`Erro ao gerar PDF: ${error.message || "Verifique o console para mais detalhes."}`);
+      showError(getTranslatedErrorMessage(error.message || "Erro desconhecido ao gerar PDF.")); // Usando a função de tradução
     } finally {
       setIsGeneratingPdf(false);
     }

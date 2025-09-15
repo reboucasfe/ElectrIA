@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { showError, showSuccess } from '@/utils/toast';
 import { useState } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 const passwordSchema = z.object({
   newPassword: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
@@ -33,7 +34,7 @@ const Settings = () => {
     });
 
     if (error) {
-      showError(`Erro ao atualizar senha: ${error.message}`); // Mensagem de erro traduzida
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
       showSuccess("Senha atualizada com sucesso!");
       reset();

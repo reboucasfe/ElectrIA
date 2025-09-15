@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Eye, EyeOff } from 'lucide-react';
 import InputMask from 'react-input-mask';
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 const registerFormSchema = z.object({
   fullName: z.string().min(1, { message: "Nome completo é obrigatório." }),
@@ -50,7 +51,7 @@ interface RegisterModalProps {
   onClose: () => void;
   selectedPlanId?: string;
   selectedBillingCycle?: 'monthly' | 'annual';
-  onOpenLoginModal: () => void; // Adicionada prop para abrir o modal de login
+  onOpenLoginModal: () => void;
 }
 
 const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, onOpenLoginModal }: RegisterModalProps) => {
@@ -71,7 +72,7 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, 
       howDidYouHear: "",
       hasCoupon: false,
       couponCode: "",
-      termsAccepted: false, // Valor padrão para o checkbox
+      termsAccepted: false,
     },
   });
 
@@ -114,11 +115,7 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, 
     });
 
     if (error) {
-      if (error.message === 'User already registered') {
-        showError('Este e-mail já está cadastrado. Por favor, faça login ou use outro e-mail.');
-      } else {
-        showError(`Erro ao cadastrar: ${error.message}`); // Mensagem de erro traduzida
-      }
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
       showSuccess('Cadastro realizado com sucesso! Redirecionando para o pagamento...');
       reset();

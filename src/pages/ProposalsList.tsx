@@ -12,6 +12,7 @@ import { showError, showSuccess } from '@/utils/toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProposalPreviewModal from '@/components/proposals/ProposalPreviewModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 interface Proposal {
   id: string;
@@ -46,7 +47,7 @@ const ProposalsList = () => {
     let query = supabase.from('proposals').select('*').order('created_at', { ascending: false });
 
     if (proposalFilterStatus === 'sent') {
-      query = query.in('status', ['sent', 'pending']); // 'pending' pode ser considerado como 'enviada' mas aguardando resposta
+      query = query.in('status', ['sent', 'pending']);
     } else if (proposalFilterStatus === 'accepted') {
       query = query.eq('status', 'accepted');
     } else if (proposalFilterStatus === 'draft') {
@@ -56,7 +57,7 @@ const ProposalsList = () => {
     const { data, error } = await query;
 
     if (error) {
-      showError(error.message);
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
       setProposals([]);
     } else {
       setProposals(data as Proposal[]);
@@ -139,7 +140,7 @@ const ProposalsList = () => {
 
   const handlePdfGeneratedAndSent = () => {
     setIsPreviewModalOpen(false);
-    fetchProposals(); // Recarrega a lista para atualizar o status
+    fetchProposals();
   };
 
   const handleDeleteClick = (proposal: Proposal) => {
@@ -153,10 +154,10 @@ const ProposalsList = () => {
     const { error } = await supabase.from('proposals').delete().eq('id', proposalToDelete.id);
 
     if (error) {
-      showError(error.message);
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
       showSuccess('Proposta excluída com sucesso!');
-      fetchProposals(); // Recarrega a lista
+      fetchProposals();
     }
     setIsAlertOpen(false);
     setProposalToDelete(null);

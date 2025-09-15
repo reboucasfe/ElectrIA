@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { supabase } from '@/lib/supabaseClient';
 import { Session, User } from '@supabase/supabase-js';
 import { showError } from '@/utils/toast';
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 interface AuthContextType {
   user: User | null;
@@ -44,7 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      showError(`Erro ao sair: ${error.message}`); // Prefixo da mensagem de erro traduzido
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     }
   };
 

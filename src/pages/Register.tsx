@@ -6,9 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { showError, showSuccess } from '@/utils/toast';
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 interface RegisterProps {
-  onOpenLoginModal: () => void; // Nova prop para abrir o modal de login
+  onOpenLoginModal: () => void;
 }
 
 const Register = ({ onOpenLoginModal }: RegisterProps) => {
@@ -25,20 +26,14 @@ const Register = ({ onOpenLoginModal }: RegisterProps) => {
       password,
       options: {
         data: {
-          payment_status: 'pending', // Adiciona o status de pagamento pendente
+          payment_status: 'pending',
         },
       },
     });
     if (error) {
-      // Intercepta a mensagem de erro do Supabase para "usuário já registrado"
-      if (error.message === 'User already registered') {
-        showError('Este e-mail já está cadastrado. Por favor, faça login ou use outro e-mail.');
-      } else {
-        showError(error.message);
-      }
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
-      // showSuccess('Cadastro realizado com sucesso! Por favor, verifique seu e-mail para confirmar sua conta.'); // Removido
-      navigate('/upgrade'); // Redireciona para a página de upgrade
+      navigate('/upgrade');
     }
     setLoading(false);
   };

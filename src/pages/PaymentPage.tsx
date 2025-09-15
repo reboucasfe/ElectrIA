@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 const formatCurrency = (value: number) => {
   return value.toLocaleString('pt-BR', {
@@ -88,13 +89,13 @@ const PaymentPage = () => {
       const { data: updatedUserData, error: updateError } = await supabase.auth.updateUser({
         data: {
           payment_status: 'paid',
-          plan_id: planId // Adiciona o planId ao user_metadata
+          plan_id: planId
         }
       });
 
       if (updateError) {
         console.error("PaymentPage: Error updating user metadata:", updateError.message);
-        showError(`Erro ao atualizar status de pagamento: ${updateError.message}`); // Mensagem de erro traduzida
+        showError(getTranslatedErrorMessage(updateError.message)); // Usando a função de tradução
         setLoading(false);
         return;
       }

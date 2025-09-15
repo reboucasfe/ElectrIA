@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { showError, showSuccess } from '@/utils/toast';
-import { FcGoogle } from 'react-icons/fc'; // Importado FcGoogle para o ícone colorido
+import { FcGoogle } from 'react-icons/fc';
 import { Eye, EyeOff } from 'lucide-react';
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 interface LoginFormContentProps {
-  onClose?: () => void; // Para fechar o modal após o login
-  onOpenRegisterModal?: (planId?: string, billingCycle?: 'monthly' | 'annual') => void; // Para abrir o modal de registro
+  onClose?: () => void;
+  onOpenRegisterModal?: (planId?: string, billingCycle?: 'monthly' | 'annual') => void;
 }
 
 const LoginFormContent = ({ onClose, onOpenRegisterModal }: LoginFormContentProps) => {
@@ -27,10 +28,10 @@ const LoginFormContent = ({ onClose, onOpenRegisterModal }: LoginFormContentProp
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      showError(`Erro ao fazer login: ${error.message}`); // Mensagem de erro traduzida
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
       showSuccess('Login realizado com sucesso!');
-      onClose?.(); // Fecha o modal se estiver em um
+      onClose?.();
       navigate('/dashboard');
     }
     setLoading(false);
@@ -46,7 +47,7 @@ const LoginFormContent = ({ onClose, onOpenRegisterModal }: LoginFormContentProp
     });
 
     if (error) {
-      showError(`Erro ao fazer login com Google: ${error.message}`); // Mensagem de erro traduzida
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
       setLoading(false);
     }
   };
@@ -62,7 +63,7 @@ const LoginFormContent = ({ onClose, onOpenRegisterModal }: LoginFormContentProp
     });
 
     if (error) {
-      showError(`Erro ao redefinir senha: ${error.message}`); // Mensagem de erro traduzida
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
       showSuccess('Verifique seu e-mail para o link de redefinição de senha!');
     }

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { showError, showSuccess } from '@/utils/toast';
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 
 const UpdatePassword = () => {
   const [password, setPassword] = useState('');
@@ -22,7 +23,7 @@ const UpdatePassword = () => {
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     if (error) {
-      showError(`Erro ao atualizar senha: ${error.message}`); // Mensagem de erro traduzida
+      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
     } else {
       showSuccess('Sua senha foi atualizada com sucesso! Você já pode fazer login.');
       navigate('/login');
