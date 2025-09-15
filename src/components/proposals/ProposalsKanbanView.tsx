@@ -63,6 +63,18 @@ const calculateProposalTotal = (services: Array<{ calculated_total: number }>) =
   return services.reduce((sum, service) => sum + service.calculated_total, 0);
 };
 
+// Função para traduzir o status para português
+const translateStatus = (status: Proposal['status']) => {
+  switch (status) {
+    case 'draft': return 'Em Edição';
+    case 'sent': return 'Enviada';
+    case 'pending': return 'Pendente';
+    case 'accepted': return 'Aceita';
+    case 'rejected': return 'Rejeitada';
+    default: return status;
+  }
+};
+
 const ProposalsKanbanView = () => {
   const navigate = useNavigate();
   const { user } = useAuth(); // Obter o usuário logado
@@ -175,9 +187,9 @@ const ProposalsKanbanView = () => {
         // Registrar no histórico de revisões SEM alterar o revision_number da proposta
         if (user && updatedProposal) {
           const changesSummary = {
-            summary: `Status da proposta alterado via Kanban de '${oldStatus}' para '${newStatus}'.`,
+            summary: `Status da proposta alterado via Kanban de '${translateStatus(oldStatus)}' para '${translateStatus(newStatus)}'.`,
             details: {
-              status: { old: oldStatus, new: newStatus }
+              status: { old: translateStatus(oldStatus), new: translateStatus(newStatus) }
             }
           };
           const { error: revisionError } = await supabase.from('proposal_revisions').insert({
