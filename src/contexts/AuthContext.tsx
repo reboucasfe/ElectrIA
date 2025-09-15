@@ -24,6 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(session?.user ?? null);
       setLoading(false);
       console.log("AuthContext: Initial session loaded. User:", session?.user);
+      console.log("AuthContext: Initial user_metadata:", session?.user?.user_metadata);
     };
 
     getSession();
@@ -32,6 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       console.log("AuthContext: Auth state changed. Event:", _event, "New User:", session?.user);
+      console.log("AuthContext: New user_metadata:", session?.user?.user_metadata);
     });
 
     return () => {

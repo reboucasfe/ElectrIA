@@ -80,23 +80,29 @@ const PaymentPage = () => {
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Simula o processamento do pagamento
+
     if (user) {
-      console.log("PaymentPage: Updating user metadata with planId:", planId);
-      const { error: updateError } = await supabase.auth.updateUser({
+      console.log("PaymentPage: User object BEFORE update:", user);
+      console.log("PaymentPage: Attempting to update user metadata with planId:", planId);
+      const { data: updatedUserData, error: updateError } = await supabase.auth.updateUser({
         data: {
           payment_status: 'paid',
           plan_id: planId // Adiciona o planId ao user_metadata
         }
       });
+
       if (updateError) {
         console.error("PaymentPage: Error updating user metadata:", updateError.message);
         showError(`Erro ao atualizar status de pagamento: ${updateError.message}`);
         setLoading(false);
         return;
       }
-      console.log("PaymentPage: User metadata updated successfully.");
+      console.log("PaymentPage: User metadata update successful. Updated user data:", updatedUserData);
+    } else {
+      console.warn("PaymentPage: No user found to update metadata.");
     }
+    
     setLoading(false);
     showSuccess("Pagamento simulado com sucesso! Redirecionando para o dashboard.");
     navigate('/dashboard');
