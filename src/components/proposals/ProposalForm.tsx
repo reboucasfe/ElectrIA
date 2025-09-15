@@ -97,28 +97,51 @@ const fieldNameMap: { [key: string]: string } = {
 const compareServices = (oldServices: SelectedService[], newServices: SelectedService[]): string => {
   const oldMap = new Map((oldServices || []).map(s => [s.uniqueId, s]));
   const newMap = new Map((newServices || []).map(s => [s.uniqueId, s]));
-  const changes: string[] = [];
+  const serviceChanges: string[] = [];
 
-  // Checa por serviços removidos e modificados
+  // Check for removed services
   oldMap.forEach((oldService, uniqueId) => {
     if (!newMap.has(uniqueId)) {
-      changes.push(`- Removido: ${oldService.name}`);
+      serviceChanges.push(`- Removido: ${oldService.name} (Qtd: ${oldService.quantity})`);
+    }
+  });
+
+  // Check for added or modified services
+  newMap.forEach((newService, uniqueId) => {
+    if (!oldMap.has(uniqueId)) {
+      serviceChanges.push(`+ Adicionado: ${newService.name} (Qtd: ${newService.quantity})`);
     } else {
-      const newService = newMap.get(uniqueId)!;
+      const oldService = oldMap.get(uniqueId)!;
+      const individualChanges: string[] = [];
+
       if (oldService.quantity !== newService.quantity) {
-        changes.push(`~ Modificado: ${oldService.name} (Qtd: ${oldService.quantity} -> ${newService.quantity})`);
+        individualChanges.push(`Qtd: ${oldService.quantity} -> ${newService.quantity}`);
+      }
+      if (oldService.price_type !== newService.price_type) {
+        individualChanges.push(`Tipo de Preço: ${oldService.price_type} -> ${newService.price_type}`);
+      }
+      // Compare prices and hours only if relevant to the price_type
+      if (newService.price_type === 'fixed') {
+        if (oldService.fixed_price !== newService.fixed_price) {
+          individualChanges.push(`Preço Fixo: ${formatCurrency(oldService.fixed_price || 0)} -> ${formatCurrency(newService.fixed_price || 0)}`);
+        }
+      } else if (newService.price_type === 'hourly') {
+        if (oldService.hourly_rate !== newService.hourly_rate) {
+          individualChanges.push(`Valor por Hora: ${formatCurrency(oldService.hourly_rate || 0)} -> ${formatCurrency(newService.hourly_rate || 0)}`);
+        }
+        if (oldService.total_hours !== newService.total_hours) {
+          individualChanges.push(`Total de Horas: ${oldService.total_hours || 0} -> ${newService.total_hours || 0}`);
+        }
+      }
+      // Note: calculated_total is derived, so we compare its components.
+
+      if (individualChanges.length > 0) {
+        serviceChanges.push(`~ Modificado: ${newService.name} (${individualChanges.join(', ')})`);
       }
     }
   });
 
-  // Checa por serviços adicionados
-  newMap.forEach((newService, uniqueId) => {
-    if (!oldMap.has(uniqueId)) {
-      changes.push(`+ Adicionado: ${newService.name} (Qtd: ${newService.quantity})`);
-    }
-  });
-
-  return changes.join('\n');
+  return serviceChanges.join('\n');
 };
 
 // Helper para comparar objetos e gerar um resumo de mudanças
@@ -128,29 +151,48 @@ const getChangesSummary = (oldData: ProposalFormValues, newData: ProposalFormVal
 
   const fieldsToCompare: Array<keyof ProposalFormValues> = [
     'clientName', 'clientEmail', 'clientPhone', 'proposalTitle',
-    'proposalDescription', 'notes', 'validityDays', 'paymentMethods'
-  ];
+    'proposalDescription', 'notes', 'validityDays'
+  ]; 
 
-  const areValuesDifferent = (val1: any, val2: any) => {
-    const isEmpty = (v: any) => v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0);
+  const areValuesEffectivelyDifferent = (val1: any, val2: any) => {
+    const isEmpty = (v: any) => 
+      v === null || v === undefined || (typeof v === 'string' && v.trim() === '') || (Array.isArray(v) && v.length === 0);
+
+    // If both values are considered empty, they are not different.
     if (isEmpty(val1) && isEmpty(val2)) {
       return false;
     }
+
+    // Special handling for arrays (like paymentMethods)
+    // Sort arrays before stringifying to ensure order doesn't cause a false positive
+    if (Array.isArray(val1) && Array.isArray(val2)) {
+      const sortedVal1 = [...val1].sort();
+      const sortedVal2 = [...val2].sort();
+      return JSON.stringify(sortedVal1) !== JSON.stringify(sortedVal2);
+    }
+    
+    // For other types, compare their stringified versions.
     return JSON.stringify(val1) !== JSON.stringify(val2);
   };
 
   fieldsToCompare.forEach(field => {
-    if (areValuesDifferent(oldData[field], newData[field])) {
+    if (areValuesEffectivelyDifferent(oldData[field], newData[field])) {
       changedFields.push(field);
       changes[field] = { old: oldData[field], new: newData[field] };
     }
   });
 
-  // Comparação detalhada de serviços
+  // Special handling for paymentMethods (array of strings)
+  if (areValuesEffectivelyDifferent(oldData.paymentMethods, newData.paymentMethods)) {
+    changedFields.push('paymentMethods');
+    changes.paymentMethods = { old: oldData.paymentMethods, new: newData.paymentMethods };
+  }
+
+  // Detailed comparison of services
   const serviceChangesDescription = compareServices(oldData.selectedServices, newData.selectedServices);
   if (serviceChangesDescription) {
     changedFields.push('selectedServices');
-    changes.selectedServices = serviceChangesDescription;
+    changes.selectedServices = serviceChangesDescription; // This will be a string with detailed changes
   }
 
   const summary = changedFields.length > 0
