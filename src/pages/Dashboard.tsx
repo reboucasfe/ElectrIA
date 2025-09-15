@@ -1,7 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, Users, ClipboardList, CheckCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button'; // Importar Button
 import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 
 const Dashboard = () => {
@@ -48,30 +47,19 @@ const Dashboard = () => {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {kpiData.map((kpi) => (
-          <Card key={kpi.title} className="flex flex-col"> {/* Adicionado flex-col para o layout */}
-            {kpi.action ? (
-              <Button variant="ghost" className="h-auto p-0 flex-grow justify-start" onClick={kpi.action}> {/* Botão para itens clicáveis */}
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 w-full">
-                  <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
-                  <kpi.icon className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent className="w-full text-left">
-                  <div className="text-2xl font-bold">{kpi.value}</div>
-                  <p className="text-xs text-muted-foreground">{kpi.description}</p>
-                </CardContent>
-              </Button>
-            ) : (
-              <> {/* Renderiza como Card normal para itens não clicáveis */}
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
-                  <kpi.icon className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{kpi.value}</div>
-                  <p className="text-xs text-muted-foreground">{kpi.description}</p>
-                </CardContent>
-              </>
-            )}
+          <Card
+            key={kpi.title}
+            className={`flex flex-col ${kpi.action ? 'cursor-pointer hover:bg-gray-50 transition-colors' : ''}`} // Adiciona classes de cursor e hover
+            onClick={kpi.action || undefined} // Adiciona onClick se houver uma ação
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+              <kpi.icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{kpi.value}</div>
+              <p className="text-xs text-muted-foreground">{kpi.description}</p>
+            </CardContent>
           </Card>
         ))}
       </div>
