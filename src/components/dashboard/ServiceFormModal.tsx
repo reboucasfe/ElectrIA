@@ -176,7 +176,7 @@ const ServiceFormModal = ({ isOpen, onClose, onSave, service }: ServiceFormModal
           )}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose} disabled={loading}>Cancelar</Button>
-            <Button type="submit" disabled={loading}>{loading ? 'Salvando...' : 'Salvar Serviço'}</Button>
+            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">{loading ? 'Salvando...' : 'Salvar Serviço'}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -81,7 +81,7 @@ const Services = () => {
           <h1 className="text-3xl font-bold">Meus Serviços</h1>
           <p className="text-gray-500">Gerencie seu catálogo de serviços e preços.</p>
         </div>
-        <Button onClick={handleAddNew}>
+        <Button onClick={handleAddNew} className="bg-blue-600 hover:bg-blue-700">
           <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Novo Serviço
         </Button>
       </div>
@@ -142,7 +142,7 @@ const Services = () => {
             <div className="text-center py-12">
               <h3 className="text-lg font-semibold">Nenhum serviço cadastrado</h3>
               <p className="text-sm text-gray-500 mt-1">Comece adicionando seu primeiro serviço para agilizar suas propostas.</p>
-              <Button className="mt-4" onClick={handleAddNew}>
+              <Button className="mt-4 bg-blue-600 hover:bg-blue-700" onClick={handleAddNew}>
                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Serviço
               </Button>
             </div>

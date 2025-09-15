@@ -63,7 +63,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut}>
+        <DropdownMenuItem onClick={handleSignOut} className="bg-blue-600 text-white hover:bg-blue-700 focus:bg-blue-700">
           Sair
         </DropdownMenuItem>
       </DropdownMenuContent>

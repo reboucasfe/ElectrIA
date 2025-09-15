@@ -69,7 +69,7 @@ const Settings = () => {
               />
               {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
             </div>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
               {loading ? 'Atualizando...' : 'Atualizar Senha'}
             </Button>
           </form>

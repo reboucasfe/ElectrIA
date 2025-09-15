@@ -263,7 +263,7 @@ const Profile = () => {
               />
             </div>
             
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
               {loading ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
           </form>
