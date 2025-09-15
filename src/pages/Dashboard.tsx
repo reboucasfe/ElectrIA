@@ -1,40 +1,40 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, Users, ClipboardList, CheckCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const navigate = useNavigate(); // Inicializar useNavigate
+  const navigate = useNavigate();
 
   const kpiData = [
     {
       title: "Propostas Enviadas",
-      value: "75",
+      value: "0", // Alterado para 0
       icon: ClipboardList,
-      description: "+15% vs. mês passado",
-      action: () => navigate('/proposals?type=sent'), // Ação para navegar
+      description: "Dados em breve", // Descrição ajustada
+      action: () => navigate('/proposals-overview?status=sent'), // Ação para navegar
     },
     {
       title: "Propostas Aceitas",
-      value: "52",
+      value: "0", // Alterado para 0
       icon: CheckCircle,
-      description: "+21% vs. mês passado",
-      action: () => navigate('/proposals?type=accepted'), // Ação para navegar
+      description: "Dados em breve", // Descrição ajustada
+      action: () => navigate('/proposals-overview?status=accepted'), // Ação para navegar
     },
     {
       title: "Taxa de Conversão",
-      value: "69.3%",
+      value: "N/A", // Alterado para N/A
       icon: Users,
-      description: "+5.2% vs. mês passado",
-      action: null, // Não é um botão, é uma métrica
+      description: "Dados em breve", // Descrição ajustada
+      action: null,
     },
     {
       title: "Valor Total Fechado",
-      value: "R$ 12.450,00",
+      value: "R$ 0,00", // Alterado para R$ 0,00
       icon: DollarSign,
-      description: "+30% vs. mês passado",
-      action: null, // Não é um botão, é uma métrica
+      description: "Dados em breve", // Descrição ajustada
+      action: null,
     },
   ];
 
@@ -49,8 +49,8 @@ const Dashboard = () => {
         {kpiData.map((kpi) => (
           <Card
             key={kpi.title}
-            className={`flex flex-col ${kpi.action ? 'cursor-pointer hover:bg-gray-50 transition-colors' : ''}`} // Adiciona classes de cursor e hover
-            onClick={kpi.action || undefined} // Adiciona onClick se houver uma ação
+            className={`flex flex-col ${kpi.action ? 'cursor-pointer hover:bg-gray-50 transition-colors' : ''}`}
+            onClick={kpi.action || undefined}
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>

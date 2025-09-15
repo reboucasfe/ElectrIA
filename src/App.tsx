@@ -23,7 +23,11 @@ import WhatsAppButton from "./components/WhatsAppButton";
 import RegisterModal from "./components/RegisterModal";
 import LoginModal from "./components/LoginModal";
 import PaymentPage from "./pages/PaymentPage";
-import ProposalsList from "./pages/ProposalsList"; // Importar a nova página
+import ProposalsList from "./pages/ProposalsList";
+import ProposalsOverview from "./pages/ProposalsOverview"; // Importar a nova página
+import NewProposal from "./pages/NewProposal"; // Importar a nova página
+import ProposalsInProgress from "./pages/ProposalsInProgress"; // Importar a nova página
+import ProposalsClosed from "./pages/ProposalsClosed"; // Importar a nova página
 
 const queryClient = new QueryClient();
 
@@ -101,7 +105,11 @@ const App = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/upgrade" element={<Upgrade />} />
-                <Route path="/proposals" element={<ProposalsList />} /> {/* Nova rota para a lista de propostas */}
+                <Route path="/proposals" element={<ProposalsList />} /> {/* Rota antiga, mantida por compatibilidade */}
+                <Route path="/proposals-overview" element={<ProposalsOverview />} /> {/* Nova rota principal de propostas */}
+                <Route path="/proposals/new" element={<NewProposal />} /> {/* Rota para nova proposta */}
+                <Route path="/proposals/in-progress" element={<ProposalsInProgress />} /> {/* Rota para propostas em andamento */}
+                <Route path="/proposals/closed" element={<ProposalsClosed />} /> {/* Rota para propostas fechadas */}
               </Route>
             </Route>
 
