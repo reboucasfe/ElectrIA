@@ -343,6 +343,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
       let currentProposalId = proposalData.id;
       let currentProposalNumber = proposalData.proposalNumber;
       let currentCreatedAt = proposalData.created_at;
+      let currentRevisionNumber = proposalData.revisionNumber;
 
       // Passo 1: Salvar/Atualizar a proposta no Supabase
       const proposalPayload = {
@@ -375,6 +376,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
           currentProposalId = result.data.id;
           currentProposalNumber = result.data.proposal_number;
           currentCreatedAt = result.data.created_at;
+          currentRevisionNumber = result.data.revision_number;
         }
       }
 
@@ -390,6 +392,11 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
         setIsGeneratingPdf(false);
         return;
       }
+
+      // Formata o número da proposta para o nome do arquivo
+      const formattedProposalNumber = formatProposalNumber(currentProposalNumber, currentCreatedAt, currentRevisionNumber);
+      const filename = `${formattedProposalNumber}-${proposalData.clientName.replace(/\s/g, '-')}.pdf`;
+
 
       // Passo 2: Gerar PDF página por página
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -415,7 +422,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
         pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
       }
 
-      pdf.save(`proposta-${proposalData.clientName.replace(/\s/g, '-')}-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
+      pdf.save(filename);
       showSuccess("PDF da proposta gerado com sucesso!");
       console.log("handleGeneratePdf: PDF salvo com sucesso.");
 
