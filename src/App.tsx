@@ -28,8 +28,9 @@ import ProposalsOverview from "./pages/ProposalsOverview";
 import NewProposal from "./pages/NewProposal";
 import ProposalsInProgress from "./pages/ProposalsInProgress";
 import ProposalsClosed from "./pages/ProposalsClosed";
-import TermsOfUse from "./pages/TermsOfUse"; // Importar a nova página
-import PrivacyPolicy from "./pages/PrivacyPolicy"; // Importar a nova página
+import TermsOfUse from "./pages/TermsOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Services from "./pages/Services";
 
 const queryClient = new QueryClient();
 
@@ -90,15 +91,14 @@ const App = () => {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Index onOpenRegisterModal={handleOpenRegisterModal} onOpenLoginModal={handleOpenLoginModal} />} />
-            <Route path="/terms-of-use" element={<TermsOfUse />} /> {/* Nova rota */}
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} /> {/* Nova rota */}
+            <Route path="/terms-of-use" element={<TermsOfUse />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             
             {/* Auth Routes with Header */}
             <Route element={<AuthLayout onOpenRegisterModal={handleOpenRegisterModal} onOpenLoginModal={handleOpenLoginModal} />}>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register onOpenLoginModal={handleOpenLoginModal} />} />
               <Route path="/update-password" element={<UpdatePassword />} />
-              {/* Payment page, protegida, mas usa o cabeçalho do AuthLayout */}
               <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
             </Route>
             
@@ -109,11 +109,12 @@ const App = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/upgrade" element={<Upgrade />} />
-                <Route path="/proposals" element={<ProposalsList />} /> {/* Rota antiga, mantida por compatibilidade */}
-                <Route path="/proposals-overview" element={<ProposalsOverview />} /> {/* Nova rota principal de propostas */}
-                <Route path="/proposals/new" element={<NewProposal />} /> {/* Rota para nova proposta */}
-                <Route path="/proposals/in-progress" element={<ProposalsInProgress />} /> {/* Rota para propostas em andamento */}
-                <Route path="/proposals/closed" element={<ProposalsClosed />} /> {/* Rota para propostas fechadas */}
+                <Route path="/services" element={<Services />} />
+                <Route path="/proposals" element={<ProposalsList />} />
+                <Route path="/proposals-overview" element={<ProposalsOverview />} />
+                <Route path="/proposals/new" element={<NewProposal />} />
+                <Route path="/proposals/in-progress" element={<ProposalsInProgress />} />
+                <Route path="/proposals/closed" element={<ProposalsClosed />} />
               </Route>
             </Route>
 
@@ -126,7 +127,7 @@ const App = () => {
             onClose={() => setIsRegisterModalOpen(false)}
             selectedPlanId={selectedPlanIdForRegister}
             selectedBillingCycle={selectedBillingCycleForRegister}
-            onOpenLoginModal={handleOpenLoginModal} // Passando a prop
+            onOpenLoginModal={handleOpenLoginModal}
           />
           <LoginModal
             isOpen={isLoginModalOpen}

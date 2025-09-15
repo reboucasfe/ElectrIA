@@ -1,11 +1,12 @@
 import { NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, User, Settings, Zap, Crown, FileText } from 'lucide-react'; // Importar FileText
+import { LayoutDashboard, User, Settings, Zap, Crown, FileText, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const MobileSidebar = () => {
   const navItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { href: '/proposals-overview', icon: FileText, label: 'Propostas' }, // Novo item para Propostas
+    { href: '/proposals-overview', icon: FileText, label: 'Propostas' },
+    { href: '/services', icon: Wrench, label: 'Serviços' },
     { href: '/profile', icon: User, label: 'Perfil' },
     { href: '/upgrade', icon: Crown, label: 'Upgrade Plano' },
     { href: '/settings', icon: Settings, label: 'Configurações' },
