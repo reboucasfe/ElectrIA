@@ -112,7 +112,7 @@ const Upgrade = () => {
             return (
               <Card 
                 key={planId} 
-                className={`p-8 flex flex-col shadow-lg transition-all duration-300 ${isCurrentPlan ? 'border-2 border-blue-600 relative' : ''} ${isClickable ? 'hover:-translate-y-2 hover:shadow-xl cursor-pointer' : 'cursor-not-allowed bg-gray-50'}`}
+                className={`p-8 flex flex-col shadow-lg transition-all duration-300 ${isCurrentPlan ? 'border-2 border-blue-600 relative' : 'border-2 border-transparent'} ${isClickable ? 'hover:-translate-y-2 hover:shadow-xl cursor-pointer hover:border-blue-600' : 'cursor-not-allowed bg-gray-50'}`}
                 onClick={() => {
                   if (isClickable) {
                     handlePlanActionClick(planId);

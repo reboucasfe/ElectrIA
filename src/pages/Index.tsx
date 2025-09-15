@@ -336,7 +336,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               <Card 
-                className="p-8 flex flex-col shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer"
+                className="p-8 flex flex-col shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer border-2 border-transparent hover:border-blue-600"
                 onClick={() => handlePlanButtonClick('essencial')}
               >
                 <CardHeader className="p-0 mb-6"><CardTitle>Essencial</CardTitle></CardHeader>
@@ -411,7 +411,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                 </Button>
               </Card>
               <Card 
-                className="p-8 flex flex-col shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer"
+                className="p-8 flex flex-col shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer border-2 border-transparent hover:border-blue-600"
                 onClick={() => handlePlanButtonClick('premium')}
               >
                 <CardHeader className="p-0 mb-6"><CardTitle>Premium</CardTitle></CardHeader>
