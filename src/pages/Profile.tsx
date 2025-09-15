@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from '@/components/ui/checkbox'; // Importar Checkbox
+import { Checkbox } from '@/components/ui/checkbox';
 import { Upload } from 'lucide-react';
 import InputMask from 'react-input-mask';
 
@@ -183,13 +183,13 @@ const Profile = () => {
   return (
     <div className="space-y-8">
        <h1 className="text-3xl font-bold">Perfil</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>Informações Pessoais</CardTitle>
-          <CardDescription>Atualize seu nome e foto de perfil.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6"> {/* Formulário único */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações Pessoais</CardTitle>
+            <CardDescription>Atualize seu nome e foto de perfil.</CardDescription>
+          </CardHeader>
+          <CardContent>
             <div className="flex items-center space-x-4">
               <Avatar className="h-20 w-20">
                 <AvatarImage src={avatarPreview || user?.user_metadata?.avatar_url || undefined} alt="User avatar" />
@@ -204,7 +204,7 @@ const Profile = () => {
                     accept="image/jpeg, image/png"
                     onChange={handleFileChange}
                     disabled={loading}
-                    className="pr-10" // Adiciona padding à direita para o ícone
+                    className="pr-10"
                   />
                   <Upload className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
                 </div>
@@ -243,7 +243,7 @@ const Profile = () => {
                     maskChar="_"
                     value={field.value}
                     onChange={(e) => {
-                      field.onChange(e.target.value.replace(/\D/g, '')); // Passa o valor não mascarado
+                      field.onChange(e.target.value.replace(/\D/g, ''));
                     }}
                     onBlur={field.onBlur}
                   >
@@ -289,22 +289,16 @@ const Profile = () => {
                 className="cursor-not-allowed bg-gray-100"
               />
             </div>
-            
-            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
-              {loading ? 'Salvando...' : 'Salvar Alterações'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Nova Seção: Dados da Empresa */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Dados da Empresa</CardTitle>
-          <CardDescription>Informações da sua empresa para uso em propostas e pagamentos.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Nova Seção: Dados da Empresa */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Dados da Empresa</CardTitle>
+            <CardDescription>Informações da sua empresa para uso em propostas e pagamentos.</CardDescription>
+          </CardHeader>
+          <CardContent>
             <div className="space-y-2">
               <Label htmlFor="cnpj">CNPJ (Opcional)</Label>
               <Controller
@@ -335,7 +329,7 @@ const Profile = () => {
               {errors.cnpj && <p className="text-sm text-red-500">{errors.cnpj.message}</p>}
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mt-6"> {/* Adicionado mt-6 para espaçamento */}
               <h3 className="text-lg font-semibold">Dados Bancários para Pagamento</h3>
               <div className="space-y-2">
                 <Label htmlFor="bankName">Nome do Banco</Label>
@@ -357,7 +351,7 @@ const Profile = () => {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mt-6"> {/* Adicionado mt-6 para espaçamento */}
               <h3 className="text-lg font-semibold">Meios de Pagamento Aceitos</h3>
               <Controller
                 name="acceptedPaymentMethods"
@@ -384,13 +378,13 @@ const Profile = () => {
                 )}
               />
             </div>
-
-            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
-              {loading ? 'Salvando...' : 'Salvar Dados da Empresa'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+        
+        <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
+          {loading ? 'Salvando...' : 'Salvar Alterações'}
+        </Button>
+      </form>
     </div>
   );
 };
