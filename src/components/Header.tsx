@@ -3,7 +3,7 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Zap } from 'lucide-react';
-import { useAuth } from '@/contexts/Auth/AuthContext'; // Corrigido o caminho do import
+import { useAuth } from '@/contexts/AuthContext'; // Caminho corrigido
 import { useMemo } from 'react';
 
 interface HeaderProps {
