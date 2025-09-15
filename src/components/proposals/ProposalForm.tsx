@@ -112,6 +112,13 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
       console.error("ProposalForm: Erros de validação:", errors);
+      // Adiciona log mais específico para selectedServices
+      if (errors.selectedServices) {
+        console.error("ProposalForm: Detalhes do erro em selectedServices:", errors.selectedServices);
+        errors.selectedServices.forEach((serviceError, index) => {
+          console.error(`  Erro no Serviço ${index}:`, serviceError);
+        });
+      }
       showError("Por favor, corrija os erros no formulário.");
     }
   }, [errors]);
@@ -190,6 +197,12 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
 
     const serviceToAdd = availableServices.find(s => s.id === selectedServiceToAdd);
     if (serviceToAdd) {
+      // Adiciona uma verificação para garantir que o serviço tem um ID válido
+      if (!serviceToAdd.id) {
+        console.error("handleAddService: Serviço selecionado não possui um ID válido:", serviceToAdd);
+        showError("Serviço selecionado não possui um ID válido.");
+        return;
+      }
       const newService: SelectedService = {
         ...serviceToAdd,
         uniqueId: crypto.randomUUID(),
