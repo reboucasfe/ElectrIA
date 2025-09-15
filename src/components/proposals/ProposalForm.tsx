@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod'; // Linha corrigida
+import * as z from 'zod';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { showError, showSuccess } from '@/utils/toast';
@@ -174,14 +174,14 @@ const ProposalForm = () => {
   };
 
   const handleOpenPreviewModal = (data: ProposalFormValues) => {
-    console.log("Opening preview modal with data:", data); // Log para depuração
+    console.log("ProposalForm: Validação do formulário bem-sucedida. Abrindo modal de pré-visualização com dados:", data);
     setPreviewData(data);
     setIsPreviewModalOpen(true);
   };
 
   const onSubmit = async (data: ProposalFormValues) => {
+    console.log("ProposalForm: Função onSubmit (Salvar Rascunho) chamada. Dados:", data);
     setLoading(true);
-    console.log("Dados da Proposta (Salvar Rascunho):", data);
     // Esta função atualmente apenas simula o salvamento.
     // Para salvar de verdade, você precisaria de uma tabela 'proposals' no Supabase
     // e adicionar a lógica de inserção aqui.
@@ -206,7 +206,7 @@ const ProposalForm = () => {
             <div className="grid gap-2">
               <Label htmlFor="clientEmail">Email do Cliente (Opcional)</Label>
               <Input id="clientEmail" type="email" placeholder="email@cliente.com" {...register('clientEmail')} />
-              {errors.clientEmail && <p className className="text-sm text-red-500">{errors.clientEmail.message}</p>}
+              {errors.clientEmail && <p className="text-sm text-red-500">{errors.clientEmail.message}</p>}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="clientPhone">WhatsApp do Cliente (Opcional)</Label>
