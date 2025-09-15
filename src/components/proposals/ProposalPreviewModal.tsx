@@ -8,15 +8,16 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { showError, showSuccess } from '@/utils/toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { Service } from '@/components/dashboard/ServiceFormModal'; // Importa a interface Service
+import { Service } from '@/components/dashboard/ServiceFormModal';
 
-// Estende a interface Service para incluir a quantidade e o total calculado no formulário
 interface SelectedService extends Service {
+  uniqueId: string;
   quantity: number;
   calculated_total: number;
 }
 
 interface ProposalFormValues {
+  id?: string; // Adiciona o ID da proposta
   clientName: string;
   clientEmail?: string;
   clientPhone?: string;
@@ -26,12 +27,14 @@ interface ProposalFormValues {
   notes?: string;
   paymentMethods: string[];
   validityDays: number;
+  status?: string; // Adiciona o status para exibição
 }
 
 interface ProposalPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   proposalData: ProposalFormValues | null;
+  onPdfGeneratedAndSent: (proposalId: string) => void; // Nova prop para callback
 }
 
 const formatCurrency = (value: number) => {
@@ -41,13 +44,12 @@ const formatCurrency = (value: number) => {
   });
 };
 
-const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreviewModalProps) => {
+const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAndSent }: ProposalPreviewModalProps) => {
   console.log("ProposalPreviewModal: Component rendering. isOpen:", isOpen, "proposalData is null:", proposalData === null);
   const { user } = useAuth();
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const proposalPdfRef = useRef<HTMLDivElement>(null);
 
-  // Adiciona um log quando o modal abre
   useEffect(() => {
     if (isOpen) {
       console.log("ProposalPreviewModal: Modal está aberto. Dados da proposta:", proposalData);
@@ -70,9 +72,9 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
 
   const handleGeneratePdf = async () => {
     console.log("handleGeneratePdf: Iniciando a geração do PDF...");
-    if (!proposalData) {
-      showError("Nenhum dado de proposta para gerar PDF.");
-      console.error("handleGeneratePdf: Nenhum dado de proposta disponível.");
+    if (!proposalData || !proposalData.id) {
+      showError("Nenhum dado de proposta ou ID para gerar PDF.");
+      console.error("handleGeneratePdf: Nenhum dado de proposta ou ID disponível.");
       return;
     }
     setIsGeneratingPdf(true);
@@ -85,7 +87,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
 
     try {
       console.log("handleGeneratePdf: Capturando conteúdo com html2canvas...");
-      const canvas = await html2canvas(proposalPdfRef.current, { scale: 2, useCORS: true }); // Adicionado useCORS
+      const canvas = await html2canvas(proposalPdfRef.current, { scale: 2, useCORS: true });
       console.log("handleGeneratePdf: Captura com html2canvas concluída.");
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -108,7 +110,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
       pdf.save(`proposta-${proposalData.clientName.replace(/\s/g, '-')}-${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
       showSuccess("PDF da proposta gerado com sucesso!");
       console.log("handleGeneratePdf: PDF salvo com sucesso.");
-      onClose(); // Fecha o modal após gerar o PDF
+      onPdfGeneratedAndSent(proposalData.id); // Chama o callback para atualizar o status no pai
     } catch (error: any) {
       console.error("handleGeneratePdf: Erro ao gerar PDF:", error);
       showError(`Erro ao gerar PDF: ${error.message || "Verifique o console para mais detalhes."}`);
@@ -227,7 +229,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
             Fechar
           </Button>
           <Button onClick={handleGeneratePdf} disabled={isGeneratingPdf} className="bg-blue-600 hover:bg-blue-700">
-            {isGeneratingPdf ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null} Gerar PDF
+            {isGeneratingPdf ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null} Gerar PDF e Marcar como Enviada
           </Button>
         </DialogFooter>
       </DialogContent>

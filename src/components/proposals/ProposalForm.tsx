@@ -22,10 +22,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import InputMask from 'react-input-mask';
-import ServiceFormModal, { Service } from '@/components/dashboard/ServiceFormModal'; // Importa o modal de serviço
+import ServiceFormModal, { Service } from '@/components/dashboard/ServiceFormModal';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-import ProposalPreviewModal from './ProposalPreviewModal'; // Importa o novo modal de pré-visualização
+import ProposalPreviewModal from './ProposalPreviewModal';
 
 // Estende a interface Service para incluir a quantidade e o total calculado no formulário
 interface SelectedService extends Service {
@@ -71,17 +71,23 @@ const formatCurrency = (value: number) => {
   });
 };
 
-const ProposalForm = () => {
+interface ProposalFormProps {
+  initialData?: any; // Dados iniciais para edição
+  proposalId?: string; // ID da proposta se estiver editando
+}
+
+const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [availableServices, setAvailableServices] = useState<Service[]>([]);
   const [selectedServiceToAdd, setSelectedServiceToAdd] = useState<string>('');
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewData, setPreviewData] = useState<ProposalFormValues | null>(null);
-  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false); // Estado para o modal de serviço
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
 
+  const navigate = useNavigate();
 
-  const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<ProposalFormValues>({
+  const { register, handleSubmit, control, setValue, watch, reset, formState: { errors } } = useForm<ProposalFormValues>({
     resolver: zodResolver(proposalFormSchema),
     defaultValues: {
       clientName: '',
@@ -96,11 +102,10 @@ const ProposalForm = () => {
     },
   });
 
-  const watchedFormValues = watch(); // Assiste a todos os valores do formulário
+  const watchedFormValues = watch();
   const watchedServices = watchedFormValues.selectedServices;
   const watchedPaymentMethods = watchedFormValues.paymentMethods;
 
-  // Fetch available services from Supabase
   const fetchAvailableServices = useCallback(async () => {
     if (!user) return;
     const { data, error } = await supabase
@@ -119,12 +124,42 @@ const ProposalForm = () => {
     fetchAvailableServices();
   }, [fetchAvailableServices]);
 
-  // Pre-fill payment methods from user profile
+  // Preencher formulário com dados iniciais para edição
   useEffect(() => {
-    if (user?.user_metadata?.accepted_payment_methods) {
+    if (initialData) {
+      reset({
+        clientName: initialData.client_name,
+        clientEmail: initialData.client_email || '',
+        clientPhone: initialData.client_phone || '',
+        proposalTitle: initialData.proposal_title,
+        proposalDescription: initialData.proposal_description || '',
+        selectedServices: initialData.selected_services.map((s: any) => ({ ...s, uniqueId: s.uniqueId || crypto.randomUUID() })), // Garante uniqueId
+        notes: initialData.notes || '',
+        paymentMethods: initialData.payment_methods || [],
+        validityDays: initialData.validity_days,
+      });
+    } else {
+      // Reset para valores padrão ao criar nova proposta
+      reset({
+        clientName: '',
+        clientEmail: '',
+        clientPhone: '',
+        proposalTitle: user?.user_metadata?.company_name ? `Proposta de Serviços - ${user.user_metadata.company_name}` : 'Proposta de Serviços',
+        proposalDescription: '',
+        selectedServices: [],
+        notes: '',
+        paymentMethods: user?.user_metadata?.accepted_payment_methods || [],
+        validityDays: 7,
+      });
+    }
+  }, [initialData, reset, user]);
+
+  // Pre-fill payment methods from user profile if creating a new proposal
+  useEffect(() => {
+    if (!initialData && user?.user_metadata?.accepted_payment_methods) {
       setValue('paymentMethods', user.user_metadata.accepted_payment_methods);
     }
-  }, [user, setValue]);
+  }, [user, setValue, initialData]);
 
   const calculateServiceTotal = (service: Service, quantity: number): number => {
     if (service.price_type === 'fixed' && service.fixed_price !== undefined) {
@@ -147,8 +182,8 @@ const ProposalForm = () => {
     if (serviceToAdd) {
       const newService: SelectedService = {
         ...serviceToAdd,
-        uniqueId: crypto.randomUUID(), // Gera um ID único para esta instância do serviço
-        quantity: 1, // Default quantity
+        uniqueId: crypto.randomUUID(),
+        quantity: 1,
         calculated_total: calculateServiceTotal(serviceToAdd, 1),
       };
       setValue('selectedServices', [...watchedServices, newService]);
@@ -175,14 +210,70 @@ const ProposalForm = () => {
     setValue('selectedServices', newServices);
   };
 
-  const handleOpenPreviewModal = (data: ProposalFormValues) => {
-    console.log("ProposalForm: Validação do formulário bem-sucedida. Abrindo modal de pré-visualização com dados:", data);
-    setPreviewData(data);
-    setIsPreviewModalOpen(true);
+  const saveProposalToSupabase = async (data: ProposalFormValues, newStatus: string = 'draft', pdfGenerated: boolean = false) => {
+    if (!user) {
+      showError("Você precisa estar logado para salvar uma proposta.");
+      return null;
+    }
+
+    setLoading(true);
+
+    const proposalPayload = {
+      user_id: user.id,
+      client_name: data.clientName,
+      client_email: data.clientEmail || null,
+      client_phone: data.clientPhone || null,
+      proposal_title: data.proposalTitle,
+      proposal_description: data.proposalDescription || null,
+      selected_services: data.selectedServices,
+      notes: data.notes || null,
+      payment_methods: data.paymentMethods,
+      validity_days: data.validityDays,
+      status: newStatus,
+      pdf_generated_at: pdfGenerated ? new Date().toISOString() : null,
+      sent_at: newStatus === 'sent' ? new Date().toISOString() : null,
+    };
+
+    let result;
+    if (proposalId) {
+      // Atualizar proposta existente
+      result = await supabase.from('proposals').update(proposalPayload).eq('id', proposalId).select().single();
+    } else {
+      // Inserir nova proposta
+      result = await supabase.from('proposals').insert([proposalPayload]).select().single();
+    }
+
+    setLoading(false);
+
+    if (result.error) {
+      showError(`Erro ao salvar proposta: ${result.error.message}`);
+      return null;
+    } else {
+      showSuccess(`Proposta ${proposalId ? 'atualizada' : 'salva'} com sucesso!`);
+      if (!proposalId) { // Se for uma nova proposta, navega para a edição dela
+        navigate(`/proposals/edit/${result.data.id}`);
+      }
+      return result.data;
+    }
   };
 
-  const handleOpenServiceModal = () => {
-    setIsServiceModalOpen(true);
+  const handleSaveDraft = async (data: ProposalFormValues) => {
+    await saveProposalToSupabase(data, 'draft');
+  };
+
+  const handleOpenPreviewModal = async (data: ProposalFormValues) => {
+    console.log("ProposalForm: Validação do formulário bem-sucedida. Tentando salvar e abrir modal de pré-visualização com dados:", data);
+    const savedProposal = await saveProposalToSupabase(data, proposalId ? initialData.status : 'draft'); // Mantém status ou define como draft
+    if (savedProposal) {
+      setPreviewData({
+        ...data,
+        // Garante que o ID da proposta salva seja passado para o modal
+        id: savedProposal.id, 
+        // Atualiza o status no previewData para refletir o que foi salvo
+        status: savedProposal.status,
+      });
+      setIsPreviewModalOpen(true);
+    }
   };
 
   const handleServiceModalClose = () => {
@@ -190,23 +281,32 @@ const ProposalForm = () => {
   };
 
   const handleServiceSaved = () => {
-    fetchAvailableServices(); // Recarrega a lista de serviços após salvar um novo
+    fetchAvailableServices();
     handleServiceModalClose();
   };
 
-  const onSubmit = async (data: ProposalFormValues) => {
-    console.log("ProposalForm: Função onSubmit (Salvar Rascunho) chamada. Dados:", data);
+  const handlePdfGeneratedAndSent = async (proposalId: string) => {
+    // Esta função será chamada pelo ProposalPreviewModal após gerar o PDF
+    // e deve atualizar o status da proposta para 'sent' no banco de dados.
     setLoading(true);
-    // Esta função atualmente apenas simula o salvamento.
-    // Para salvar de verdade, você precisaria de uma tabela 'proposals' no Supabase
-    // e adicionar a lógica de inserção aqui.
-    showSuccess("Proposta salva como rascunho (funcionalidade de salvamento em banco de dados em desenvolvimento)!");
+    const { error } = await supabase
+      .from('proposals')
+      .update({ status: 'sent', pdf_generated_at: new Date().toISOString(), sent_at: new Date().toISOString() })
+      .eq('id', proposalId);
+
+    if (error) {
+      showError(`Erro ao atualizar status da proposta após PDF: ${error.message}`);
+    } else {
+      showSuccess("Status da proposta atualizado para 'Enviada'!");
+    }
     setLoading(false);
+    setIsPreviewModalOpen(false); // Fecha o modal após a ação completa
+    navigate('/proposals'); // Redireciona para a lista de propostas
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(handleSaveDraft)} className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Informações do Cliente</CardTitle>
@@ -284,7 +384,7 @@ const ProposalForm = () => {
             <CardDescription>Selecione os serviços do seu catálogo para esta proposta.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-end gap-2"> {/* Usar items-end para alinhar o botão */}
+            <div className="flex items-end gap-2">
               <div className="grid gap-2 flex-grow">
                 <Label htmlFor="serviceSelect">Adicionar serviço do catálogo</Label>
                 <Select value={selectedServiceToAdd} onValueChange={setSelectedServiceToAdd}>
@@ -405,13 +505,14 @@ const ProposalForm = () => {
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}
         proposalData={previewData}
+        onPdfGeneratedAndSent={handlePdfGeneratedAndSent}
       />
 
       <ServiceFormModal
         isOpen={isServiceModalOpen}
         onClose={handleServiceModalClose}
         onSave={handleServiceSaved}
-        service={null} // Sempre null para adicionar um novo serviço
+        service={null}
       />
     </>
   );
