@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MoreHorizontal, Edit, FileText, Trash2 } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, Edit, FileText, Trash2, CheckCircle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/lib/supabaseClient';
@@ -134,6 +134,22 @@ const ProposalsInProgress = () => {
     setProposalToDelete(null);
   };
 
+  const handleMarkAsAccepted = async (proposalId: string) => {
+    setLoading(true);
+    const { error } = await supabase
+      .from('proposals')
+      .update({ status: 'accepted' })
+      .eq('id', proposalId);
+
+    if (error) {
+      showError(getTranslatedErrorMessage(error.message));
+    } else {
+      showSuccess('Proposta marcada como Aceita!');
+      fetchProposals();
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4">
@@ -197,6 +213,12 @@ const ProposalsInProgress = () => {
                           <DropdownMenuItem onClick={() => handleGeneratePdfClick(proposal)}>
                             <FileText className="mr-2 h-4 w-4" /> Gerar PDF
                           </DropdownMenuItem>
+                          {/* Adicionado: Marcar como Aceita */}
+                          {!['accepted', 'rejected'].includes(proposal.status) && (
+                            <DropdownMenuItem onClick={() => handleMarkAsAccepted(proposal.id)}>
+                              <CheckCircle className="mr-2 h-4 w-4 text-green-600" /> Marcar como Aceita
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem onClick={() => handleDeleteClick(proposal)} className="text-red-600">
                             <Trash2 className="mr-2 h-4 w-4" /> Excluir
                           </DropdownMenuItem>
