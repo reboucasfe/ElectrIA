@@ -42,6 +42,7 @@ const formatCurrency = (value: number) => {
 };
 
 const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreviewModalProps) => {
+  console.log("ProposalPreviewModal: Component rendering. isOpen:", isOpen, "proposalData is null:", proposalData === null);
   const { user } = useAuth();
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const proposalPdfRef = useRef<HTMLDivElement>(null);
@@ -166,7 +167,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
                         <td className="border border-gray-200 p-3">{service.name}</td>
                         <td className="border border-gray-200 p-3 text-center">{service.quantity}</td>
                         <td className="border border-gray-200 p-3 text-right">
-                          {formatCurrency(service.price_type === 'fixed' ? (service.fixed_price || 0) : (service.hourly_rate || 0))}
+                          {service.price_type === 'fixed' ? formatCurrency(service.fixed_price || 0) : `${formatCurrency(service.hourly_rate || 0)}/h`}
                         </td>
                         <td className="border border-gray-200 p-3 text-right">{formatCurrency(service.calculated_total)}</td>
                       </tr>
