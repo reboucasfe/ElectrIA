@@ -35,6 +35,8 @@ const PaymentPage = () => {
   const { planId = 'professional', billingCycle = 'annual' } = (location.state || {}) as { planId?: string, billingCycle?: string };
   const { user } = useAuth();
 
+  console.log("PaymentPage: planId from state:", planId, "billingCycle from state:", billingCycle);
+
   const { totalPrice, planTitle, cycleText } = useMemo(() => {
     const prices = {
       essencial: 127,
@@ -80,6 +82,7 @@ const PaymentPage = () => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
     if (user) {
+      console.log("PaymentPage: Updating user metadata with planId:", planId);
       const { error: updateError } = await supabase.auth.updateUser({
         data: {
           payment_status: 'paid',
@@ -87,10 +90,12 @@ const PaymentPage = () => {
         }
       });
       if (updateError) {
+        console.error("PaymentPage: Error updating user metadata:", updateError.message);
         showError(`Erro ao atualizar status de pagamento: ${updateError.message}`);
         setLoading(false);
         return;
       }
+      console.log("PaymentPage: User metadata updated successfully.");
     }
     setLoading(false);
     showSuccess("Pagamento simulado com sucesso! Redirecionando para o dashboard.");

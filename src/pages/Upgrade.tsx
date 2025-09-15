@@ -14,6 +14,7 @@ const Upgrade = () => {
 
   // Obtém o plano atual do usuário do user_metadata, com 'essencial' como padrão se não estiver definido
   const currentUserPlan = (user?.user_metadata?.plan_id || 'essencial') as 'essencial' | 'professional' | 'premium';
+  console.log("Upgrade Page: Current user plan from metadata:", currentUserPlan);
 
   const prices = {
     annual: {
@@ -64,6 +65,7 @@ const Upgrade = () => {
   };
 
   const handlePlanActionClick = (planId: string) => {
+    console.log("Upgrade Page: handlePlanActionClick called for planId:", planId, "billingCycle:", billingCycle);
     navigate('/payment', { state: { planId, billingCycle } });
   };
 
@@ -110,6 +112,8 @@ const Upgrade = () => {
             } else {
               buttonText = 'Plano Atual';
             }
+
+            console.log(`Plan Card: ${plan.title} (ID: ${planId}) - CurrentUserPlan: ${currentUserPlan}, IsCurrent: ${isCurrentPlan}, IsUpgrade: ${isUpgrade}, IsClickable: ${isClickable}, ButtonText: ${buttonText}`);
 
             return (
               <Card 
