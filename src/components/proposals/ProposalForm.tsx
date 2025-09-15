@@ -26,6 +26,7 @@ import ServiceFormModal, { Service } from '@/components/dashboard/ServiceFormMod
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
+import { formatProposalNumber } from '@/utils/proposalUtils'; // Importar a nova função
 
 import ProposalPreviewModal from './ProposalPreviewModal';
 
@@ -37,7 +38,7 @@ interface SelectedService extends Service {
 }
 
 const proposalFormSchema = z.object({
-  proposalNumber: z.number().optional(), // Novo campo para o número da proposta
+  proposalNumber: z.number().optional(), // Armazena o número sequencial bruto (inteiro)
   clientName: z.string().min(1, { message: "Nome do cliente é obrigatório." }),
   clientEmail: z.string().email({ message: "E-mail do cliente inválido." }).optional().or(z.literal('')),
   clientPhone: z.string()
@@ -63,6 +64,7 @@ const proposalFormSchema = z.object({
   notes: z.string().optional(),
   paymentMethods: z.array(z.string()).min(1, { message: "Selecione pelo menos um método de pagamento." }),
   validityDays: z.coerce.number().min(1, { message: "Validade deve ser no mínimo 1 dia." }).default(7),
+  created_at: z.string().optional(), // Adicionado para passar a data de criação
 });
 
 type ProposalFormValues = z.infer<typeof proposalFormSchema>;
@@ -103,6 +105,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
       notes: '',
       paymentMethods: user?.user_metadata?.accepted_payment_methods || [],
       validityDays: 7,
+      created_at: new Date().toISOString(), // Define a data de criação padrão
     },
   });
 
@@ -148,7 +151,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
     const initializeForm = async () => {
       if (initialData) {
         reset({
-          proposalNumber: initialData.proposal_number, // Carrega o número da proposta existente
+          proposalNumber: initialData.proposal_number, // Carrega o número da proposta existente (inteiro)
           clientName: initialData.client_name,
           clientEmail: initialData.client_email || '',
           clientPhone: initialData.client_phone || '',
@@ -158,6 +161,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
           notes: initialData.notes || '',
           paymentMethods: initialData.payment_methods || [],
           validityDays: initialData.validity_days,
+          created_at: initialData.created_at, // Carrega a data de criação existente
         });
       } else {
         // Reset para valores padrão ao criar nova proposta
@@ -171,6 +175,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
           notes: '',
           paymentMethods: user?.user_metadata?.accepted_payment_methods || [],
           validityDays: 7,
+          created_at: new Date().toISOString(), // Define a data de criação para a nova proposta
         });
 
         // Gerar novo número de proposta apenas para novas propostas
@@ -271,7 +276,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
 
     const proposalPayload = {
       user_id: user.id,
-      proposal_number: data.proposalNumber, // Inclui o número da proposta
+      proposal_number: data.proposalNumber, // Inclui o número da proposta (inteiro)
       client_name: data.clientName,
       client_email: data.clientEmail || null,
       client_phone: data.clientPhone || null,
@@ -284,6 +289,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
       status: newStatus,
       pdf_generated_at: pdfGenerated ? new Date().toISOString() : null,
       sent_at: newStatus === 'sent' ? new Date().toISOString() : null,
+      created_at: data.created_at, // Garante que created_at seja salvo
     };
 
     let result;
@@ -327,6 +333,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
         id: savedProposal.id, 
         status: savedProposal.status,
         proposalNumber: savedProposal.proposal_number, // Garante que o número da proposta esteja no previewData
+        created_at: savedProposal.created_at, // Garante que created_at esteja no previewData
       });
       setIsPreviewModalOpen(true);
     } else {
@@ -377,7 +384,12 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
           <CardContent className="space-y-4">
             <div className="grid gap-2">
               <Label htmlFor="proposalNumber">Número da Proposta</Label>
-              <Input id="proposalNumber" value={watchedFormValues.proposalNumber || ''} disabled className="bg-gray-100 cursor-not-allowed" />
+              <Input 
+                id="proposalNumber" 
+                value={formatProposalNumber(watchedFormValues.proposalNumber, watchedFormValues.created_at)} 
+                disabled 
+                className="bg-gray-100 cursor-not-allowed" 
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="clientName">Nome do Cliente</Label>

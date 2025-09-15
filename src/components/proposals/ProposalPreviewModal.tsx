@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Service } from '@/components/dashboard/ServiceFormModal';
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
 import { cn } from '@/lib/utils'; // Importar cn para combinar classes
+import { formatProposalNumber } from '@/utils/proposalUtils'; // Importar a nova função
 
 interface SelectedService extends Service {
   uniqueId: string;
@@ -20,7 +21,7 @@ interface SelectedService extends Service {
 
 interface ProposalFormValues {
   id?: string;
-  proposalNumber?: number; // Adicionado número da proposta
+  proposalNumber?: number; // Agora armazena o número sequencial bruto (inteiro)
   clientName: string;
   clientEmail?: string;
   clientPhone?: string;
@@ -31,6 +32,7 @@ interface ProposalFormValues {
   paymentMethods: string[];
   validityDays: number;
   status?: string;
+  created_at?: string; // Adicionado para usar na formatação
 }
 
 interface ProposalPreviewModalProps {
@@ -134,18 +136,18 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
         </DialogHeader>
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
           <div ref={proposalPdfRef} className="bg-white p-10 shadow-lg rounded-lg text-gray-900 leading-relaxed" style={{ fontFamily: 'Arial, sans-serif' }}>
-            <div className="mb-10 text-center no-page-break-inside"> {/* Aplicado no-page-break-inside */}
+            <div className="mb-10 text-center no-page-break-inside">
               {user?.user_metadata?.avatar_url && (
                 <img src={user.user_metadata.avatar_url} alt="Logo da Empresa" className="h-20 mx-auto mb-4 object-contain" />
               )}
               <h1 className="text-4xl font-bold text-blue-700 mb-2">{proposalData.proposalTitle}</h1>
               {proposalData.proposalNumber && (
-                <p className="text-xl text-gray-700 mb-1">Proposta Nº: {proposalData.proposalNumber}</p>
+                <p className="text-xl text-gray-700 mb-1">Proposta Nº: {formatProposalNumber(proposalData.proposalNumber, proposalData.created_at)}</p>
               )}
               <p className="text-xl text-gray-700">{companyName}</p>
             </div>
 
-            <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50 no-page-break-inside"> {/* Aplicado no-page-break-inside */}
+            <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50 no-page-break-inside">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Informações do Cliente</h2>
               <p className="mb-2"><strong className="font-medium">Nome:</strong> {proposalData.clientName}</p>
               {proposalData.clientEmail && <p className="mb-2"><strong className="font-medium">Email:</strong> {proposalData.clientEmail}</p>}
@@ -153,7 +155,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
             </div>
 
             {proposalData.proposalDescription && (
-              <div className="mb-10 p-6 border border-gray-200 rounded-lg no-page-break-inside"> {/* Aplicado no-page-break-inside */}
+              <div className="mb-10 p-6 border border-gray-200 rounded-lg no-page-break-inside">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Descrição da Proposta</h2>
                 <p className="text-gray-700">{proposalData.proposalDescription}</p>
               </div>
@@ -184,7 +186,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-blue-100 font-bold text-blue-800 no-page-break-inside"> {/* Aplicado no-page-break-inside */}
+                    <tr className="bg-blue-100 font-bold text-blue-800 no-page-break-inside">
                       <td colSpan={3} className="border border-gray-200 p-3 text-right text-xl">Total Geral:</td>
                       <td className="border border-gray-200 p-3 text-right text-xl">{formatCurrency(proposalTotal)}</td>
                     </tr>
@@ -196,15 +198,15 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
             </div>
 
             {proposalData.notes && (
-              <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50 no-page-break-inside"> {/* Aplicado no-page-break-inside */}
+              <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50 no-page-break-inside">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Notas Adicionais</h2>
                 <p className="text-gray-700">{proposalData.notes}</p>
               </div>
             )}
 
-            <div className="mb-10 p-6 border border-gray-200 rounded-lg no-page-break-inside"> {/* Aplicado no-page-break-inside */}
+            <div className="mb-10 p-6 border border-gray-200 rounded-lg no-page-break-inside">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Condições de Pagamento</h2>
-              <p className="mb-3"><strong className="font-medium">Validade da Proposta:</strong> {proposalData.validityDays} dias a partir de {new Date().toLocaleDateString('pt-BR')}</p>
+              <p className="mb-3"><strong className="font-medium">Validade da Proposta:</strong> {proposalData.validityDays} dias a partir de {new Date(proposalData.created_at || new Date()).toLocaleDateString('pt-BR')}</p>
               <p className="mb-2"><strong className="font-medium">Meios de Pagamento Aceitos:</strong></p>
               <ul className="list-disc list-inside ml-6 text-gray-700">
                 {proposalData.paymentMethods.length > 0 ? (
@@ -222,14 +224,14 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
               </div>
             </div>
 
-            <div className="text-center mt-12 pt-6 border-t border-gray-200 no-page-break-inside"> {/* Aplicado no-page-break-inside */}
+            <div className="text-center mt-12 pt-6 border-t border-gray-200 no-page-break-inside">
               <p className="text-gray-700 text-lg mb-2">Atenciosamente,</p>
               <p className="font-bold text-xl text-gray-900">{userFullName}</p>
               <p className="text-gray-700">{companyName}</p>
               <p className="text-gray-700">WhatsApp: {userWhatsapp}</p>
               <p className="text-gray-700">Email: {userEmail}</p>
               {userCnpj && <p className="text-gray-700">CNPJ: {userCnpj}</p>}
-              {userCompanyCity && <p className="text-gray-700">{userCompanyCity}, Brasil</p>} {/* Exibe a cidade da empresa */}
+              {userCompanyCity && <p className="text-gray-700">{userCompanyCity}, Brasil</p>}
             </div>
           </div>
         </div>

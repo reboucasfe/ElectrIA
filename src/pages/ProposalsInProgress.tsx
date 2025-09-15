@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import ProposalPreviewModal from '@/components/proposals/ProposalPreviewModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
+import { formatProposalNumber } from '@/utils/proposalUtils'; // Importar a nova função
 
 interface Proposal {
   id: string;
@@ -103,6 +104,7 @@ const ProposalsInProgress = () => {
       paymentMethods: proposal.payment_methods,
       validityDays: proposal.validity_days,
       status: proposal.status,
+      created_at: proposal.created_at, // Passa a data de criação
     });
     setIsPreviewModalOpen(true);
   };
@@ -174,7 +176,7 @@ const ProposalsInProgress = () => {
               <TableBody>
                 {proposals.map((proposal) => (
                   <TableRow key={proposal.id}>
-                    <TableCell className="font-medium">{proposal.proposal_number || 'N/A'}</TableCell> {/* Exibe o número da proposta */}
+                    <TableCell className="font-medium">{formatProposalNumber(proposal.proposal_number, proposal.created_at)}</TableCell> {/* Exibe o número da proposta formatado */}
                     <TableCell>{proposal.client_name}</TableCell>
                     <TableCell>{proposal.proposal_title}</TableCell>
                     <TableCell>{getStatusLabel(proposal.status)}</TableCell>
