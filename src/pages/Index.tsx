@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/Auth/AuthContext"; // Corrigido o caminho do import
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -499,7 +499,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12 px-4">
+      <footer id="contato" className="bg-gray-900 text-gray-400 py-12 px-4"> {/* Adicionado id="contato" aqui */}
         <div className="container mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 text-center md:text-left">
           <div className="col-span-1 md:col-span-2 space-y-4">
             <Link to="/" className="flex items-center justify-center md:justify-start mb-4">

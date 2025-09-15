@@ -3,7 +3,7 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Zap } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/Auth/AuthContext'; // Corrigido o caminho do import
 import { useMemo } from 'react';
 
 interface HeaderProps {
@@ -68,6 +68,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
           <Link to="/#como-funciona" className="text-gray-600 hover:text-blue-600 transition-colors">Como Funciona</Link>
           <Link to="/#planos" className="text-gray-600 hover:text-blue-600 transition-colors">Planos</Link>
           <Link to="/#faq" className="text-gray-600 hover:text-blue-600 transition-colors">FAQ</Link>
+          <Link to="/#contato" className="text-gray-600 hover:text-blue-600 transition-colors">Contato</Link> {/* Novo link de Contato */}
         </div>
         <div className="flex items-center space-x-4">
           {user ? ( // Usuário está logado
