@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'; // Alterado para @hello-pangea/dnd
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { supabase } from '@/lib/supabaseClient';
 import { showError, showSuccess } from '@/utils/toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Edit, FileText, Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { MoreHorizontal, Edit, FileText, Trash2, CheckCircle, XCircle, Clock, History } from 'lucide-react'; // Importar History
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProposalPreviewModal from '@/components/proposals/ProposalPreviewModal';
@@ -16,12 +16,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
 import { formatProposalNumber } from '@/utils/proposalUtils';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/contexts/AuthContext'; // Importar useAuth para obter o user.id
+import { useAuth } from '@/contexts/AuthContext';
+import RevisionHistoryModal from '@/components/proposals/RevisionHistoryModal'; // Importar RevisionHistoryModal
 
 interface Proposal {
   id: string;
   proposal_number?: number;
-  revision_number?: number; // Adicionado número da revisão
+  revision_number?: number;
   client_name: string;
   status: 'draft' | 'sent' | 'accepted' | 'pending' | 'rejected';
   selected_services: Array<{ calculated_total: number }>;
@@ -77,13 +78,15 @@ const translateStatus = (status: Proposal['status']) => {
 
 const ProposalsKanbanView = () => {
   const navigate = useNavigate();
-  const { user } = useAuth(); // Obter o usuário logado
+  const { user } = useAuth();
   const [proposalsByColumn, setProposalsByColumn] = useState<{ [key: string]: Proposal[] }>({});
   const [loading, setLoading] = useState(true);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [selectedProposalForPreview, setSelectedProposalForPreview] = useState<any | null>(null);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [proposalToDelete, setProposalToDelete] = useState<Proposal | null>(null);
+  const [isRevisionHistoryModalOpen, setIsRevisionHistoryModalOpen] = useState(false); // Novo estado
+  const [selectedProposalForHistory, setSelectedProposalForHistory] = useState<Proposal | null>(null); // Novo estado
 
   const fetchProposals = useCallback(async () => {
     setLoading(true);
@@ -117,7 +120,6 @@ const ProposalsKanbanView = () => {
     }
 
     if (source.droppableId === destination.droppableId) {
-      // Reordenar dentro da mesma coluna (não implementado para simplicidade, mas possível)
       return;
     }
 
@@ -131,15 +133,14 @@ const ProposalsKanbanView = () => {
 
     if (!draggedProposal) return;
 
-    // Determine new status based on destination column
-    const newStatus = columns.find(col => col.id === destinationColumnId)?.status[0]; // Take the first status as the primary for the column
+    const newStatus = columns.find(col => col.id === destinationColumnId)?.status[0];
 
     if (!newStatus) {
       showError("Status de destino inválido.");
       return;
     }
 
-    const oldStatus = draggedProposal.status; // Capture old status
+    const oldStatus = draggedProposal.status;
 
     // Optimistic update
     const newSourceProposals = Array.from(sourceColumn);
@@ -154,9 +155,7 @@ const ProposalsKanbanView = () => {
       [destinationColumnId]: newDestinationProposals,
     }));
 
-    // Update in Supabase
     try {
-      // DO NOT increment revision_number here for status changes
       const updatePayload: Partial<Proposal> = { 
         status: newStatus,
       };
@@ -184,7 +183,6 @@ const ProposalsKanbanView = () => {
       } else {
         showSuccess(`Proposta "${draggedProposal.proposal_title}" movida para "${columns.find(col => col.id === destinationColumnId)?.title}"!`);
         
-        // Registrar no histórico de revisões SEM alterar o revision_number da proposta
         if (user && updatedProposal) {
           const changesSummary = {
             summary: `Status da proposta alterado via Kanban de '${translateStatus(oldStatus)}' para '${translateStatus(newStatus)}'.`,
@@ -194,11 +192,10 @@ const ProposalsKanbanView = () => {
           };
           const { error: revisionError } = await supabase.from('proposal_revisions').insert({
             proposal_id: updatedProposal.id,
-            // Use o revision_number *atual* da proposta, pois nenhuma mudança de conteúdo ocorreu
             revision_number: draggedProposal.revision_number, 
             user_id: user.id,
             changes: changesSummary,
-            change_type: 'status_change', // Novo campo para indicar tipo de mudança
+            change_type: 'status_change',
           });
           if (revisionError) {
             console.error("Kanban: Erro ao salvar revisão de status:", revisionError);
@@ -206,7 +203,6 @@ const ProposalsKanbanView = () => {
           }
         }
 
-        // Re-fetch to ensure data consistency, especially for 'sent' status which might include 'pending'
         fetchProposals();
       }
     } catch (error: any) {
@@ -228,7 +224,7 @@ const ProposalsKanbanView = () => {
     setSelectedProposalForPreview({
       id: proposal.id,
       proposalNumber: proposal.proposal_number,
-      revisionNumber: proposal.revision_number, // Passa o número da revisão
+      revisionNumber: proposal.revision_number,
       clientName: proposal.client_name,
       clientEmail: proposal.client_email,
       clientPhone: proposal.client_phone,
@@ -246,7 +242,7 @@ const ProposalsKanbanView = () => {
 
   const handlePdfGeneratedAndSent = () => {
     setIsPreviewModalOpen(false);
-    fetchProposals(); // Atualiza a lista após gerar e enviar PDF
+    fetchProposals();
   };
 
   const handleDeleteClick = (proposal: Proposal) => {
@@ -267,6 +263,11 @@ const ProposalsKanbanView = () => {
     }
     setIsAlertOpen(false);
     setProposalToDelete(null);
+  };
+
+  const handleOpenRevisionHistory = (proposal: Proposal) => {
+    setSelectedProposalForHistory(proposal);
+    setIsRevisionHistoryModalOpen(true);
   };
 
   const getStatusBadge = (status: Proposal['status']) => {
@@ -351,6 +352,9 @@ const ProposalsKanbanView = () => {
                                   <DropdownMenuItem onClick={() => handleGeneratePdfClick(proposal)}>
                                     <FileText className="mr-2 h-4 w-4" /> Gerar PDF
                                   </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleOpenRevisionHistory(proposal)}>
+                                    <History className="mr-2 h-4 w-4" /> Histórico
+                                  </DropdownMenuItem>
                                   {proposal.status !== 'accepted' && (
                                     <DropdownMenuItem onClick={() => onDragEnd({
                                       draggableId: proposal.id,
@@ -425,6 +429,16 @@ const ProposalsKanbanView = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {selectedProposalForHistory && (
+        <RevisionHistoryModal
+          isOpen={isRevisionHistoryModalOpen}
+          onClose={() => setIsRevisionHistoryModalOpen(false)}
+          proposalId={selectedProposalForHistory.id}
+          proposalSequentialNumber={selectedProposalForHistory.proposal_number || 0}
+          proposalCreatedAt={selectedProposalForHistory.created_at}
+        />
+      )}
     </DragDropContext>
   );
 };

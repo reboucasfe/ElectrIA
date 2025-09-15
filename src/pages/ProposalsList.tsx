@@ -4,7 +4,7 @@ import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MoreHorizontal, Edit, FileText, Trash2, CheckCircle } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, Edit, FileText, Trash2, CheckCircle, History } from 'lucide-react'; // Importar History
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/lib/supabaseClient';
@@ -24,6 +24,7 @@ import {
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { addDays, subDays, isWithinInterval, parseISO } from 'date-fns';
+import RevisionHistoryModal from '@/components/proposals/RevisionHistoryModal'; // Importar RevisionHistoryModal
 
 interface Proposal {
   id: string;
@@ -48,7 +49,6 @@ const ProposalsList = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Obter o status inicial da URL, se houver
   const initialUrlStatus = new URLSearchParams(location.search).get('status');
 
   const [proposals, setProposals] = useState<Proposal[]>([]);
@@ -58,14 +58,15 @@ const ProposalsList = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [proposalToDelete, setProposalToDelete] = useState<Proposal | null>(null);
 
-  // Estados para os novos filtros
   const [statusFilter, setStatusFilter] = useState<string>(initialUrlStatus || 'all');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
     to: new Date(),
   });
 
-  // Efeito para atualizar o filtro de status interno quando o parâmetro da URL muda
+  const [isRevisionHistoryModalOpen, setIsRevisionHistoryModalOpen] = useState(false); // Novo estado
+  const [selectedProposalForHistory, setSelectedProposalForHistory] = useState<Proposal | null>(null); // Novo estado
+
   useEffect(() => {
     const urlStatus = new URLSearchParams(location.search).get('status');
     setStatusFilter(urlStatus || 'all');
@@ -75,7 +76,6 @@ const ProposalsList = () => {
     setLoading(true);
     let query = supabase.from('proposals').select('*').order('created_at', { ascending: false });
 
-    // Aplicar filtro de status
     if (statusFilter !== 'all') {
       if (statusFilter === 'sent') {
         query = query.in('status', ['sent', 'pending']);
@@ -84,10 +84,8 @@ const ProposalsList = () => {
       }
     }
 
-    // Aplicar filtro de período
     if (dateRange?.from && dateRange?.to) {
       query = query.gte('created_at', dateRange.from.toISOString());
-      // Adicionar um dia à data 'to' para incluir o dia inteiro
       query = query.lte('created_at', addDays(dateRange.to, 1).toISOString());
     }
 
@@ -100,11 +98,11 @@ const ProposalsList = () => {
       setProposals(data as Proposal[]);
     }
     setLoading(false);
-  }, [statusFilter, dateRange]); // Depende dos estados dos filtros
+  }, [statusFilter, dateRange]);
 
   useEffect(() => {
     fetchProposals();
-  }, [fetchProposals]); // Re-fetch quando fetchProposals muda (devido à mudança nos filtros)
+  }, [fetchProposals]);
 
   const getTitle = () => {
     if (statusFilter === 'sent') {
@@ -168,7 +166,7 @@ const ProposalsList = () => {
     setSelectedProposalForPreview({
       id: proposal.id,
       proposalNumber: proposal.proposal_number,
-      revisionNumber: proposal.revision_number, // Passa o número da revisão
+      revisionNumber: proposal.revision_number,
       clientName: proposal.client_name,
       clientEmail: proposal.client_email,
       clientPhone: proposal.client_phone,
@@ -223,6 +221,11 @@ const ProposalsList = () => {
       fetchProposals();
     }
     setLoading(false);
+  };
+
+  const handleOpenRevisionHistory = (proposal: Proposal) => {
+    setSelectedProposalForHistory(proposal);
+    setIsRevisionHistoryModalOpen(true);
   };
 
   return (
@@ -311,6 +314,9 @@ const ProposalsList = () => {
                           <DropdownMenuItem onClick={() => handleGeneratePdfClick(proposal)}>
                             <FileText className="mr-2 h-4 w-4" /> Gerar PDF
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleOpenRevisionHistory(proposal)}>
+                            <History className="mr-2 h-4 w-4" /> Histórico
+                          </DropdownMenuItem>
                           {!['accepted', 'rejected'].includes(proposal.status) && (
                             <DropdownMenuItem onClick={() => handleMarkAsAccepted(proposal.id)}>
                               <CheckCircle className="mr-2 h-4 w-4 text-green-600" /> Marcar como Aceita
@@ -357,6 +363,16 @@ const ProposalsList = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {selectedProposalForHistory && (
+        <RevisionHistoryModal
+          isOpen={isRevisionHistoryModalOpen}
+          onClose={() => setIsRevisionHistoryModalOpen(false)}
+          proposalId={selectedProposalForHistory.id}
+          proposalSequentialNumber={selectedProposalForHistory.proposal_number || 0}
+          proposalCreatedAt={selectedProposalForHistory.created_at}
+        />
+      )}
     </div>
   );
 };
