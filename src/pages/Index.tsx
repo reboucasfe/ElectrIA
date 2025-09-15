@@ -1,21 +1,21 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom"; // Importar Link
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
-import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle, Clock, XCircle, FileWarning, Calculator, Eye } from "lucide-react"; // Adicionei ícones relevantes
+import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle, Clock, XCircle, FileWarning, Calculator, Eye } from "lucide-react";
 
 import { Header } from "@/components/Header";
 
 interface IndexProps {
   onOpenRegisterModal: (planId?: string, billingCycle?: 'monthly' | 'annual') => void;
-  onOpenLoginModal: () => void; // Adicionada a prop onOpenLoginModal
+  onOpenLoginModal: () => void;
 }
 
-const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => { // Recebendo a prop
+const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
   const [billingCycle, setBillingCycle] = useState<'annual' | 'monthly'>('annual');
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -89,7 +89,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => { // Re
   return (
     <TooltipProvider>
     <div className="bg-white text-gray-800">
-      <Header onOpenRegisterModal={onOpenRegisterModal} onOpenLoginModal={onOpenLoginModal} /> {/* Passando a prop */}
+      <Header onOpenRegisterModal={onOpenRegisterModal} onOpenLoginModal={onOpenLoginModal} />
 
       <main>
         {/* Hero Section */}
@@ -433,9 +433,74 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => { // Re
       </main>
 
       {/* Footer */}
-      <footer className="py-12 px-4 bg-gray-900 text-gray-400">
-        <div className="container mx-auto text-center">
-          <p>&copy; {new Date().getFullYear()} EletroProposta IA. Todos os direitos reservados.</p>
+      <footer className="bg-gray-900 text-gray-400 py-12 px-4">
+        <div className="container mx-auto grid grid-cols-1 md:grid-cols-5 gap-8 text-center md:text-left">
+          <div className="col-span-1 md:col-span-2 space-y-4">
+            <Link to="/" className="flex items-center justify-center md:justify-start mb-4">
+              <Zap className="h-8 w-8 text-blue-600 mr-2" />
+              <span className="text-xl font-bold text-white">EletricIA</span>
+            </Link>
+            <p className="text-sm leading-relaxed">
+              A primeira IA especializada em propostas para eletricistas no Brasil. Revolucione seu atendimento e feche mais vendas.
+            </p>
+            <div className="space-y-2 text-sm">
+              <p>(11) 99999-9999</p>
+              <p>contato@electricia.com.br</p>
+              <p>São Paulo, SP - Brasil</p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="text-white font-semibold mb-3">Produto</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#como-funciona" className="hover:text-white transition-colors">Como Funciona</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Funcionalidades</a></li>
+              <li><a href="#planos" className="hover:text-white transition-colors">Preços</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Demonstração</a></li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="text-white font-semibold mb-3">Suporte</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="hover:text-white transition-colors">Central de Ajuda</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Tutoriais</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Contato</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Status do Sistema</a></li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="text-white font-semibold mb-3">Empresa</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="hover:text-white transition-colors">Sobre Nós</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Carreiras</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Imprensa</a></li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="text-white font-semibold mb-3">Legal</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="hover:text-white transition-colors">Termos de Uso</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Política de Privacidade</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">LGPD</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Cookies</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-700 mt-12 pt-8 text-center text-sm space-y-4">
+          <p>&copy; {new Date().getFullYear()} EletricIA. Todos os direitos reservados.</p>
+          <p className="flex items-center justify-center">
+            Desenvolvido com <Zap className="h-4 w-4 mx-1 text-blue-400" /> para eletricistas brasileiros
+          </p>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4">
+            <span className="flex items-center text-green-400"><Check className="h-4 w-4 mr-1" /> SSL Seguro</span>
+            <span className="flex items-center text-green-400"><Check className="h-4 w-4 mr-1" /> LGPD Compliant</span>
+            <span className="flex items-center text-blue-400"><Zap className="h-4 w-4 mr-1" /> 99.9% Uptime</span>
+          </div>
         </div>
       </footer>
     </div>
