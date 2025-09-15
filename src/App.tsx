@@ -28,6 +28,7 @@ import ProposalsOverview from "./pages/ProposalsOverview"; // Importar a nova p�
 import NewProposal from "./pages/NewProposal"; // Importar a nova página
 import ProposalsInProgress from "./pages/ProposalsInProgress"; // Importar a nova página
 import ProposalsClosed from "./pages/ProposalsClosed"; // Importar a nova página
+import Contact from "./pages/Contact"; // Import the new Contact page
 
 const queryClient = new QueryClient();
 
@@ -88,6 +89,7 @@ const App = () => {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Index onOpenRegisterModal={handleOpenRegisterModal} onOpenLoginModal={handleOpenLoginModal} />} />
+            <Route path="/contact" element={<Contact />} /> {/* Added Contact Route */}
             
             {/* Auth Routes with Header */}
             <Route element={<AuthLayout onOpenRegisterModal={handleOpenRegisterModal} onOpenLoginModal={handleOpenLoginModal} />}>
@@ -105,11 +107,11 @@ const App = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/upgrade" element={<Upgrade />} />
-                <Route path="/proposals" element={<ProposalsList />} /> {/* Rota antiga, mantida por compatibilidade */}
-                <Route path="/proposals-overview" element={<ProposalsOverview />} /> {/* Nova rota principal de propostas */}
-                <Route path="/proposals/new" element={<NewProposal />} /> {/* Rota para nova proposta */}
-                <Route path="/proposals/in-progress" element={<ProposalsInProgress />} /> {/* Rota para propostas em andamento */}
-                <Route path="/proposals/closed" element={<ProposalsClosed />} /> {/* Rota para propostas fechadas */}
+                <Route path="/proposals" element={<ProposalsList />} />
+                <Route path="/proposals-overview" element={<ProposalsOverview />} />
+                <Route path="/proposals/new" element={<NewProposal />} />
+                <Route path="/proposals/in-progress" element={<ProposalsInProgress />} />
+                <Route path="/proposals/closed" element={<ProposalsClosed />} />
               </Route>
             </Route>
 

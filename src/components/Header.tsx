@@ -58,6 +58,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
           <Link to="/#como-funciona" className="text-gray-600 hover:text-blue-600 transition-colors">Como Funciona</Link>
           <Link to="/#planos" className="text-gray-600 hover:text-blue-600 transition-colors">Planos</Link>
           <Link to="/#faq" className="text-gray-600 hover:text-blue-600 transition-colors">FAQ</Link>
+          <Link to="/contact" className="text-gray-600 hover:text-blue-600 transition-colors">Contato</Link>
         </div>
         <div className="flex items-center space-x-4">
           {user ? ( // Usuário está logado
