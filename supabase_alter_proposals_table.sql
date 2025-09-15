@@ -1,0 +1,2 @@
+ALTER TABLE proposals
+ADD COLUMN accepted_at TIMESTAMP WITH TIME ZONE;
