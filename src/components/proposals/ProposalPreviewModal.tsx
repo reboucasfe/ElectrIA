@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useMemo, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -127,6 +127,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData, onPdfGeneratedAnd
       <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0">
         <DialogHeader className="p-6 border-b">
           <DialogTitle className="text-2xl">Pré-visualização da Proposta</DialogTitle>
+          <DialogDescription>Revise os detalhes da proposta antes de gerar o PDF.</DialogDescription> {/* Adicionado DialogDescription */}
         </DialogHeader>
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
           <div ref={proposalPdfRef} className="bg-white p-10 shadow-lg rounded-lg text-gray-900 leading-relaxed" style={{ fontFamily: 'Arial, sans-serif' }}>
