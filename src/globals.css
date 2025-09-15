@@ -99,3 +99,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes float-animation {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(var(--float-range));
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Zap, Bot, MessageSquare, BarChart3, ClipboardList, Users, Star, ShieldCheck, ArrowRight, Check, HelpCircle, Clock, XCircle, FileWarning, Calculator, Eye } from "lucide-react";
 
 import { Header } from "@/components/Header";
+import FloatingBubbles from "@/components/FloatingBubbles"; // Importar o novo componente
 
 interface IndexProps {
   onOpenRegisterModal: (planId?: string, billingCycle?: 'monthly' | 'annual') => void;
@@ -93,7 +94,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
 
       <main>
         {/* Hero Section */}
-        <section className="relative text-center md:text-left py-20 px-4 md:py-32">
+        <section className="relative text-center md:text-left py-20 px-4 md:py-32 overflow-hidden">
           <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
@@ -127,8 +128,9 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                 </div>
               </div>
             </div>
-            <div className="bg-gray-100 rounded-lg aspect-video flex items-center justify-center">
-              <p className="text-gray-400">Visual do Produto Aqui</p>
+            <div className="relative bg-gray-100 rounded-lg aspect-video flex items-center justify-center overflow-hidden">
+              <FloatingBubbles />
+              <p className="absolute text-gray-400 z-10">Visual do Produto Aqui</p>
             </div>
           </div>
         </section>
@@ -214,7 +216,8 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                 <div className="bg-blue-100 text-blue-600 rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold mb-6 shadow-sm">3</div>
                 <h3 className="text-xl font-semibold mb-3">Envie a Proposta</h3>
                 <p className="text-gray-600">Uma proposta completa e profissional é gerada e enviada para o cliente em segundos.</p>
-              </div>
+              </CardContent>
+              </Card>
             </div>
           </div>
         </section>
