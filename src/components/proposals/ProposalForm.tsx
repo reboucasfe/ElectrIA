@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -22,7 +22,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import InputMask from 'react-input-mask';
-import { Service } from '@/components/dashboard/ServiceFormModal';
+import ServiceFormModal, { Service } from '@/components/dashboard/ServiceFormModal'; // Importa o modal de serviço
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 import ProposalPreviewModal from './ProposalPreviewModal'; // Importa o novo modal de pré-visualização
@@ -78,6 +78,7 @@ const ProposalForm = () => {
   const [selectedServiceToAdd, setSelectedServiceToAdd] = useState<string>('');
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewData, setPreviewData] = useState<ProposalFormValues | null>(null);
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false); // Estado para o modal de serviço
 
 
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<ProposalFormValues>({
@@ -100,22 +101,23 @@ const ProposalForm = () => {
   const watchedPaymentMethods = watchedFormValues.paymentMethods;
 
   // Fetch available services from Supabase
-  useEffect(() => {
-    const fetchAvailableServices = async () => {
-      if (!user) return;
-      const { data, error } = await supabase
-        .from('services')
-        .select('*')
-        .eq('user_id', user.id);
+  const fetchAvailableServices = useCallback(async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .eq('user_id', user.id);
 
-      if (error) {
-        showError(`Erro ao carregar serviços: ${error.message}`);
-      } else {
-        setAvailableServices(data as Service[]);
-      }
-    };
-    fetchAvailableServices();
+    if (error) {
+      showError(`Erro ao carregar serviços: ${error.message}`);
+    } else {
+      setAvailableServices(data as Service[]);
+    }
   }, [user]);
+
+  useEffect(() => {
+    fetchAvailableServices();
+  }, [fetchAvailableServices]);
 
   // Pre-fill payment methods from user profile
   useEffect(() => {
@@ -177,6 +179,19 @@ const ProposalForm = () => {
     console.log("ProposalForm: Validação do formulário bem-sucedida. Abrindo modal de pré-visualização com dados:", data);
     setPreviewData(data);
     setIsPreviewModalOpen(true);
+  };
+
+  const handleOpenServiceModal = () => {
+    setIsServiceModalOpen(true);
+  };
+
+  const handleServiceModalClose = () => {
+    setIsServiceModalOpen(false);
+  };
+
+  const handleServiceSaved = () => {
+    fetchAvailableServices(); // Recarrega a lista de serviços após salvar um novo
+    handleServiceModalClose();
   };
 
   const onSubmit = async (data: ProposalFormValues) => {
@@ -269,24 +284,30 @@ const ProposalForm = () => {
             <CardDescription>Selecione os serviços do seu catálogo para esta proposta.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-2">
-              <Select value={selectedServiceToAdd} onValueChange={setSelectedServiceToAdd}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Adicionar serviço do catálogo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableServices.length === 0 && (
-                    <SelectItem value="no-services" disabled>Nenhum serviço cadastrado. Adicione em 'Meus Serviços'.</SelectItem>
-                  )}
-                  {availableServices.map(service => (
-                    <SelectItem key={service.id} value={service.id}>
-                      {service.name} ({formatCurrency(service.fixed_price || 0)})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button type="button" onClick={handleAddService} disabled={!selectedServiceToAdd || availableServices.length === 0}>
+            <div className="flex items-end gap-2"> {/* Usar items-end para alinhar o botão */}
+              <div className="grid gap-2 flex-grow">
+                <Label htmlFor="serviceSelect">Adicionar serviço do catálogo</Label>
+                <Select value={selectedServiceToAdd} onValueChange={setSelectedServiceToAdd}>
+                  <SelectTrigger id="serviceSelect" className="w-full">
+                    <SelectValue placeholder="Selecione um serviço" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableServices.length === 0 && (
+                      <SelectItem value="no-services" disabled>Nenhum serviço cadastrado.</SelectItem>
+                    )}
+                    {availableServices.map(service => (
+                      <SelectItem key={service.id} value={service.id}>
+                        {service.name} ({formatCurrency(service.fixed_price || 0)})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button type="button" onClick={handleAddService} disabled={!selectedServiceToAdd || availableServices.length === 0} size="icon" className="h-10 w-10">
                 <PlusCircle className="h-4 w-4" />
+              </Button>
+              <Button type="button" onClick={handleOpenServiceModal} variant="outline" className="h-10">
+                <PlusCircle className="h-4 w-4 mr-2" /> Novo Serviço
               </Button>
             </div>
             {errors.selectedServices && <p className="text-sm text-red-500">{errors.selectedServices.message}</p>}
@@ -384,6 +405,13 @@ const ProposalForm = () => {
         isOpen={isPreviewModalOpen}
         onClose={() => setIsPreviewModalOpen(false)}
         proposalData={previewData}
+      />
+
+      <ServiceFormModal
+        isOpen={isServiceModalOpen}
+        onClose={handleServiceModalClose}
+        onSave={handleServiceSaved}
+        service={null} // Sempre null para adicionar um novo serviço
       />
     </>
   );

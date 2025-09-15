@@ -84,7 +84,7 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
 
     try {
       console.log("handleGeneratePdf: Capturando conteúdo com html2canvas...");
-      const canvas = await html2canvas(proposalPdfRef.current, { scale: 2 });
+      const canvas = await html2canvas(proposalPdfRef.current, { scale: 2, useCORS: true }); // Adicionado useCORS
       console.log("handleGeneratePdf: Captura com html2canvas concluída.");
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -125,99 +125,99 @@ const ProposalPreviewModal = ({ isOpen, onClose, proposalData }: ProposalPreview
           <DialogTitle className="text-2xl">Pré-visualização da Proposta</DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-          <div ref={proposalPdfRef} className="bg-white p-8 shadow-md rounded-lg text-gray-900" style={{ fontFamily: 'Arial, sans-serif' }}>
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-bold text-blue-700 mb-2">{proposalData.proposalTitle}</h1>
-              <p className="text-lg text-gray-700">{companyName}</p>
+          <div ref={proposalPdfRef} className="bg-white p-10 shadow-lg rounded-lg text-gray-900 leading-relaxed" style={{ fontFamily: 'Arial, sans-serif' }}>
+            <div className="mb-10 text-center">
               {user?.user_metadata?.avatar_url && (
-                <img src={user.user_metadata.avatar_url} alt="Logo da Empresa" className="h-16 mx-auto mt-4" />
+                <img src={user.user_metadata.avatar_url} alt="Logo da Empresa" className="h-20 mx-auto mb-4 object-contain" />
               )}
+              <h1 className="text-4xl font-bold text-blue-700 mb-2">{proposalData.proposalTitle}</h1>
+              <p className="text-xl text-gray-700">{companyName}</p>
             </div>
 
-            <div className="mb-8 p-4 border rounded-lg bg-gray-50">
-              <h2 className="text-xl font-semibold mb-3">Informações do Cliente</h2>
-              <p><strong>Nome:</strong> {proposalData.clientName}</p>
-              {proposalData.clientEmail && <p><strong>Email:</strong> {proposalData.clientEmail}</p>}
-              {proposalData.clientPhone && <p><strong>WhatsApp:</strong> {proposalData.clientPhone}</p>}
+            <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Informações do Cliente</h2>
+              <p className="mb-2"><strong className="font-medium">Nome:</strong> {proposalData.clientName}</p>
+              {proposalData.clientEmail && <p className="mb-2"><strong className="font-medium">Email:</strong> {proposalData.clientEmail}</p>}
+              {proposalData.clientPhone && <p className="mb-2"><strong className="font-medium">WhatsApp:</strong> {proposalData.clientPhone}</p>}
             </div>
 
             {proposalData.proposalDescription && (
-              <div className="mb-8 p-4 border rounded-lg">
-                <h2 className="text-xl font-semibold mb-3">Descrição da Proposta</h2>
-                <p>{proposalData.proposalDescription}</p>
+              <div className="mb-10 p-6 border border-gray-200 rounded-lg">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Descrição da Proposta</h2>
+                <p className="text-gray-700">{proposalData.proposalDescription}</p>
               </div>
             )}
 
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-3">Serviços Incluídos</h2>
+            <div className="mb-10">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Serviços Incluídos</h2>
               {proposalData.selectedServices.length > 0 ? (
                 <table className="w-full border-collapse">
                   <thead>
-                    <tr className="bg-gray-100">
-                      <th className="border p-2 text-left">Serviço</th>
-                      <th className="border p-2 text-center">Qtd.</th>
-                      <th className="border p-2 text-right">Valor Unit.</th>
-                      <th className="border p-2 text-right">Total</th>
+                    <tr className="bg-blue-50 text-blue-800">
+                      <th className="border border-gray-200 p-3 text-left">Serviço</th>
+                      <th className="border border-gray-200 p-3 text-center w-[80px]">Qtd.</th>
+                      <th className="border border-gray-200 p-3 text-right w-[120px]">Valor Unit.</th>
+                      <th className="border border-gray-200 p-3 text-right w-[120px]">Total</th>
                     </tr>
                   </thead>
                   <tbody>
                     {proposalData.selectedServices.map((service, index) => (
-                      <tr key={service.uniqueId}>
-                        <td className="border p-2">{service.name}</td>
-                        <td className="border p-2 text-center">{service.quantity}</td>
-                        <td className="border p-2 text-right">
+                      <tr key={service.uniqueId} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="border border-gray-200 p-3">{service.name}</td>
+                        <td className="border border-gray-200 p-3 text-center">{service.quantity}</td>
+                        <td className="border border-gray-200 p-3 text-right">
                           {service.price_type === 'fixed' ? formatCurrency(service.fixed_price || 0) : `${formatCurrency(service.hourly_rate || 0)}/h`}
                         </td>
-                        <td className="border p-2 text-right">{formatCurrency(service.calculated_total)}</td>
+                        <td className="border border-gray-200 p-3 text-right">{formatCurrency(service.calculated_total)}</td>
                       </tr>
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-gray-100 font-bold">
-                      <td colSpan={3} className="border p-2 text-right">Total Geral:</td>
-                      <td className="border p-2 text-right">{formatCurrency(proposalTotal)}</td>
+                    <tr className="bg-blue-100 font-bold text-blue-800">
+                      <td colSpan={3} className="border border-gray-200 p-3 text-right text-xl">Total Geral:</td>
+                      <td className="border border-gray-200 p-3 text-right text-xl">{formatCurrency(proposalTotal)}</td>
                     </tr>
                   </tfoot>
                 </table>
               ) : (
-                <p className="text-gray-500">Nenhum serviço adicionado a esta proposta.</p>
+                <p className="text-gray-500 italic">Nenhum serviço adicionado a esta proposta.</p>
               )}
             </div>
 
             {proposalData.notes && (
-              <div className="mb-8 p-4 border rounded-lg bg-gray-50">
-                <h2 className="text-xl font-semibold mb-3">Notas Adicionais</h2>
-                <p>{proposalData.notes}</p>
+              <div className="mb-10 p-6 border border-gray-200 rounded-lg bg-gray-50">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Notas Adicionais</h2>
+                <p className="text-gray-700">{proposalData.notes}</p>
               </div>
             )}
 
-            <div className="mb-8 p-4 border rounded-lg">
-              <h2 className="text-xl font-semibold mb-3">Condições de Pagamento</h2>
-              <p className="mb-2"><strong>Validade da Proposta:</strong> {proposalData.validityDays} dias a partir de {new Date().toLocaleDateString('pt-BR')}</p>
-              <p className="mb-2"><strong>Meios de Pagamento Aceitos:</strong></p>
-              <ul className="list-disc list-inside ml-4">
+            <div className="mb-10 p-6 border border-gray-200 rounded-lg">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Condições de Pagamento</h2>
+              <p className="mb-3"><strong className="font-medium">Validade da Proposta:</strong> {proposalData.validityDays} dias a partir de {new Date().toLocaleDateString('pt-BR')}</p>
+              <p className="mb-2"><strong className="font-medium">Meios de Pagamento Aceitos:</strong></p>
+              <ul className="list-disc list-inside ml-6 text-gray-700">
                 {proposalData.paymentMethods.length > 0 ? (
                   proposalData.paymentMethods.map((method, index) => <li key={index}>{method}</li>)
                 ) : (
                   <li>Nenhum método de pagamento selecionado.</li>
                 )}
               </ul>
-              <div className="mt-4 space-y-1">
-                <p><strong>Dados Bancários:</strong></p>
-                <p className="ml-4">Banco: {userBankName}</p>
-                <p className="ml-4">Agência: {userBankAgency}</p>
-                <p className="ml-4">Conta: {userBankAccount}</p>
-                <p className="ml-4">Chave Pix: {userPixKey}</p>
+              <div className="mt-6 space-y-2">
+                <p className="text-lg font-semibold text-gray-800">Dados Bancários:</p>
+                <p className="ml-6 text-gray-700">Banco: {userBankName}</p>
+                <p className="ml-6 text-gray-700">Agência: {userBankAgency}</p>
+                <p className="ml-6 text-gray-700">Conta: {userBankAccount}</p>
+                <p className="ml-6 text-gray-700">Chave Pix: {userPixKey}</p>
               </div>
             </div>
 
-            <div className="text-center mt-12 pt-4 border-t border-gray-200">
-              <p className="text-gray-700">Atenciosamente,</p>
-              <p className="font-semibold text-lg">{userFullName}</p>
-              <p className="text-gray-600">{companyName}</p>
-              <p className="text-gray-600">WhatsApp: {userWhatsapp}</p>
-              <p className="text-gray-600">Email: {userEmail}</p>
-              {userCnpj && <p className="text-gray-600">CNPJ: {userCnpj}</p>}
+            <div className="text-center mt-12 pt-6 border-t border-gray-200">
+              <p className="text-gray-700 text-lg mb-2">Atenciosamente,</p>
+              <p className="font-bold text-xl text-gray-900">{userFullName}</p>
+              <p className="text-gray-700">{companyName}</p>
+              <p className="text-gray-700">WhatsApp: {userWhatsapp}</p>
+              <p className="text-gray-700">Email: {userEmail}</p>
+              {userCnpj && <p className="text-gray-700">CNPJ: {userCnpj}</p>}
             </div>
           </div>
         </div>
