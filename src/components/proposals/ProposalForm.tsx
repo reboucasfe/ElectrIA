@@ -24,6 +24,7 @@ import { Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import InputMask from 'react-input-mask';
 import ServiceFormModal, { Service } from '@/components/dashboard/ServiceFormModal';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom'; // Adicionado: Importação do useNavigate
 
 import ProposalPreviewModal from './ProposalPreviewModal';
 
