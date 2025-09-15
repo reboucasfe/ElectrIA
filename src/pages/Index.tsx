@@ -216,8 +216,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                 <div className="bg-blue-100 text-blue-600 rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold mb-6 shadow-sm">3</div>
                 <h3 className="text-xl font-semibold mb-3">Envie a Proposta</h3>
                 <p className="text-gray-600">Uma proposta completa e profissional é gerada e enviada para o cliente em segundos.</p>
-              </CardContent>
-              </Card>
+              </div>
             </div>
           </div>
         </section>
@@ -315,7 +314,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                       <span className="flex items-center"><Check className="h-5 w-5 text-green-500 mr-2" /> Suporte via email</span>
                       <Tooltip>
                         <TooltipTrigger><HelpCircle className="h-4 w-4 text-gray-400" /></TooltipTrigger>
-                        <TooltipContent><p>Receba ajuda e tire suas dúvidas com nossa equipe de suporte através de email.</p></TooltipContent>
+                        <TooltipContent><p>Receba ajuda e tire suas dúvidas com nossa equipe de suporte através de email.</p></p></TooltipContent>
                       </Tooltip>
                     </li>
                   </ul>
