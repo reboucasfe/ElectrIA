@@ -16,6 +16,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
 import { formatProposalNumber } from '@/utils/proposalUtils';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext'; // Importar useAuth para obter o user.id
 
 interface Proposal {
   id: string;
@@ -64,6 +65,7 @@ const calculateProposalTotal = (services: Array<{ calculated_total: number }>) =
 
 const ProposalsKanbanView = () => {
   const navigate = useNavigate();
+  const { user } = useAuth(); // Obter o usuário logado
   const [proposalsByColumn, setProposalsByColumn] = useState<{ [key: string]: Proposal[] }>({});
   const [loading, setLoading] = useState(true);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -125,6 +127,8 @@ const ProposalsKanbanView = () => {
       return;
     }
 
+    const oldStatus = draggedProposal.status; // Capture old status
+
     // Optimistic update
     const newSourceProposals = Array.from(sourceColumn);
     newSourceProposals.splice(source.index, 1);
@@ -140,17 +144,24 @@ const ProposalsKanbanView = () => {
 
     // Update in Supabase
     try {
-      const updatePayload: Partial<Proposal> = { status: newStatus };
+      let currentRevisionNumber = (draggedProposal.revision_number || 0) + 1;
+
+      const updatePayload: Partial<Proposal> = { 
+        status: newStatus,
+        revision_number: currentRevisionNumber, // Incrementa o número da revisão
+      };
       if (newStatus === 'accepted') {
         updatePayload.accepted_at = new Date().toISOString();
       } else if (newStatus === 'sent' && !draggedProposal.sent_at) {
         updatePayload.sent_at = new Date().toISOString();
       }
 
-      const { error } = await supabase
+      const { data: updatedProposal, error } = await supabase
         .from('proposals')
         .update(updatePayload)
-        .eq('id', draggableId);
+        .eq('id', draggableId)
+        .select()
+        .single();
 
       if (error) {
         showError(getTranslatedErrorMessage(error.message));
@@ -162,6 +173,27 @@ const ProposalsKanbanView = () => {
         }));
       } else {
         showSuccess(`Proposta "${draggedProposal.proposal_title}" movida para "${columns.find(col => col.id === destinationColumnId)?.title}"!`);
+        
+        // Registrar no histórico de revisões
+        if (user && updatedProposal) {
+          const changesSummary = {
+            summary: `Status da proposta alterado via Kanban de '${oldStatus}' para '${newStatus}'.`,
+            details: {
+              status: { old: oldStatus, new: newStatus }
+            }
+          };
+          const { error: revisionError } = await supabase.from('proposal_revisions').insert({
+            proposal_id: updatedProposal.id,
+            revision_number: updatedProposal.revision_number,
+            user_id: user.id,
+            changes: changesSummary,
+          });
+          if (revisionError) {
+            console.error("Kanban: Erro ao salvar revisão de status:", revisionError);
+            showError(getTranslatedErrorMessage(revisionError.message));
+          }
+        }
+
         // Re-fetch to ensure data consistency, especially for 'sent' status which might include 'pending'
         fetchProposals();
       }
