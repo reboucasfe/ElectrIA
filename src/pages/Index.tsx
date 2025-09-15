@@ -110,7 +110,21 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => { // Re
                   {getButtonText('Ir para o Dashboard', 'Começar Agora')} <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
-              <p className="mt-6 text-sm text-gray-500">Confiado por mais de 500 eletricistas em todo o Brasil.</p>
+              {/* Novas estatísticas */}
+              <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4">
+                <div className="text-left">
+                  <p className="text-2xl font-bold text-gray-900">+500</p>
+                  <p className="text-sm text-gray-600">eletricistas usando nossa IA</p>
+                </div>
+                <div className="text-left">
+                  <p className="text-2xl font-bold text-gray-900">95%</p>
+                  <p className="text-sm text-gray-600">aprovação dos clientes</p>
+                </div>
+                <div className="text-left">
+                  <p className="text-2xl font-bold text-gray-900">300%</p>
+                  <p className="text-sm text-gray-600">ROI em 3 meses</p>
+                </div>
+              </div>
             </div>
             <div className="bg-gray-100 rounded-lg aspect-video flex items-center justify-center">
               <p className="text-gray-400">Visual do Produto Aqui</p>
