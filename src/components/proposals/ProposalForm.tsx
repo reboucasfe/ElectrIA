@@ -409,7 +409,7 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
 
     if (proposalId) {
       // Fetch old data to compare for revision history
-      const { data: oldProposal, error: fetchError } = await supabase
+      const { data: oldProposalRaw, error: fetchError } = await supabase
         .from('proposals')
         .select('*')
         .eq('id', proposalId)
@@ -421,9 +421,25 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
         return null;
       }
 
+      // Explicitly map oldProposalRaw to ProposalFormValues to ensure consistent empty states
+      const oldData: ProposalFormValues = {
+        proposalNumber: oldProposalRaw.proposal_number,
+        revisionNumber: oldProposalRaw.revision_number || 0,
+        clientName: oldProposalRaw.client_name,
+        clientEmail: oldProposalRaw.client_email || '', // Ensure empty string for null
+        clientPhone: oldProposalRaw.client_phone || '', // Ensure empty string for null
+        proposalTitle: oldProposalRaw.proposal_title,
+        proposalDescription: oldProposalRaw.proposal_description || '', // Ensure empty string for null
+        selectedServices: oldProposalRaw.selected_services.map((s: any) => ({ ...s, uniqueId: s.uniqueId || crypto.randomUUID() })),
+        notes: oldProposalRaw.notes || '', // Ensure empty string for null
+        paymentMethods: oldProposalRaw.payment_methods || [], // Ensure empty array for null
+        validityDays: oldProposalRaw.validity_days,
+        created_at: oldProposalRaw.created_at,
+      };
+
       // Increment revision number for existing proposals
-      currentRevisionNumber = (oldProposal?.revision_number || 0) + 1;
-      changesSummary = getChangesSummary(oldProposal as ProposalFormValues, data);
+      currentRevisionNumber = (oldData.revisionNumber || 0) + 1;
+      changesSummary = getChangesSummary(oldData, data); // Pass the explicitly mapped oldData
     }
 
     const proposalPayload = {

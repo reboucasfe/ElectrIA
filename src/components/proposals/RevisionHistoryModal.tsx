@@ -77,8 +77,8 @@ const RevisionHistoryModal = ({ isOpen, onClose, proposalId, proposalSequentialN
   }, [isOpen, fetchRevisions]);
 
   const renderChangeValue = (value: any) => {
-    if (value === null || value === undefined || (Array.isArray(value) && value.length === 0) || value === '') {
-      return <span className="text-gray-500 italic">Não definido</span>;
+    if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '') || (Array.isArray(value) && value.length === 0)) {
+      return <span className="text-gray-500 italic">Vazio</span>; // Alterado de "Não definido" para "Vazio"
     }
     if (Array.isArray(value)) {
       return value.join(', ');
@@ -109,9 +109,11 @@ const RevisionHistoryModal = ({ isOpen, onClose, proposalId, proposalSequentialN
         {Object.entries(changes.details).map(([key, value]) => (
           <div key={key} className="border-b pb-2">
             <strong className="text-gray-800">{fieldNameMap[key] || key}</strong>
-            {typeof value === 'string' ? (
+            {key === 'selectedServices' && typeof value === 'string' ? ( // Specific handling for selectedServices string
+              <pre className="whitespace-pre-wrap font-sans text-sm text-gray-600 mt-1">{value}</pre>
+            ) : typeof value === 'string' ? ( // Generic string (e.g., if summary is directly stored here, though it shouldn't be)
               <p className="text-gray-600 mt-1">{value}</p>
-            ) : (
+            ) : ( // Object { old, new }
               <div className="grid grid-cols-[auto,1fr] gap-x-2 mt-1 text-sm">
                 <div className="text-red-600 font-semibold">De:</div>
                 <div className="p-2 rounded-md bg-red-50 border border-red-200">{renderChangeValue(value.old)}</div>
