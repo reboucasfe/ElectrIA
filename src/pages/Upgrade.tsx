@@ -9,9 +9,11 @@ import { Zap, Check, HelpCircle } from "lucide-react";
 
 const Upgrade = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
-  const [currentUserPlan, setCurrentUserPlan] = useState<'essencial' | 'professional' | 'premium'>('essencial'); // Simulação do plano atual do usuário
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Obtém o plano atual do usuário do user_metadata, com 'essencial' como padrão se não estiver definido
+  const currentUserPlan = (user?.user_metadata?.plan_id || 'essencial') as 'essencial' | 'professional' | 'premium';
 
   const prices = {
     annual: {

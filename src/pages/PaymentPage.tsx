@@ -81,7 +81,10 @@ const PaymentPage = () => {
     await new Promise(resolve => setTimeout(resolve, 2000));
     if (user) {
       const { error: updateError } = await supabase.auth.updateUser({
-        data: { payment_status: 'paid' }
+        data: {
+          payment_status: 'paid',
+          plan_id: planId // Adiciona o planId ao user_metadata
+        }
       });
       if (updateError) {
         showError(`Erro ao atualizar status de pagamento: ${updateError.message}`);
