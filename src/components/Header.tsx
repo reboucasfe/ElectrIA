@@ -63,12 +63,12 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
           {user ? ( // Usuário está logado
             isPaid ? ( // Usuário é pagante
               <>
-                <Button variant="ghost" onClick={() => navigate('/dashboard')}>Dashboard</Button>
-                <Button onClick={handleSignOut} className="bg-blue-600 hover:bg-blue-700">Sair</Button>
+                <Button onClick={() => navigate('/dashboard')} className="bg-blue-600 hover:bg-blue-700">Dashboard</Button>
+                <Button variant="ghost" onClick={handleSignOut}>Sair</Button>
               </>
             ) : ( // Usuário está logado, mas NÃO é pagante
               <>
-                <Button variant="ghost" onClick={handleSignOut} className="bg-blue-600 hover:bg-blue-700">Sair</Button>
+                <Button variant="ghost" onClick={handleSignOut}>Sair</Button>
                 <Button onClick={handleFinalizeSubscriptionClick} className="bg-blue-600 hover:bg-blue-700">Finalizar Assinatura</Button>
               </>
             )
