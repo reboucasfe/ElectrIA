@@ -29,6 +29,7 @@ import ProposalPreviewModal from './ProposalPreviewModal'; // Importa o novo mod
 
 // Estende a interface Service para incluir a quantidade e o total calculado no formulário
 interface SelectedService extends Service {
+  uniqueId: string; // Adiciona um ID único para cada instância de serviço na proposta
   quantity: number;
   calculated_total: number;
 }
@@ -45,6 +46,7 @@ const proposalFormSchema = z.object({
   proposalTitle: z.string().min(1, { message: "Título da proposta é obrigatório." }),
   proposalDescription: z.string().optional(),
   selectedServices: z.array(z.object({
+    uniqueId: z.string(), // Valida o novo campo uniqueId
     id: z.string(),
     name: z.string(),
     description: z.string().optional(),
@@ -143,6 +145,7 @@ const ProposalForm = () => {
     if (serviceToAdd) {
       const newService: SelectedService = {
         ...serviceToAdd,
+        uniqueId: crypto.randomUUID(), // Gera um ID único para esta instância do serviço
         quantity: 1, // Default quantity
         calculated_total: calculateServiceTotal(serviceToAdd, 1),
       };
@@ -151,28 +154,34 @@ const ProposalForm = () => {
     }
   };
 
-  const handleRemoveService = (index: number) => {
-    const newServices = watchedServices.filter((_, i) => i !== index);
+  const handleRemoveService = (uniqueId: string) => {
+    const newServices = watchedServices.filter((service) => service.uniqueId !== uniqueId);
     setValue('selectedServices', newServices);
   };
 
-  const handleQuantityChange = (index: number, newQuantity: number) => {
-    const newServices = [...watchedServices];
-    if (newServices[index]) {
-      newServices[index].quantity = newQuantity;
-      newServices[index].calculated_total = calculateServiceTotal(newServices[index], newQuantity);
-      setValue('selectedServices', newServices);
-    }
+  const handleQuantityChange = (uniqueId: string, newQuantity: number) => {
+    const newServices = watchedServices.map((service) => {
+      if (service.uniqueId === uniqueId) {
+        return {
+          ...service,
+          quantity: newQuantity,
+          calculated_total: calculateServiceTotal(service, newQuantity),
+        };
+      }
+      return service;
+    });
+    setValue('selectedServices', newServices);
   };
 
   const handleOpenPreviewModal = (data: ProposalFormValues) => {
+    console.log("Opening preview modal with data:", data); // Log para depuração
     setPreviewData(data);
     setIsPreviewModalOpen(true);
   };
 
   const onSubmit = async (data: ProposalFormValues) => {
     setLoading(true);
-    console.log("Dados da Proposta:", data);
+    console.log("Dados da Proposta (Salvar Rascunho):", data);
     // Esta função atualmente apenas simula o salvamento.
     // Para salvar de verdade, você precisaria de uma tabela 'proposals' no Supabase
     // e adicionar a lógica de inserção aqui.
@@ -295,14 +304,14 @@ const ProposalForm = () => {
                 </TableHeader>
                 <TableBody>
                   {watchedServices.map((service, index) => (
-                    <TableRow key={service.id}>
+                    <TableRow key={service.uniqueId}> {/* Usando uniqueId como key */}
                       <TableCell className="font-medium">{service.name}</TableCell>
                       <TableCell>
                         <Input
                           type="number"
                           min="1"
                           value={service.quantity}
-                          onChange={(e) => handleQuantityChange(index, parseInt(e.target.value))}
+                          onChange={(e) => handleQuantityChange(service.uniqueId, parseInt(e.target.value))}
                           className="w-20 text-center"
                         />
                       </TableCell>
@@ -311,7 +320,7 @@ const ProposalForm = () => {
                       </TableCell>
                       <TableCell className="text-right">{formatCurrency(service.calculated_total)}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" onClick={() => handleRemoveService(index)}>
+                        <Button variant="ghost" size="icon" onClick={() => handleRemoveService(service.uniqueId)}>
                           <Trash2 className="h-4 w-4 text-red-500" />
                         </Button>
                       </TableCell>
