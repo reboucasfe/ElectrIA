@@ -12,12 +12,22 @@ import { showError, showSuccess } from '@/utils/toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProposalPreviewModal from '@/components/proposals/ProposalPreviewModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
-import { formatProposalNumber } from '@/utils/proposalUtils'; // Importar a nova função
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
+import { formatProposalNumber } from '@/utils/proposalUtils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { DateRange } from 'react-day-picker';
+import { addDays, subDays, isWithinInterval, parseISO } from 'date-fns';
 
 interface Proposal {
   id: string;
-  proposal_number?: number; // Adicionado número da proposta
+  proposal_number?: number;
   client_name: string;
   status: 'draft' | 'sent' | 'accepted' | 'pending' | 'rejected';
   selected_services: Array<{ calculated_total: number }>;
@@ -30,13 +40,15 @@ interface Proposal {
   notes?: string;
   payment_methods: string[];
   validity_days: number;
-  accepted_at?: string; // Adicionado accepted_at
+  accepted_at?: string;
 }
 
 const ProposalsList = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const proposalFilterStatus = new URLSearchParams(location.search).get('status');
+  
+  // Obter o status inicial da URL, se houver
+  const initialUrlStatus = new URLSearchParams(location.search).get('status');
 
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,51 +57,76 @@ const ProposalsList = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [proposalToDelete, setProposalToDelete] = useState<Proposal | null>(null);
 
+  // Estados para os novos filtros
+  const [statusFilter, setStatusFilter] = useState<string>(initialUrlStatus || 'all');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
+  });
+
+  // Efeito para atualizar o filtro de status interno quando o parâmetro da URL muda
+  useEffect(() => {
+    const urlStatus = new URLSearchParams(location.search).get('status');
+    setStatusFilter(urlStatus || 'all');
+  }, [location.search]);
+
   const fetchProposals = useCallback(async () => {
     setLoading(true);
     let query = supabase.from('proposals').select('*').order('created_at', { ascending: false });
 
-    if (proposalFilterStatus === 'sent') {
-      query = query.in('status', ['sent', 'pending']);
-    } else if (proposalFilterStatus === 'accepted') {
-      query = query.eq('status', 'accepted');
-    } else if (proposalFilterStatus === 'draft') {
-      query = query.eq('status', 'draft');
+    // Aplicar filtro de status
+    if (statusFilter !== 'all') {
+      if (statusFilter === 'sent') {
+        query = query.in('status', ['sent', 'pending']);
+      } else {
+        query = query.eq('status', statusFilter);
+      }
+    }
+
+    // Aplicar filtro de período
+    if (dateRange?.from && dateRange?.to) {
+      query = query.gte('created_at', dateRange.from.toISOString());
+      // Adicionar um dia à data 'to' para incluir o dia inteiro
+      query = query.lte('created_at', addDays(dateRange.to, 1).toISOString());
     }
 
     const { data, error } = await query;
 
     if (error) {
-      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
+      showError(getTranslatedErrorMessage(error.message));
       setProposals([]);
     } else {
       setProposals(data as Proposal[]);
     }
     setLoading(false);
-  }, [proposalFilterStatus]);
+  }, [statusFilter, dateRange]); // Depende dos estados dos filtros
 
   useEffect(() => {
     fetchProposals();
-  }, [fetchProposals]);
+  }, [fetchProposals]); // Re-fetch quando fetchProposals muda (devido à mudança nos filtros)
 
   const getTitle = () => {
-    if (proposalFilterStatus === 'sent') {
+    if (statusFilter === 'sent') {
       return 'Propostas Enviadas';
-    } else if (proposalFilterStatus === 'accepted') {
+    } else if (statusFilter === 'accepted') {
       return 'Propostas Aceitas';
-    } else if (proposalFilterStatus === 'draft') {
+    } else if (statusFilter === 'draft') {
       return 'Propostas Em Edição';
+    } else if (statusFilter === 'rejected') {
+      return 'Propostas Rejeitadas';
     }
     return 'Todas as Propostas';
   };
 
   const getDescription = () => {
-    if (proposalFilterStatus === 'sent') {
+    if (statusFilter === 'sent') {
       return 'Aqui você pode visualizar todas as propostas que foram enviadas aos seus clientes.';
-    } else if (proposalFilterStatus === 'accepted') {
+    } else if (statusFilter === 'accepted') {
       return 'Aqui você pode visualizar as propostas que foram aceitas pelos seus clientes.';
-    } else if (proposalFilterStatus === 'draft') {
+    } else if (statusFilter === 'draft') {
       return 'Propostas que ainda não foram enviadas ou geradas em PDF.';
+    } else if (statusFilter === 'rejected') {
+      return 'Propostas que foram rejeitadas pelos seus clientes.';
     }
     return 'Visualize e gerencie todas as suas propostas.';
   };
@@ -129,7 +166,7 @@ const ProposalsList = () => {
   const handleGeneratePdfClick = (proposal: Proposal) => {
     setSelectedProposalForPreview({
       id: proposal.id,
-      proposalNumber: proposal.proposal_number, // Passa o número da proposta
+      proposalNumber: proposal.proposal_number,
       clientName: proposal.client_name,
       clientEmail: proposal.client_email,
       clientPhone: proposal.client_phone,
@@ -140,7 +177,7 @@ const ProposalsList = () => {
       paymentMethods: proposal.payment_methods,
       validityDays: proposal.validity_days,
       status: proposal.status,
-      created_at: proposal.created_at, // Passa a data de criação
+      created_at: proposal.created_at,
     });
     setIsPreviewModalOpen(true);
   };
@@ -161,7 +198,7 @@ const ProposalsList = () => {
     const { error } = await supabase.from('proposals').delete().eq('id', proposalToDelete.id);
 
     if (error) {
-      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
+      showError(getTranslatedErrorMessage(error.message));
     } else {
       showSuccess('Proposta excluída com sucesso!');
       fetchProposals();
@@ -174,7 +211,7 @@ const ProposalsList = () => {
     setLoading(true);
     const { error } = await supabase
       .from('proposals')
-      .update({ status: 'accepted', accepted_at: new Date().toISOString() }) // Adiciona accepted_at
+      .update({ status: 'accepted', accepted_at: new Date().toISOString() })
       .eq('id', proposalId);
 
     if (error) {
@@ -198,14 +235,34 @@ const ProposalsList = () => {
         </div>
       </div>
 
+      {/* Filtros */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-end">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">Status:</span>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filtrar por Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="draft">Em Edição</SelectItem>
+              <SelectItem value="sent">Enviadas/Pendentes</SelectItem>
+              <SelectItem value="accepted">Aceitas</SelectItem>
+              <SelectItem value="rejected">Rejeitadas</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">Período:</span>
+          <DateRangePicker date={dateRange} setDate={setDateRange} />
+        </div>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Detalhes das Propostas</CardTitle>
           <CardDescription>
-            {proposalFilterStatus === 'sent' ? 'Todas as propostas que você enviou ou estão pendentes.' :
-             proposalFilterStatus === 'accepted' ? 'Todas as propostas que foram aceitas.' :
-             proposalFilterStatus === 'draft' ? 'Todos os rascunhos de propostas.' :
-             'Todas as suas propostas cadastradas.'}
+            {getDescription()}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -219,7 +276,7 @@ const ProposalsList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nº Proposta</TableHead> {/* Nova coluna */}
+                  <TableHead>Nº Proposta</TableHead>
                   <TableHead>Cliente</TableHead>
                   <TableHead>Título</TableHead>
                   <TableHead>Status</TableHead>
@@ -231,7 +288,7 @@ const ProposalsList = () => {
               <TableBody>
                 {proposals.map((proposal) => (
                   <TableRow key={proposal.id}>
-                    <TableCell className="font-medium">{formatProposalNumber(proposal.proposal_number, proposal.created_at)}</TableCell> {/* Exibe o número da proposta formatado */}
+                    <TableCell className="font-medium">{formatProposalNumber(proposal.proposal_number, proposal.created_at)}</TableCell>
                     <TableCell>{proposal.client_name}</TableCell>
                     <TableCell>{proposal.proposal_title}</TableCell>
                     <TableCell>{getStatusLabel(proposal.status)}</TableCell>
@@ -252,7 +309,6 @@ const ProposalsList = () => {
                           <DropdownMenuItem onClick={() => handleGeneratePdfClick(proposal)}>
                             <FileText className="mr-2 h-4 w-4" /> Gerar PDF
                           </DropdownMenuItem>
-                          {/* Adicionado: Marcar como Aceita */}
                           {!['accepted', 'rejected'].includes(proposal.status) && (
                             <DropdownMenuItem onClick={() => handleMarkAsAccepted(proposal.id)}>
                               <CheckCircle className="mr-2 h-4 w-4 text-green-600" /> Marcar como Aceita
@@ -270,10 +326,7 @@ const ProposalsList = () => {
             </Table>
           ) : (
             <p className="text-center text-gray-500 py-8">
-              Nenhuma proposta {proposalFilterStatus === 'sent' ? 'enviada ou pendente' :
-                               proposalFilterStatus === 'accepted' ? 'aceita' :
-                               proposalFilterStatus === 'draft' ? 'em edição' :
-                               ''} encontrada.
+              Nenhuma proposta encontrada com os filtros aplicados.
             </p>
           )}
         </CardContent>

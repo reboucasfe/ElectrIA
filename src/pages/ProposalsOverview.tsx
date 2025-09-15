@@ -33,7 +33,7 @@ const ProposalsOverview = () => {
           <Button className="mt-6 bg-blue-600 hover:bg-blue-700">Ver Kanban</Button>
         </Card>
 
-        <Card className="flex flex-col items-center text-center p-6 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => navigate('/proposals?status=sent')}>
+        <Card className="flex flex-col items-center text-center p-6 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => navigate('/proposals')}> {/* Removido o filtro ?status=sent */}
           <CardHeader className="p-0 mb-4">
             <ListChecks className="h-12 w-12 text-yellow-600 mx-auto" />
             <CardTitle className="mt-4 text-xl">Lista de Propostas</CardTitle>
