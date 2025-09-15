@@ -120,9 +120,15 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
       // Adiciona log mais específico para selectedServices
       if (errors.selectedServices) {
         console.error("ProposalForm: Detalhes do erro em selectedServices:", errors.selectedServices);
-        errors.selectedServices.forEach((serviceError, index) => {
-          console.error(`  Erro no Serviço ${index}:`, serviceError);
-        });
+        // Verifica se errors.selectedServices é um array antes de chamar forEach
+        if (Array.isArray(errors.selectedServices)) {
+          errors.selectedServices.forEach((serviceError, index) => {
+            console.error(`  Erro no Serviço ${index}:`, serviceError);
+          });
+        } else if (errors.selectedServices.message) {
+          // Se não for um array, mas tiver uma mensagem (erro de validação da lista em si)
+          console.error("  Erro na lista de serviços:", errors.selectedServices.message);
+        }
       }
       showError("Por favor, corrija os erros no formulário.");
     }
