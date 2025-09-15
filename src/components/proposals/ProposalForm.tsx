@@ -53,9 +53,9 @@ const proposalFormSchema = z.object({
     name: z.string(),
     description: z.string().optional(),
     price_type: z.enum(['fixed', 'hourly']),
-    fixed_price: z.number().optional(),
-    hourly_rate: z.number().optional(),
-    total_hours: z.number().optional(),
+    fixed_price: z.number().nullable().optional(), // Permite null ou undefined
+    hourly_rate: z.number().nullable().optional(), // Permite null ou undefined
+    total_hours: z.number().nullable().optional(), // Permite null ou undefined
     quantity: z.number().min(1, { message: "Quantidade deve ser no mínimo 1." }),
     calculated_total: z.number(),
   })).min(1, { message: "Adicione pelo menos um serviço à proposta." }),
@@ -179,10 +179,10 @@ const ProposalForm = ({ initialData, proposalId }: ProposalFormProps) => {
   }, [user, setValue, initialData]);
 
   const calculateServiceTotal = (service: Service, quantity: number): number => {
-    if (service.price_type === 'fixed' && service.fixed_price !== undefined) {
+    if (service.price_type === 'fixed' && service.fixed_price !== undefined && service.fixed_price !== null) {
       return service.fixed_price * quantity;
     }
-    if (service.price_type === 'hourly' && service.hourly_rate !== undefined && service.total_hours !== undefined) {
+    if (service.price_type === 'hourly' && service.hourly_rate !== undefined && service.hourly_rate !== null && service.total_hours !== undefined && service.total_hours !== null) {
       return (service.hourly_rate * service.total_hours) * quantity;
     }
     return 0;

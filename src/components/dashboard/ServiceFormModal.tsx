@@ -64,9 +64,9 @@ export interface Service {
   name: string;
   description?: string;
   price_type: 'fixed' | 'hourly';
-  fixed_price?: number; // Agora sempre representará o valor total
-  hourly_rate?: number;
-  total_hours?: number; // Novo campo na interface
+  fixed_price?: number | null; // Agora sempre representará o valor total, pode ser null
+  hourly_rate?: number | null;
+  total_hours?: number | null; // Novo campo na interface, pode ser null
 }
 
 interface ServiceFormModalProps {
