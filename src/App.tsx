@@ -21,8 +21,9 @@ import Settings from "./pages/Settings";
 import Upgrade from "./pages/Upgrade";
 import WhatsAppButton from "./components/WhatsAppButton";
 import RegisterModal from "./components/RegisterModal";
-import LoginModal from "./components/LoginModal"; // Importar LoginModal
+import LoginModal from "./components/LoginModal";
 import PaymentPage from "./pages/PaymentPage";
+import ProposalsList from "./pages/ProposalsList"; // Importar a nova página
 
 const queryClient = new QueryClient();
 
@@ -54,18 +55,18 @@ const App = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [selectedPlanIdForRegister, setSelectedPlanIdForRegister] = useState<string | undefined>(undefined);
   const [selectedBillingCycleForRegister, setSelectedBillingCycleForRegister] = useState<'monthly' | 'annual' | undefined>(undefined);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // Novo estado para o modal de login
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const handleOpenRegisterModal = (planId?: string, billingCycle?: 'monthly' | 'annual') => {
     console.log("App.tsx: handleOpenRegisterModal received planId:", planId, "and billingCycle:", billingCycle);
-    setIsLoginModalOpen(false); // Fecha o modal de login se estiver aberto
+    setIsLoginModalOpen(false);
     setSelectedPlanIdForRegister(planId);
     setSelectedBillingCycleForRegister(billingCycle);
     setIsRegisterModalOpen(true);
   };
 
   const handleOpenLoginModal = () => {
-    setIsRegisterModalOpen(false); // Fecha o modal de registro se estiver aberto
+    setIsRegisterModalOpen(false);
     setIsLoginModalOpen(true);
   };
 
@@ -100,6 +101,7 @@ const App = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/upgrade" element={<Upgrade />} />
+                <Route path="/proposals" element={<ProposalsList />} /> {/* Nova rota para a lista de propostas */}
               </Route>
             </Route>
 
