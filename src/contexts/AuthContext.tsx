@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      showError(`Erro ao sair: ${error.message}`);
+      showError(`Erro ao sair: ${error.message}`); // Prefixo da mensagem de erro traduzido
     }
   };
 

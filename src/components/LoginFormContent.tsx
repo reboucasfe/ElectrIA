@@ -27,7 +27,7 @@ const LoginFormContent = ({ onClose, onOpenRegisterModal }: LoginFormContentProp
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      showError(error.message);
+      showError(`Erro ao fazer login: ${error.message}`); // Mensagem de erro traduzida
     } else {
       showSuccess('Login realizado com sucesso!');
       onClose?.(); // Fecha o modal se estiver em um
@@ -46,7 +46,7 @@ const LoginFormContent = ({ onClose, onOpenRegisterModal }: LoginFormContentProp
     });
 
     if (error) {
-      showError(error.message);
+      showError(`Erro ao fazer login com Google: ${error.message}`); // Mensagem de erro traduzida
       setLoading(false);
     }
   };
@@ -62,7 +62,7 @@ const LoginFormContent = ({ onClose, onOpenRegisterModal }: LoginFormContentProp
     });
 
     if (error) {
-      showError(error.message);
+      showError(`Erro ao redefinir senha: ${error.message}`); // Mensagem de erro traduzida
     } else {
       showSuccess('Verifique seu e-mail para o link de redefinição de senha!');
     }

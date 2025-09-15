@@ -22,7 +22,7 @@ const UpdatePassword = () => {
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     if (error) {
-      showError(error.message);
+      showError(`Erro ao atualizar senha: ${error.message}`); // Mensagem de erro traduzida
     } else {
       showSuccess('Sua senha foi atualizada com sucesso! Você já pode fazer login.');
       navigate('/login');

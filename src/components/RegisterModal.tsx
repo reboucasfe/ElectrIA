@@ -117,7 +117,7 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, 
       if (error.message === 'User already registered') {
         showError('Este e-mail já está cadastrado. Por favor, faça login ou use outro e-mail.');
       } else {
-        showError(error.message);
+        showError(`Erro ao cadastrar: ${error.message}`); // Mensagem de erro traduzida
       }
     } else {
       showSuccess('Cadastro realizado com sucesso! Redirecionando para o pagamento...');

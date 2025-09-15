@@ -33,7 +33,7 @@ const Settings = () => {
     });
 
     if (error) {
-      showError(error.message);
+      showError(`Erro ao atualizar senha: ${error.message}`); // Mensagem de erro traduzida
     } else {
       showSuccess("Senha atualizada com sucesso!");
       reset();

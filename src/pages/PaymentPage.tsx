@@ -94,7 +94,7 @@ const PaymentPage = () => {
 
       if (updateError) {
         console.error("PaymentPage: Error updating user metadata:", updateError.message);
-        showError(`Erro ao atualizar status de pagamento: ${updateError.message}`);
+        showError(`Erro ao atualizar status de pagamento: ${updateError.message}`); // Mensagem de erro traduzida
         setLoading(false);
         return;
       }
