@@ -31,6 +31,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const isPaid = paymentStatus === 'paid';
   const currentPath = location.pathname;
 
+  // Verifica se a navegação para /payment tem uma intenção de upgrade/renovação
+  const isUpgradeOrRenewIntent = location.state?.isUpgradeOrRenew === true;
+
   // Se o usuário NÃO é pagante
   if (!isPaid) {
     // Se ele está tentando acessar a página de pagamento, permite
@@ -43,12 +46,15 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   // Se o usuário É pagante
-  // Se um usuário pagante de alguma forma cair na página de pagamento, redireciona-o para o dashboard
-  if (isPaid && currentPath === '/payment') {
+  // Se um usuário pagante de alguma forma cair na página de pagamento,
+  // mas NÃO com uma intenção de upgrade/renovação, redireciona-o para o dashboard
+  if (isPaid && currentPath === '/payment' && !isUpgradeOrRenewIntent) {
     return <Navigate to="/dashboard" replace state={{ from: location }} />;
   }
 
-  // Se o usuário é pagante e está em qualquer outra rota protegida, permite o acesso
+  // Se o usuário é pagante e está em qualquer outra rota protegida, ou
+  // se é pagante e está na página de pagamento COM intenção de upgrade/renovação,
+  // permite o acesso
   return children || <Outlet />;
 };
 
