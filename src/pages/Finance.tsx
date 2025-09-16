@@ -13,14 +13,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { showError, showSuccess } from '@/utils/toast';
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
 import TransactionFormModal, { Transaction } from '@/components/finance/TransactionFormModal';
-import CategoryFormModal, { TransactionCategory } from '@/components/finance/CategoryFormModal'; // Importar CategoryFormModal
+import CategoryFormModal, { TransactionCategory } from '@/components/finance/CategoryFormModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { addDays, subDays, isWithinInterval, parseISO } from 'date-fns';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'; // Importação adicionada
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 const formatCurrency = (value: number) => {
   return value.toLocaleString('pt-BR', {
@@ -32,16 +32,22 @@ const formatCurrency = (value: number) => {
 const Finance = () => {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [categories, setCategories] = useState<TransactionCategory[]>([]); // Novo estado para categorias
+  const [categories, setCategories] = useState<TransactionCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false); // Novo estado para modal de categoria
-  const [selectedCategory, setSelectedCategory] = useState<TransactionCategory | null>(null); // Categoria selecionada para edição
+  
+  const [isManageCategoriesModalOpen, setIsManageCategoriesModalOpen] = useState(false); // Modal para listar e gerenciar categorias
+  const [isCategoryFormModalOpen, setIsCategoryFormModalOpen] = useState(false); // Modal para adicionar/editar uma categoria
+  const [selectedCategory, setSelectedCategory] = useState<TransactionCategory | null>(null);
+  
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
-  const [isCategoryAlertOpen, setIsCategoryAlertOpen] = useState(false); // Novo estado para alert de categoria
-  const [categoryToDelete, setCategoryToDelete] = useState<TransactionCategory | null>(null); // Categoria a ser deletada
+  
+  const [isCategoryAlertOpen, setIsCategoryAlertOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<TransactionCategory | null>(null);
+  
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
     to: new Date(),
@@ -61,7 +67,7 @@ const Finance = () => {
 
     if (dateRange?.from && dateRange?.to) {
       query = query.gte('date', format(dateRange.from, 'yyyy-MM-dd'));
-      query = query.lte('date', format(addDays(dateRange.to, 1), 'yyyy-MM-dd')); // Add 1 day to 'to' to include the whole day
+      query = query.lte('date', format(addDays(dateRange.to, 1), 'yyyy-MM-dd'));
     }
 
     const { data, error } = await query;
@@ -165,9 +171,24 @@ const Finance = () => {
     setTransactionToDelete(null);
   };
 
-  const handleOpenCategoryModal = (category?: TransactionCategory) => {
+  // Funções para o modal de CATEGORIAS
+  const handleOpenManageCategoriesModal = () => {
+    setIsManageCategoriesModalOpen(true);
+  };
+
+  const handleOpenCategoryFormModal = (category?: TransactionCategory) => {
     setSelectedCategory(category || null);
-    setIsCategoryModalOpen(true);
+    setIsCategoryFormModalOpen(true);
+  };
+
+  const handleCloseCategoryFormModal = () => {
+    setIsCategoryFormModalOpen(false);
+    setSelectedCategory(null);
+  };
+
+  const handleCategorySaved = () => {
+    fetchCategories(); // Atualiza a lista de categorias
+    handleCloseCategoryFormModal(); // Fecha o modal de formulário
   };
 
   const handleDeleteCategoryClick = (category: TransactionCategory) => {
@@ -178,7 +199,6 @@ const Finance = () => {
   const handleDeleteCategoryConfirm = async () => {
     if (!categoryToDelete) return;
 
-    // Check if there are any transactions associated with this category
     const { count, error: countError } = await supabase
       .from('transactions')
       .select('id', { count: 'exact' })
@@ -219,7 +239,7 @@ const Finance = () => {
           <p className="text-gray-500">Controle suas entradas e saídas.</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => handleOpenCategoryModal()} variant="outline">
+          <Button onClick={handleOpenManageCategoriesModal} variant="outline">
             <Settings2 className="mr-2 h-4 w-4" /> Gerenciar Categorias
           </Button>
           <Button onClick={handleAddNewTransaction} className="bg-blue-600 hover:bg-blue-700">
@@ -336,14 +356,14 @@ const Finance = () => {
         onClose={() => setIsTransactionModalOpen(false)}
         onSave={fetchTransactions}
         transaction={selectedTransaction}
-        availableCategories={categories} // Passa as categorias disponíveis
-        onOpenCategoryModal={handleOpenCategoryModal} // Passa a função para abrir o modal de categoria
+        availableCategories={categories}
+        onOpenCategoryModal={handleOpenCategoryFormModal} // Passa a função para abrir o modal de formulário de categoria
       />
 
       <CategoryFormModal
-        isOpen={isCategoryModalOpen}
-        onClose={() => setIsCategoryModalOpen(false)}
-        onSave={fetchCategories}
+        isOpen={isCategoryFormModalOpen}
+        onClose={handleCloseCategoryFormModal}
+        onSave={handleCategorySaved}
         category={selectedCategory}
       />
 
@@ -364,7 +384,6 @@ const Finance = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Alert para exclusão de categoria */}
       <AlertDialog open={isCategoryAlertOpen} onOpenChange={setIsCategoryAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -379,12 +398,12 @@ const Finance = () => {
             <AlertDialogAction onClick={handleDeleteCategoryConfirm} className="bg-red-600 hover:bg-red-700">
               Sim, excluir
             </AlertDialogAction>
-          </AlertDialogFooter>
+          </DialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Modal de Gerenciamento de Categorias (para listar e editar) */}
-      <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
+      <Dialog open={isManageCategoriesModalOpen} onOpenChange={setIsManageCategoriesModalOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Gerenciar Categorias</DialogTitle>
@@ -393,7 +412,7 @@ const Finance = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
-            <Button onClick={() => handleOpenCategoryModal()} className="w-full bg-blue-600 hover:bg-blue-700">
+            <Button onClick={() => handleOpenCategoryFormModal()} className="w-full bg-blue-600 hover:bg-blue-700">
               <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Nova Categoria
             </Button>
             {categories.length === 0 ? (
@@ -421,7 +440,7 @@ const Finance = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleOpenCategoryModal(cat)}>
+                            <DropdownMenuItem onClick={() => handleOpenCategoryFormModal(cat)}>
                               <Edit className="mr-2 h-4 w-4" /> Editar
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDeleteCategoryClick(cat)} className="text-red-600">
@@ -437,7 +456,7 @@ const Finance = () => {
             )}
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setIsCategoryModalOpen(false)}>Fechar</Button>
+            <Button type="button" variant="outline" onClick={() => setIsManageCategoriesModalOpen(false)}>Fechar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
