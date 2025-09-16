@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, DollarSign, ArrowUpCircle, ArrowDownCircle, Settings2, CalendarDays } from 'lucide-react';
+import { PlusCircle, DollarSign, ArrowUpCircle, ArrowDownCircle, Settings2, CalendarDays, CalendarIcon } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
@@ -17,11 +17,20 @@ import CategoryFormModal, { TransactionCategory } from '@/components/finance/Cat
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
-import { addDays, subDays, isWithinInterval, parseISO, isPast, isToday } from 'date-fns';
-import { format } from 'date-fns';
+import { addDays, subDays, isWithinInterval, parseISO, isPast, isToday, startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfDay, endOfDay, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import CashFlowChart from '@/components/finance/CashFlowChart'; // Importar o novo componente de gráfico
+import CashFlowChart from '@/components/finance/CashFlowChart';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 
 const formatCurrency = (value: number) => {
   return value.toLocaleString('pt-BR', {
@@ -32,7 +41,7 @@ const formatCurrency = (value: number) => {
 
 const Finance = () => {
   const { user } = useAuth();
-  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]); // Todas as transações
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<TransactionCategory[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -49,10 +58,48 @@ const Finance = () => {
   const [isCategoryAlertOpen, setIsCategoryAlertOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<TransactionCategory | null>(null);
   
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+  // Estados para os novos filtros
+  const [filterType, setFilterType] = useState<'month' | 'week' | 'day' | 'custom'>('month');
+  const [selectedFilterDate, setSelectedFilterDate] = useState<Date | undefined>(new Date());
+  const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
     to: new Date(),
   });
+
+  // Calcula o range de datas para o gráfico e histórico com base nos filtros
+  const { chartStartDate, chartEndDate } = useMemo(() => {
+    let start: Date;
+    let end: Date;
+
+    if (!selectedFilterDate && filterType !== 'custom') {
+      // Fallback para o mês atual se nenhuma data for selecionada para filtros não-customizados
+      start = startOfMonth(new Date());
+      end = endOfMonth(new Date());
+    } else {
+      switch (filterType) {
+        case 'month':
+          start = startOfMonth(selectedFilterDate || new Date());
+          end = endOfMonth(selectedFilterDate || new Date());
+          break;
+        case 'week':
+          start = startOfWeek(selectedFilterDate || new Date(), { locale: ptBR });
+          end = endOfWeek(selectedFilterDate || new Date(), { locale: ptBR });
+          break;
+        case 'day':
+          start = startOfDay(selectedFilterDate || new Date());
+          end = endOfDay(selectedFilterDate || new Date());
+          break;
+        case 'custom':
+          start = customDateRange?.from || startOfMonth(new Date());
+          end = customDateRange?.to || endOfMonth(new Date());
+          break;
+        default:
+          start = startOfMonth(new Date());
+          end = endOfMonth(new Date());
+      }
+    }
+    return { chartStartDate: start, chartEndDate: end };
+  }, [filterType, selectedFilterDate, customDateRange]);
 
   const fetchTransactions = useCallback(async () => {
     if (!user?.id) {
@@ -99,16 +146,12 @@ const Finance = () => {
     fetchCategories();
   }, [fetchTransactions, fetchCategories]);
 
-  const filteredTransactions = useMemo(() => {
-    if (!dateRange?.from || !dateRange?.to) {
-      return allTransactions;
-    }
+  const filteredTransactionsForHistory = useMemo(() => {
     return allTransactions.filter(transaction => {
       const transactionDate = parseISO(transaction.date);
-      // Inclui o dia 'to' completo
-      return isWithinInterval(transactionDate, { start: dateRange.from!, end: addDays(dateRange.to!, 1) });
+      return isWithinInterval(transactionDate, { start: chartStartDate, end: addDays(chartEndDate, 1) });
     });
-  }, [allTransactions, dateRange]);
+  }, [allTransactions, chartStartDate, chartEndDate]);
 
   const { pastTransactions, futureIncomes, futureExpenses } = useMemo(() => {
     const today = new Date();
@@ -125,11 +168,10 @@ const Finance = () => {
           futureInc.push(t);
         } else {
           futureExp.push(t);
-        }
       }
+    }
     });
 
-    // Ordenar futuras por data crescente
     futureInc.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
     futureExp.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
 
@@ -138,10 +180,12 @@ const Finance = () => {
 
   const kpiData = useMemo(() => {
     const totalIncome = pastTransactions
+      .filter(t => isWithinInterval(parseISO(t.date), { start: chartStartDate, end: addDays(chartEndDate, 1) }))
       .filter(t => t.type === 'income')
       .reduce((sum, t) => sum + t.amount, 0);
 
     const totalExpenses = pastTransactions
+      .filter(t => isWithinInterval(parseISO(t.date), { start: chartStartDate, end: addDays(chartEndDate, 1) }))
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0);
 
@@ -170,7 +214,7 @@ const Finance = () => {
         color: 'text-red-600',
       },
     ];
-  }, [pastTransactions]);
+  }, [pastTransactions, chartStartDate, chartEndDate]);
 
   const handleAddNewTransaction = () => {
     setSelectedTransaction(null);
@@ -278,9 +322,72 @@ const Finance = () => {
         </div>
       </div>
 
-      {/* Filtro de Período para KPIs e Histórico */}
-      <div className="flex justify-end">
-        <DateRangePicker date={dateRange} setDate={setDateRange} />
+      {/* Filtros de Período para o Gráfico e Histórico */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-end items-center">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">Visualizar por:</span>
+          <Select value={filterType} onValueChange={(value: 'month' | 'week' | 'day' | 'custom') => {
+            setFilterType(value);
+            if (value !== 'custom') {
+              setSelectedFilterDate(new Date()); // Resetar para a data atual ao mudar o tipo
+            }
+          }}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Tipo de Filtro" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="month">Mês</SelectItem>
+              <SelectItem value="week">Semana</SelectItem>
+              <SelectItem value="day">Dia</SelectItem>
+              <SelectItem value="custom">Período Personalizado</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {filterType !== 'custom' && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-700">Data:</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-[180px] justify-start text-left font-normal",
+                    !selectedFilterDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedFilterDate ? (
+                    filterType === 'month' ? format(selectedFilterDate, "MMMM yyyy", { locale: ptBR }) :
+                    filterType === 'week' ? `Semana de ${format(startOfWeek(selectedFilterDate, { locale: ptBR }), "dd/MM")}` :
+                    format(selectedFilterDate, "PPP", { locale: ptBR })
+                  ) : (
+                    <span>Selecione uma data</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={selectedFilterDate}
+                  onSelect={setSelectedFilterDate}
+                  initialFocus
+                  locale={ptBR}
+                  captionLayout={filterType === 'month' ? "dropdown-buttons" : "buttons"}
+                  fromYear={new Date().getFullYear() - 5}
+                  toYear={new Date().getFullYear() + 5}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        )}
+
+        {filterType === 'custom' && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-700">Período:</span>
+            <DateRangePicker date={customDateRange} setDate={setCustomDateRange} />
+          </div>
+        )}
       </div>
 
       {/* KPIs Principais */}
@@ -314,8 +421,10 @@ const Finance = () => {
             <Skeleton className="h-[300px] w-full" />
           ) : (
             <CashFlowChart
-              transactions={allTransactions} // Passa todas as transações para o gráfico
+              transactions={allTransactions}
               onTransactionClick={handleEditTransaction}
+              startDate={chartStartDate}
+              endDate={chartEndDate}
             />
           )}
         </CardContent>
@@ -460,7 +569,7 @@ const Finance = () => {
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
             </div>
-          ) : filteredTransactions.length > 0 ? (
+          ) : filteredTransactionsForHistory.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -473,7 +582,7 @@ const Finance = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredTransactions.map((transaction) => (
+                {filteredTransactionsForHistory.map((transaction) => (
                   <TableRow key={transaction.id}>
                     <TableCell>{format(parseISO(transaction.date), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
                     <TableCell>{transaction.description || '-'}</TableCell>

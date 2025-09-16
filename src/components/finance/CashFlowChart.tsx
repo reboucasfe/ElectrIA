@@ -4,13 +4,15 @@ import React, { useMemo } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceDot
 } from 'recharts';
-import { format, parseISO, eachDayOfInterval, startOfMonth, endOfMonth, addMonths, isSameDay, isPast, isToday } from 'date-fns';
+import { format, parseISO, eachDayOfInterval, startOfMonth, endOfMonth, addMonths, isSameDay, isPast, isToday, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Transaction } from '@/components/finance/TransactionFormModal';
 
 interface CashFlowChartProps {
   transactions: Transaction[];
   onTransactionClick: (transaction: Transaction) => void;
+  startDate: Date; // Nova prop
+  endDate: Date;   // Nova prop
 }
 
 const formatCurrency = (value: number) => {
@@ -20,22 +22,22 @@ const formatCurrency = (value: number) => {
   });
 };
 
-const CashFlowChart = ({ transactions, onTransactionClick }: CashFlowChartProps) => {
+const CashFlowChart = ({ transactions, onTransactionClick, startDate, endDate }: CashFlowChartProps) => {
 
   const chartData = useMemo(() => {
     if (!transactions || transactions.length === 0) {
-      return [];
+      // Se não houver transações, ainda queremos mostrar o período selecionado com saldo zero
+      const daysInInterval = eachDayOfInterval({ start: startDate, end: endDate });
+      return daysInInterval.map(day => ({
+        date: format(day, 'yyyy-MM-dd'), // Formato ISO para consistência interna
+        balance: 0,
+        transactions: [],
+      }));
     }
 
-    // Ordenar transações por data
     const sortedTransactions = [...transactions].sort((a, b) =>
       parseISO(a.date).getTime() - parseISO(b.date).getTime()
     );
-
-    // Determinar o intervalo de datas para o gráfico (últimos 3 meses + próximos 3 meses)
-    const today = new Date();
-    const startDate = startOfMonth(addMonths(today, -3));
-    const endDate = endOfMonth(addMonths(today, 3));
 
     const daysInInterval = eachDayOfInterval({ start: startDate, end: endDate });
 
@@ -62,21 +64,21 @@ const CashFlowChart = ({ transactions, onTransactionClick }: CashFlowChartProps)
 
       runningBalance += dailyBalanceChange;
       data.push({
-        date: format(day, 'dd/MM', { locale: ptBR }),
+        date: format(day, 'yyyy-MM-dd'), // Formato ISO para consistência interna
         balance: runningBalance,
         transactions: dailyTransactions,
       });
     });
 
     return data;
-  }, [transactions]);
+  }, [transactions, startDate, endDate]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const currentData = payload[0].payload;
       return (
         <div className="bg-white p-3 border rounded-md shadow-lg text-sm">
-          <p className="font-bold mb-1">{label}</p>
+          <p className="font-bold mb-1">{format(parseISO(label), 'PPP', { locale: ptBR })}</p>
           <p className="text-gray-700">Saldo: <span className="font-semibold">{formatCurrency(currentData.balance)}</span></p>
           {currentData.transactions.length > 0 && (
             <div className="mt-2 border-t pt-2">
@@ -97,9 +99,9 @@ const CashFlowChart = ({ transactions, onTransactionClick }: CashFlowChartProps)
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
     const today = new Date();
-    const dotDate = parseISO(payload.date.split('/').reverse().join('-') + `-${today.getFullYear()}`); // Reconstruct date for comparison
+    const dotDate = parseISO(payload.date);
 
-    let fillColor = '#8884d8'; // Default blue
+    let fillColor = '#2563EB'; // Default blue
     if (payload.transactions.length > 0) {
       const hasIncome = payload.transactions.some((t: Transaction) => t.type === 'income');
       const hasExpense = payload.transactions.some((t: Transaction) => t.type === 'expense');
@@ -109,7 +111,7 @@ const CashFlowChart = ({ transactions, onTransactionClick }: CashFlowChartProps)
     }
 
     if (isSameDay(dotDate, today)) {
-      fillColor = '#2563EB'; // Darker blue for today
+      fillColor = '#60A5FA'; // Lighter blue for today's dot
     }
 
     return (
@@ -122,14 +124,24 @@ const CashFlowChart = ({ transactions, onTransactionClick }: CashFlowChartProps)
         strokeWidth={1}
         onClick={() => {
           if (payload.transactions.length > 0) {
-            // Se houver múltiplas transações no dia, podemos abrir a primeira para edição
-            // Ou, idealmente, um modal que liste todas as transações do dia
             onTransactionClick(payload.transactions[0]);
           }
         }}
         style={{ cursor: payload.transactions.length > 0 ? 'pointer' : 'default' }}
       />
     );
+  };
+
+  const xAxisTickFormatter = (tick: string) => {
+    const diffDays = differenceInDays(endDate, startDate);
+    if (diffDays <= 7) { // Semana ou menos
+      return format(parseISO(tick), 'dd/MM', { locale: ptBR });
+    } else if (diffDays <= 31) { // Mês
+      return format(parseISO(tick), 'dd', { locale: ptBR });
+    } else if (diffDays <= 365) { // Ano
+      return format(parseISO(tick), 'MMM', { locale: ptBR });
+    }
+    return format(parseISO(tick), 'MMM/yy', { locale: ptBR });
   };
 
   return (
@@ -144,7 +156,11 @@ const CashFlowChart = ({ transactions, onTransactionClick }: CashFlowChartProps)
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
+        <XAxis
+          dataKey="date"
+          tickFormatter={xAxisTickFormatter}
+          minTickGap={20} // Ajuda a evitar sobreposição de rótulos
+        />
         <YAxis tickFormatter={formatCurrency} />
         <Tooltip content={<CustomTooltip />} />
         <Line
