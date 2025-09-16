@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, Users, ClipboardList, CheckCircle, Clock } from 'lucide-react';
+import { DollarSign, Users, ClipboardList, CheckCircle } from 'lucide-react'; // Removido Clock
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
@@ -99,21 +99,7 @@ const Dashboard = () => {
     const conversionRate = totalSentCount > 0 ? ((totalAcceptedCount / totalSentCount) * 100).toFixed(1) : "0.0";
     const averageProposalValue = totalSentCount > 0 ? totalSentValue / totalSentCount : 0;
 
-    let totalResponseTime = 0;
-    let responseTimeCount = 0;
-    acceptedProposals.forEach(p => {
-      if (p.sent_at && p.accepted_at) {
-        const sentDate = parseISO(p.sent_at);
-        const acceptedDate = parseISO(p.accepted_at);
-        const diffDays = differenceInDays(acceptedDate, sentDate);
-        if (diffDays >= 0) { // Only count if accepted after or on sent date
-          totalResponseTime += diffDays;
-          responseTimeCount++;
-        }
-      }
-    });
-    const averageResponseTime = responseTimeCount > 0 ? (totalResponseTime / responseTimeCount).toFixed(1) : "N/A";
-
+    // Removido o cálculo de totalResponseTime, responseTimeCount e averageResponseTime
 
     return [
       {
@@ -145,13 +131,7 @@ const Dashboard = () => {
         description: "Valor total / Qtd. propostas enviadas",
         action: null,
       },
-      {
-        title: "Tempo Médio de Resposta",
-        value: averageResponseTime !== "N/A" ? `${averageResponseTime} dias` : "N/A",
-        icon: Clock,
-        description: "Do envio à aceitação",
-        action: null,
-      },
+      // Removido o KPI de "Tempo Médio de Resposta"
     ];
   }, [filteredProposals, navigate]);
 
@@ -168,7 +148,7 @@ const Dashboard = () => {
       </div>
 
       {/* KPIs Principais */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"> {/* Ajustado grid-cols para 4 */}
         {kpiData.map((kpi, index) => (
           <Card
             key={index}
