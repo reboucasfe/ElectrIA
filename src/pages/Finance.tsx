@@ -168,8 +168,8 @@ const Finance = () => {
           futureInc.push(t);
         } else {
           futureExp.push(t);
+        }
       }
-    }
     });
 
     futureInc.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
