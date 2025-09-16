@@ -20,13 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, PlusCircle } from 'lucide-react'; // Importar PlusCircle
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
+import { TransactionCategory } from './CategoryFormModal'; // Importar TransactionCategory
 
 const transactionSchema = z.object({
   type: z.enum(['income', 'expense'], { required_error: "O tipo de transação é obrigatório." }),
@@ -54,9 +55,11 @@ interface TransactionFormModalProps {
   onClose: () => void;
   onSave: () => void;
   transaction?: Transaction | null;
+  availableCategories: TransactionCategory[]; // Recebe as categorias disponíveis
+  onOpenCategoryModal: (category?: TransactionCategory) => void; // Função para abrir o modal de categoria
 }
 
-const TransactionFormModal = ({ isOpen, onClose, onSave, transaction }: TransactionFormModalProps) => {
+const TransactionFormModal = ({ isOpen, onClose, onSave, transaction, availableCategories, onOpenCategoryModal }: TransactionFormModalProps) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -128,11 +131,8 @@ const TransactionFormModal = ({ isOpen, onClose, onSave, transaction }: Transact
     setLoading(false);
   };
 
-  const expenseCategories = ['Aluguel', 'Salários', 'Material Elétrico', 'Transporte', 'Marketing', 'Software', 'Outros'];
-  const incomeCategories = ['Serviços', 'Vendas', 'Consultoria', 'Reembolso', 'Outros'];
-
   const selectedType = watch('type');
-  const categories = selectedType === 'income' ? incomeCategories : expenseCategories;
+  const filteredCategories = availableCategories.filter(cat => cat.type === selectedType);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -151,7 +151,10 @@ const TransactionFormModal = ({ isOpen, onClose, onSave, transaction }: Transact
               control={control}
               render={({ field }) => (
                 <RadioGroup
-                  onValueChange={field.onChange}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    setValue('category', ''); // Limpa a categoria ao mudar o tipo
+                  }}
                   value={field.value}
                   className="flex gap-4"
                 >
@@ -177,22 +180,31 @@ const TransactionFormModal = ({ isOpen, onClose, onSave, transaction }: Transact
 
           <div className="space-y-2">
             <Label htmlFor="category">Categoria</Label>
-            <Controller
-              name="category"
-              control={control}
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <SelectTrigger id="category">
-                    <SelectValue placeholder="Selecione uma categoria" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
+            <div className="flex gap-2">
+              <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="category" className="flex-grow">
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredCategories.length === 0 ? (
+                        <SelectItem value="no-categories" disabled>Nenhuma categoria para este tipo.</SelectItem>
+                      ) : (
+                        filteredCategories.map((category) => (
+                          <SelectItem key={category.id} value={category.name}>{category.name}</SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <Button type="button" variant="outline" size="icon" onClick={() => onOpenCategoryModal()}>
+                <PlusCircle className="h-4 w-4" />
+              </Button>
+            </div>
             {errors.category && <p className="text-sm text-red-500">{errors.category.message}</p>}
           </div>
 

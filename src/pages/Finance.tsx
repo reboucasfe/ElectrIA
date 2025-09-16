@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, DollarSign, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { PlusCircle, DollarSign, ArrowUpCircle, ArrowDownCircle, Settings2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { showError, showSuccess } from '@/utils/toast';
 import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
 import TransactionFormModal, { Transaction } from '@/components/finance/TransactionFormModal';
+import CategoryFormModal, { TransactionCategory } from '@/components/finance/CategoryFormModal'; // Importar CategoryFormModal
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
@@ -30,11 +31,16 @@ const formatCurrency = (value: number) => {
 const Finance = () => {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [categories, setCategories] = useState<TransactionCategory[]>([]); // Novo estado para categorias
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false); // Novo estado para modal de categoria
+  const [selectedCategory, setSelectedCategory] = useState<TransactionCategory | null>(null); // Categoria selecionada para edição
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
+  const [isCategoryAlertOpen, setIsCategoryAlertOpen] = useState(false); // Novo estado para alert de categoria
+  const [categoryToDelete, setCategoryToDelete] = useState<TransactionCategory | null>(null); // Categoria a ser deletada
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
     to: new Date(),
@@ -68,9 +74,29 @@ const Finance = () => {
     setLoading(false);
   }, [user, dateRange]);
 
+  const fetchCategories = useCallback(async () => {
+    if (!user?.id) {
+      setCategories([]);
+      return;
+    }
+    const { data, error } = await supabase
+      .from('transaction_categories')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('name', { ascending: true });
+
+    if (error) {
+      showError(getTranslatedErrorMessage(error.message));
+      setCategories([]);
+    } else {
+      setCategories(data as TransactionCategory[]);
+    }
+  }, [user]);
+
   useEffect(() => {
     fetchTransactions();
-  }, [fetchTransactions]);
+    fetchCategories();
+  }, [fetchTransactions, fetchCategories]);
 
   const kpiData = useMemo(() => {
     const totalIncome = transactions
@@ -108,22 +134,22 @@ const Finance = () => {
     ];
   }, [transactions]);
 
-  const handleAddNew = () => {
+  const handleAddNewTransaction = () => {
     setSelectedTransaction(null);
-    setIsModalOpen(true);
+    setIsTransactionModalOpen(true);
   };
 
-  const handleEdit = (transaction: Transaction) => {
+  const handleEditTransaction = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
-    setIsModalOpen(true);
+    setIsTransactionModalOpen(true);
   };
 
-  const handleDeleteClick = (transaction: Transaction) => {
+  const handleDeleteTransactionClick = (transaction: Transaction) => {
     setTransactionToDelete(transaction);
     setIsAlertOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteTransactionConfirm = async () => {
     if (!transactionToDelete) return;
 
     const { error } = await supabase.from('transactions').delete().eq('id', transactionToDelete.id);
@@ -138,6 +164,52 @@ const Finance = () => {
     setTransactionToDelete(null);
   };
 
+  const handleOpenCategoryModal = (category?: TransactionCategory) => {
+    setSelectedCategory(category || null);
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleDeleteCategoryClick = (category: TransactionCategory) => {
+    setCategoryToDelete(category);
+    setIsCategoryAlertOpen(true);
+  };
+
+  const handleDeleteCategoryConfirm = async () => {
+    if (!categoryToDelete) return;
+
+    // Check if there are any transactions associated with this category
+    const { count, error: countError } = await supabase
+      .from('transactions')
+      .select('id', { count: 'exact' })
+      .eq('category', categoryToDelete.name)
+      .eq('user_id', user?.id);
+
+    if (countError) {
+      showError(getTranslatedErrorMessage(countError.message));
+      setIsCategoryAlertOpen(false);
+      setCategoryToDelete(null);
+      return;
+    }
+
+    if (count && count > 0) {
+      showError(`Não é possível excluir a categoria "${categoryToDelete.name}" porque existem ${count} transações associadas a ela. Por favor, edite ou exclua as transações primeiro.`);
+      setIsCategoryAlertOpen(false);
+      setCategoryToDelete(null);
+      return;
+    }
+
+    const { error } = await supabase.from('transaction_categories').delete().eq('id', categoryToDelete.id);
+
+    if (error) {
+      showError(getTranslatedErrorMessage(error.message));
+    } else {
+      showSuccess('Categoria excluída com sucesso!');
+      fetchCategories();
+    }
+    setIsCategoryAlertOpen(false);
+    setCategoryToDelete(null);
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -145,9 +217,14 @@ const Finance = () => {
           <h1 className="text-3xl font-bold">Finanças</h1>
           <p className="text-gray-500">Controle suas entradas e saídas.</p>
         </div>
-        <Button onClick={handleAddNew} className="bg-blue-600 hover:bg-blue-700">
-          <PlusCircle className="mr-2 h-4 w-4" /> Nova Transação
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => handleOpenCategoryModal()} variant="outline">
+            <Settings2 className="mr-2 h-4 w-4" /> Gerenciar Categorias
+          </Button>
+          <Button onClick={handleAddNewTransaction} className="bg-blue-600 hover:bg-blue-700">
+            <PlusCircle className="mr-2 h-4 w-4" /> Nova Transação
+          </Button>
+        </div>
       </div>
 
       {/* Filtro de Período */}
@@ -227,10 +304,10 @@ const Finance = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(transaction)}>
+                          <DropdownMenuItem onClick={() => handleEditTransaction(transaction)}>
                             <Edit className="mr-2 h-4 w-4" /> Editar
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDeleteClick(transaction)} className="text-red-600">
+                          <DropdownMenuItem onClick={() => handleDeleteTransactionClick(transaction)} className="text-red-600">
                             <Trash2 className="mr-2 h-4 w-4" /> Excluir
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -244,7 +321,7 @@ const Finance = () => {
             <div className="text-center py-12">
               <h3 className="text-lg font-semibold">Nenhuma transação registrada</h3>
               <p className="text-sm text-gray-500 mt-1">Comece adicionando sua primeira entrada ou despesa.</p>
-              <Button className="mt-4 bg-blue-600 hover:bg-blue-700" onClick={handleAddNew}>
+              <Button className="mt-4 bg-blue-600 hover:bg-blue-700" onClick={handleAddNewTransaction}>
                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Transação
               </Button>
             </div>
@@ -254,10 +331,19 @@ const Finance = () => {
 
       {/* Modais */}
       <TransactionFormModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isTransactionModalOpen}
+        onClose={() => setIsTransactionModalOpen(false)}
         onSave={fetchTransactions}
         transaction={selectedTransaction}
+        availableCategories={categories} // Passa as categorias disponíveis
+        onOpenCategoryModal={handleOpenCategoryModal} // Passa a função para abrir o modal de categoria
+      />
+
+      <CategoryFormModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        onSave={fetchCategories}
+        category={selectedCategory}
       />
 
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
@@ -270,12 +356,90 @@ const Finance = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction onClick={handleDeleteTransactionConfirm} className="bg-red-600 hover:bg-red-700">
               Sim, excluir
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Alert para exclusão de categoria */}
+      <AlertDialog open={isCategoryAlertOpen} onOpenChange={setIsCategoryAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Você tem certeza que deseja excluir esta categoria?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. A categoria "{categoryToDelete?.name}" será excluída.
+              Se houver transações associadas a esta categoria, a exclusão não será permitida.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteCategoryConfirm} className="bg-red-600 hover:bg-red-700">
+              Sim, excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Modal de Gerenciamento de Categorias (para listar e editar) */}
+      <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Gerenciar Categorias</DialogTitle>
+            <DialogDescription>
+              Adicione, edite ou exclua suas categorias de transações.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <Button onClick={() => handleOpenCategoryModal()} className="w-full bg-blue-600 hover:bg-blue-700">
+              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Nova Categoria
+            </Button>
+            {categories.length === 0 ? (
+              <p className="text-center text-gray-500">Nenhuma categoria cadastrada.</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {categories.map((cat) => (
+                    <TableRow key={cat.id}>
+                      <TableCell className="font-medium">{cat.name}</TableCell>
+                      <TableCell>{cat.type === 'income' ? 'Receita' : 'Despesa'}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Abrir menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleOpenCategoryModal(cat)}>
+                              <Edit className="mr-2 h-4 w-4" /> Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDeleteCategoryClick(cat)} className="text-red-600">
+                              <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setIsCategoryModalOpen(false)}>Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
