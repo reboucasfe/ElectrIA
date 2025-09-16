@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, DollarSign, ArrowUpCircle, ArrowDownCircle, Settings2 } from 'lucide-react';
+import { PlusCircle, DollarSign, ArrowUpCircle, ArrowDownCircle, Settings2, CalendarDays } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
@@ -17,10 +17,11 @@ import CategoryFormModal, { TransactionCategory } from '@/components/finance/Cat
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { DateRange } from 'react-day-picker';
-import { addDays, subDays, isWithinInterval, parseISO } from 'date-fns';
+import { addDays, subDays, isWithinInterval, parseISO, isPast, isToday } from 'date-fns';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import CashFlowChart from '@/components/finance/CashFlowChart'; // Importar o novo componente de gráfico
 
 const formatCurrency = (value: number) => {
   return value.toLocaleString('pt-BR', {
@@ -31,15 +32,15 @@ const formatCurrency = (value: number) => {
 
 const Finance = () => {
   const { user } = useAuth();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]); // Todas as transações
   const [categories, setCategories] = useState<TransactionCategory[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   
-  const [isManageCategoriesModalOpen, setIsManageCategoriesModalOpen] = useState(false); // Modal para listar e gerenciar categorias
-  const [isCategoryFormModalOpen, setIsCategoryFormModalOpen] = useState(false); // Modal para adicionar/editar uma categoria
+  const [isManageCategoriesModalOpen, setIsManageCategoriesModalOpen] = useState(false);
+  const [isCategoryFormModalOpen, setIsCategoryFormModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<TransactionCategory | null>(null);
   
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -59,27 +60,20 @@ const Finance = () => {
       return;
     }
     setLoading(true);
-    let query = supabase
+    const { data, error } = await supabase
       .from('transactions')
       .select('*')
       .eq('user_id', user.id)
       .order('date', { ascending: false });
 
-    if (dateRange?.from && dateRange?.to) {
-      query = query.gte('date', format(dateRange.from, 'yyyy-MM-dd'));
-      query = query.lte('date', format(addDays(dateRange.to, 1), 'yyyy-MM-dd'));
-    }
-
-    const { data, error } = await query;
-
     if (error) {
       showError(getTranslatedErrorMessage(error.message));
-      setTransactions([]);
+      setAllTransactions([]);
     } else {
-      setTransactions(data as Transaction[]);
+      setAllTransactions(data as Transaction[]);
     }
     setLoading(false);
-  }, [user, dateRange]);
+  }, [user]);
 
   const fetchCategories = useCallback(async () => {
     if (!user?.id) {
@@ -105,12 +99,49 @@ const Finance = () => {
     fetchCategories();
   }, [fetchTransactions, fetchCategories]);
 
+  const filteredTransactions = useMemo(() => {
+    if (!dateRange?.from || !dateRange?.to) {
+      return allTransactions;
+    }
+    return allTransactions.filter(transaction => {
+      const transactionDate = parseISO(transaction.date);
+      // Inclui o dia 'to' completo
+      return isWithinInterval(transactionDate, { start: dateRange.from!, end: addDays(dateRange.to!, 1) });
+    });
+  }, [allTransactions, dateRange]);
+
+  const { pastTransactions, futureIncomes, futureExpenses } = useMemo(() => {
+    const today = new Date();
+    const past: Transaction[] = [];
+    const futureInc: Transaction[] = [];
+    const futureExp: Transaction[] = [];
+
+    allTransactions.forEach(t => {
+      const transactionDate = parseISO(t.date);
+      if (isPast(transactionDate) || isToday(transactionDate)) {
+        past.push(t);
+      } else {
+        if (t.type === 'income') {
+          futureInc.push(t);
+        } else {
+          futureExp.push(t);
+        }
+      }
+    });
+
+    // Ordenar futuras por data crescente
+    futureInc.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
+    futureExp.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
+
+    return { pastTransactions: past, futureIncomes: futureInc, futureExpenses: futureExp };
+  }, [allTransactions]);
+
   const kpiData = useMemo(() => {
-    const totalIncome = transactions
+    const totalIncome = pastTransactions
       .filter(t => t.type === 'income')
       .reduce((sum, t) => sum + t.amount, 0);
 
-    const totalExpenses = transactions
+    const totalExpenses = pastTransactions
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + t.amount, 0);
 
@@ -121,25 +152,25 @@ const Finance = () => {
         title: "Saldo Atual",
         value: formatCurrency(balance),
         icon: DollarSign,
-        description: "Total de receitas - Total de despesas",
+        description: "Total de receitas - Total de despesas (passadas)",
         color: balance >= 0 ? 'text-green-600' : 'text-red-600',
       },
       {
         title: "Total de Receitas",
         value: formatCurrency(totalIncome),
         icon: ArrowUpCircle,
-        description: "Entradas no período",
+        description: "Entradas no período (passadas)",
         color: 'text-green-600',
       },
       {
         title: "Total de Despesas",
         value: formatCurrency(totalExpenses),
         icon: ArrowDownCircle,
-        description: "Saídas no período",
+        description: "Saídas no período (passadas)",
         color: 'text-red-600',
       },
     ];
-  }, [transactions]);
+  }, [pastTransactions]);
 
   const handleAddNewTransaction = () => {
     setSelectedTransaction(null);
@@ -171,7 +202,6 @@ const Finance = () => {
     setTransactionToDelete(null);
   };
 
-  // Funções para o modal de CATEGORIAS
   const handleOpenManageCategoriesModal = () => {
     setIsManageCategoriesModalOpen(true);
   };
@@ -187,8 +217,8 @@ const Finance = () => {
   };
 
   const handleCategorySaved = () => {
-    fetchCategories(); // Atualiza a lista de categorias
-    handleCloseCategoryFormModal(); // Fecha o modal de formulário
+    fetchCategories();
+    handleCloseCategoryFormModal();
   };
 
   const handleDeleteCategoryClick = (category: TransactionCategory) => {
@@ -248,7 +278,7 @@ const Finance = () => {
         </div>
       </div>
 
-      {/* Filtro de Período */}
+      {/* Filtro de Período para KPIs e Histórico */}
       <div className="flex justify-end">
         <DateRangePicker date={dateRange} setDate={setDateRange} />
       </div>
@@ -273,11 +303,155 @@ const Finance = () => {
         ))}
       </div>
 
-      {/* Seção de Transações */}
+      {/* Gráfico de Fluxo de Caixa */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Fluxo de Caixa Projetado</CardTitle>
+          <CardDescription>Visualize o saldo da sua conta ao longo do tempo, incluindo transações futuras.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <Skeleton className="h-[300px] w-full" />
+          ) : (
+            <CashFlowChart
+              transactions={allTransactions} // Passa todas as transações para o gráfico
+              onTransactionClick={handleEditTransaction}
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Seção de Contas a Receber */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Contas a Receber</CardTitle>
+          <CardDescription>Receitas futuras agendadas.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : futureIncomes.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Descrição</TableHead>
+                  <TableHead>Categoria</TableHead>
+                  <TableHead className="text-right">Valor</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {futureIncomes.map((transaction) => (
+                  <TableRow key={transaction.id}>
+                    <TableCell className="font-medium">{format(parseISO(transaction.date), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
+                    <TableCell>{transaction.description || '-'}</TableCell>
+                    <TableCell>{transaction.category || '-'}</TableCell>
+                    <TableCell className="text-right font-medium text-green-600">
+                      {formatCurrency(transaction.amount)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Abrir menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEditTransaction(transaction)}>
+                            <Edit className="mr-2 h-4 w-4" /> Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDeleteTransactionClick(transaction)} className="text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <CalendarDays className="mx-auto h-12 w-12 mb-3 text-gray-400" />
+              <p>Nenhuma conta a receber agendada.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Seção de Contas a Pagar */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Contas a Pagar</CardTitle>
+          <CardDescription>Despesas futuras agendadas.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : futureExpenses.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Descrição</TableHead>
+                  <TableHead>Categoria</TableHead>
+                  <TableHead className="text-right">Valor</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {futureExpenses.map((transaction) => (
+                  <TableRow key={transaction.id}>
+                    <TableCell className="font-medium">{format(parseISO(transaction.date), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
+                    <TableCell>{transaction.description || '-'}</TableCell>
+                    <TableCell>{transaction.category || '-'}</TableCell>
+                    <TableCell className="text-right font-medium text-red-600">
+                      {formatCurrency(transaction.amount)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Abrir menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEditTransaction(transaction)}>
+                            <Edit className="mr-2 h-4 w-4" /> Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDeleteTransactionClick(transaction)} className="text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <CalendarDays className="mx-auto h-12 w-12 mb-3 text-gray-400" />
+              <p>Nenhuma conta a pagar agendada.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Seção de Histórico de Transações (Passadas) */}
       <Card>
         <CardHeader>
           <CardTitle>Histórico de Transações</CardTitle>
-          <CardDescription>Todas as suas entradas e saídas registradas.</CardDescription>
+          <CardDescription>Todas as suas entradas e saídas registradas no período selecionado.</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -286,7 +460,7 @@ const Finance = () => {
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
             </div>
-          ) : transactions.length > 0 ? (
+          ) : filteredTransactions.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -299,7 +473,7 @@ const Finance = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((transaction) => (
+                {filteredTransactions.map((transaction) => (
                   <TableRow key={transaction.id}>
                     <TableCell>{format(parseISO(transaction.date), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
                     <TableCell>{transaction.description || '-'}</TableCell>
@@ -357,7 +531,7 @@ const Finance = () => {
         onSave={fetchTransactions}
         transaction={selectedTransaction}
         availableCategories={categories}
-        onOpenCategoryModal={handleOpenCategoryFormModal} // Passa a função para abrir o modal de formulário de categoria
+        onOpenCategoryModal={handleOpenCategoryFormModal}
       />
 
       <CategoryFormModal
