@@ -191,6 +191,9 @@ const Finance = () => {
 
     const balance = totalIncome - totalExpenses;
 
+    const totalFutureIncome = futureIncomes.reduce((sum, t) => sum + t.amount, 0);
+    const totalFutureExpenses = futureExpenses.reduce((sum, t) => sum + t.amount, 0);
+
     return [
       {
         title: "Saldo Atual",
@@ -213,8 +216,22 @@ const Finance = () => {
         description: "Saídas no período (passadas)",
         color: 'text-red-600',
       },
+      {
+        title: "Receita Futura",
+        value: formatCurrency(totalFutureIncome),
+        icon: ArrowUpCircle,
+        description: "Receitas agendadas",
+        color: 'text-green-600',
+      },
+      {
+        title: "Despesa Futura",
+        value: formatCurrency(totalFutureExpenses),
+        icon: ArrowDownCircle,
+        description: "Despesas agendadas",
+        color: 'text-red-600',
+      },
     ];
-  }, [pastTransactions, chartStartDate, chartEndDate]);
+  }, [pastTransactions, futureIncomes, futureExpenses, chartStartDate, chartEndDate]);
 
   const handleAddNewTransaction = () => {
     setSelectedTransaction(null);
@@ -391,7 +408,7 @@ const Finance = () => {
       </div>
 
       {/* KPIs Principais */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
         {kpiData.map((kpi, index) => (
           <Card key={index} className="flex flex-col">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
