@@ -20,6 +20,7 @@ import { DateRange } from 'react-day-picker';
 import { addDays, subDays, isWithinInterval, parseISO } from 'date-fns';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'; // Importação adicionada
 
 const formatCurrency = (value: number) => {
   return value.toLocaleString('pt-BR', {
