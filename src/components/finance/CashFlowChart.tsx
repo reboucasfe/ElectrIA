@@ -99,7 +99,7 @@ const CashFlowChart = ({ transactions, onTransactionClick, startDate, endDate }:
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
     const today = new Date();
-    const dotDate = parseISO(payload.date);
+    const dotDate = parseISO(payload.date); // CORREÇÃO: Usar diretamente payload.date que já está em 'yyyy-MM-dd'
 
     let fillColor = '#2563EB'; // Default blue
     if (payload.transactions.length > 0) {
