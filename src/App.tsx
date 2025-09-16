@@ -32,6 +32,7 @@ import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Services from "./pages/Services";
 import ProposalsKanbanView from "./components/proposals/ProposalsKanbanView"; // Importar o novo componente Kanban
+import Finance from "./pages/Finance"; // Importar a nova página de Finanças
 
 const queryClient = new QueryClient();
 
@@ -117,7 +118,8 @@ const App = () => {
                 <Route path="/proposals/edit/:id" element={<ProposalFormPage />} />
                 <Route path="/proposals/in-progress" element={<ProposalsInProgress />} />
                 <Route path="/proposals/closed" element={<ProposalsClosed />} />
-                <Route path="/proposals/kanban" element={<ProposalsKanbanView />} /> {/* Nova rota para o Kanban */}
+                <Route path="/proposals/kanban" element={<ProposalsKanbanView />} />
+                <Route path="/finance" element={<Finance />} /> {/* Nova rota para Finanças */}
               </Route>
             </Route>
 

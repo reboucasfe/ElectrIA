@@ -1,12 +1,13 @@
 import { NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, User, Settings, Zap, Crown, FileText, Wrench } from 'lucide-react';
+import { LayoutDashboard, User, Settings, Zap, Crown, FileText, Wrench, DollarSign } from 'lucide-react'; // Importar DollarSign
 import { cn } from '@/lib/utils';
 
 const MobileSidebar = () => {
   const navItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { href: '/proposals-overview', icon: FileText, label: 'Propostas' }, // Link atualizado
+    { href: '/proposals-overview', icon: FileText, label: 'Propostas' },
     { href: '/services', icon: Wrench, label: 'Serviços' },
+    { href: '/finance', icon: DollarSign, label: 'Finanças' }, // Novo item de navegação
     { href: '/profile', icon: User, label: 'Perfil' },
     { href: '/upgrade', icon: Crown, label: 'Upgrade Plano' },
     { href: '/settings', icon: Settings, label: 'Configurações' },
