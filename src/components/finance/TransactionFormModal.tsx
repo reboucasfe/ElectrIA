@@ -60,7 +60,7 @@ const TransactionFormModal = ({ isOpen, onClose, onSave, transaction }: Transact
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, control, reset, setValue, formState: { errors } } = useForm<TransactionFormValues>({
+  const { register, handleSubmit, control, reset, setValue, watch, formState: { errors } } = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       type: 'expense',
