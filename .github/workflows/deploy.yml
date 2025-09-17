@@ -14,21 +14,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          submodules: false # Ignora explicitamente os submódulos
+          path: source-code # Baixa o código para um diretório específico
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Use uma versão LTS do Node.js
+          node-version: '18'
 
       - name: Install dependencies
+        working-directory: ./source-code # Executa os comandos dentro do novo diretório
         run: npm install
 
       - name: Build
+        working-directory: ./source-code # Executa o build dentro do novo diretório
         run: npm run build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./source-code/dist # Aponta para o diretório de build correto
