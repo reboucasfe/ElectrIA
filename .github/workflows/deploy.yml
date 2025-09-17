@@ -3,18 +3,16 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main # Ou a branch que você usa como principal
+      - main
 
 jobs:
   build-and-deploy:
     permissions:
-      contents: write # Adiciona permissão de escrita para o GITHUB_TOKEN
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          path: source-code # Baixa o código para um diretório específico
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -22,15 +20,13 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        working-directory: ./source-code # Executa os comandos dentro do novo diretório
         run: npm install
 
       - name: Build
-        working-directory: ./source-code # Executa o build dentro do novo diretório
         run: npm run build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./source-code/dist # Aponta para o diretório de build correto
+          publish_dir: ./dist
