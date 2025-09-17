@@ -15,4 +15,7 @@ export default defineConfig(() => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    outDir: '.', // Define a pasta de saída da build para a raiz do projeto
+  },
 }));
