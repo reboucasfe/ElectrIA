@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 export default defineConfig(() => ({
-  base: '/ElectrIA/', // <--- ATENÇÃO: Substitua 'ElectrIA' pelo nome EXATO do seu repositório GitHub (com maiúsculas/minúsculas corretas)
+  base: '/ElectrIA/', // <--- CONFIRMADO: Este deve ser o nome EXATO do seu repositório GitHub
   server: {
     host: "::",
     port: 8080,
