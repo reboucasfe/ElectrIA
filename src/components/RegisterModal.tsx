@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/select";
 import { Eye, EyeOff } from 'lucide-react';
 import InputMask from 'react-input-mask';
-import { getTranslatedErrorMessage } from '@/utils/errorTranslations'; // Importação adicionada
+import { getTranslatedErrorMessage } from '@/utils/errorTranslations';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'; // Importar Dialog components
 
 const registerFormSchema = z.object({
   fullName: z.string().min(1, { message: "Nome completo é obrigatório." }),
@@ -115,7 +116,7 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, 
     });
 
     if (error) {
-      showError(getTranslatedErrorMessage(error.message)); // Usando a função de tradução
+      showError(getTranslatedErrorMessage(error.message));
     } else {
       showSuccess('Cadastro realizado com sucesso! Redirecionando para o pagamento...');
       reset();
@@ -131,30 +132,15 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, 
     setLoading(false);
   };
 
-  const handleOverlayMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm animate-in fade-in-0"
-      onMouseDown={handleOverlayMouseDown}
-    >
-      <div
-        className="w-full max-w-md p-6 bg-white rounded-lg shadow-xl"
-      >
-        <div className="text-center">
-          <h2 className="text-2xl font-bold">Criar conta</h2>
-          <p className="text-sm text-muted-foreground mt-2">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto"> {/* Adicionado max-h e overflow-y para rolagem em telas pequenas */}
+        <DialogHeader>
+          <DialogTitle className="text-2xl text-center">Criar conta</DialogTitle>
+          <DialogDescription className="text-center">
             Você está muito perto de dar um passo importante na profissionalização dos seus serviços. Não deixe para depois!
-          </p>
-        </div>
+          </DialogDescription>
+        </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
           <div className="grid gap-2">
             <Label htmlFor="fullName">Nome Completo</Label>
@@ -287,7 +273,7 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, 
             <Checkbox
               id="hasCoupon"
               checked={hasCouponValue}
-              onCheckedChange={(checked) => setValue('hasCoupon', checked)}
+              onCheckedChange={(checked) => setValue('hasCoupon', checked as boolean)}
             />
             <Label htmlFor="hasCoupon" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Tenho um cupom
@@ -326,18 +312,20 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, 
             </div>
           </div>
 
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
-            {loading ? 'Criando Conta...' : 'Criar Conta'}
-          </Button>
+          <DialogFooter className="flex flex-col gap-4 pt-4">
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
+              {loading ? 'Criando Conta...' : 'Criar Conta'}
+            </Button>
+            <div className="mt-4 text-center text-sm">
+              Já tem cadastro?{' '}
+              <Link to="#" onClick={() => { onClose(); onOpenLoginModal(); }} className="underline text-blue-600 hover:text-blue-700">
+                Entre com sua conta
+              </Link>
+            </div>
+          </DialogFooter>
         </form>
-        <div className="mt-4 text-center text-sm">
-          Já tem cadastro?{' '}
-          <Link to="#" onClick={() => { onClose(); onOpenLoginModal(); }} className="underline text-blue-600 hover:text-blue-700">
-            Entre com sua conta
-          </Link>
-        </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
