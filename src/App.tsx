@@ -86,7 +86,7 @@ const App = () => {
   return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BrowserRouter>
+      <BrowserRouter basename="/eletricia"> {/* <--- ATENÇÃO: Substitua 'eletricia' pelo nome do seu repositório GitHub */}
         <AuthProvider>
           <Toaster />
           <Sonner />
