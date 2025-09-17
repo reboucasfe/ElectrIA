@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -66,6 +66,14 @@ const App = () => {
   const [selectedBillingCycleForRegister, setSelectedBillingCycleForRegister] = useState<'monthly' | 'annual' | undefined>(undefined);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
+  useEffect(() => {
+    const redirect = sessionStorage.redirect;
+    delete sessionStorage.redirect;
+    if (redirect && redirect !== location.pathname) {
+      history.replaceState(null, '', redirect);
+    }
+  }, []);
+
   const handleOpenRegisterModal = (planId?: string, billingCycle?: 'monthly' | 'annual') => {
     console.log("App.tsx: handleOpenRegisterModal received planId:", planId, "and billingCycle:", billingCycle);
     setIsLoginModalOpen(false);
@@ -86,7 +94,7 @@ const App = () => {
   return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <AuthProvider>
           <Toaster />
           <Sonner />
