@@ -268,7 +268,7 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
                   <CardTitle className="text-xl font-semibold">Templates de Proposta</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 text-center">
-                  <p className className="text-gray-600">Use nossos templates ou crie os seus com sua marca.</p>
+                  <p className="text-gray-600">Use nossos templates ou crie os seus com sua marca.</p>
                 </CardContent>
               </Card>
               <Card className="p-6 shadow-md border border-transparent hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
