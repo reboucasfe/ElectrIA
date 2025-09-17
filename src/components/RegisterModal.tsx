@@ -134,66 +134,67 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto"> {/* Adicionado max-h e overflow-y para rolagem em telas pequenas */}
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[425px] flex flex-col max-h-[90vh] p-0"> {/* Adicionado flex flex-col e p-0 */}
+        <DialogHeader className="p-6 pb-4"> {/* Adicionado padding ao cabeçalho */}
           <DialogTitle className="text-2xl text-center">Criar conta</DialogTitle>
           <DialogDescription className="text-center">
             Você está muito perto de dar um passo importante na profissionalização dos seus serviços. Não deixe para depois!
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="fullName">Nome Completo</Label>
-            <Input
-              id="fullName"
-              placeholder="Seu Nome Completo"
-              {...register('fullName')}
-            />
-            {errors.fullName && <p className="text-sm text-red-500">{errors.fullName.message}</p>}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="companyName">Nome da sua Empresa (opcional)</Label>
-            <Input
-              id="companyName"
-              placeholder="Nome da Empresa"
-              {...register('companyName')}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              {...register('email')}
-            />
-            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="whatsapp">WhatsApp</Label>
-            <Controller
-              name="whatsapp"
-              control={control}
-              render={({ field }) => (
-                <InputMask
-                  mask="(99) 9.9999-9999"
-                  maskChar="_"
-                  value={field.value}
-                  onChange={(e) => {
-                    field.onChange(e.target.value.replace(/\D/g, ''));
-                  }}
-                  onBlur={field.onBlur}
-                >
-                  {(inputProps: any) => (
-                    <Input
-                      {...inputProps}
-                      id="whatsapp"
-                      type="tel"
-                      placeholder="(XX) X.XXXX-XXXX"
-                      className={errors.whatsapp ? "border-red-500" : ""}
-                    />
-                  )}
-                </InputMask>
+        <div className="flex-1 overflow-y-auto px-6"> {/* Esta div será a área de rolagem */}
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-0 space-y-4"> {/* Removido mt-6, adicionado mt-0 */}
+            <div className="grid gap-2">
+              <Label htmlFor="fullName">Nome Completo</Label>
+              <Input
+                id="fullName"
+                placeholder="Seu Nome Completo"
+                {...register('fullName')}
+              />
+              {errors.fullName && <p className="text-sm text-red-500">{errors.fullName.message}</p>}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="companyName">Nome da sua Empresa (opcional)</Label>
+              <Input
+                id="companyName"
+                placeholder="Nome da Empresa"
+                {...register('companyName')}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                {...register('email')}
+              />
+              {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="whatsapp">WhatsApp</Label>
+              <Controller
+                name="whatsapp"
+                control={control}
+                render={({ field }) => (
+                  <InputMask
+                    mask="(99) 9.9999-9999"
+                    maskChar="_"
+                    value={field.value}
+                    onChange={(e) => {
+                      field.onChange(e.target.value.replace(/\D/g, ''));
+                    }}
+                    onBlur={field.onBlur}
+                  >
+                    {(inputProps: any) => (
+                      <Input
+                        {...inputProps}
+                        id="whatsapp"
+                        type="tel"
+                        placeholder="(XX) X.XXXX-XXXX"
+                        className={errors.whatsapp ? "border-red-500" : ""}
+                      />
+                    )}
+                  </InputMask>
               )}
             />
             {errors.whatsapp && <p className="text-sm text-red-500">{errors.whatsapp.message}</p>}
@@ -311,19 +312,19 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, 
               {errors.termsAccepted && <p className="text-sm text-red-500">{errors.termsAccepted.message}</p>}
             </div>
           </div>
-
-          <DialogFooter className="flex flex-col gap-4 pt-4">
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
-              {loading ? 'Criando Conta...' : 'Criar Conta'}
-            </Button>
-            <div className="mt-4 text-center text-sm">
-              Já tem cadastro?{' '}
-              <Link to="#" onClick={() => { onClose(); onOpenLoginModal(); }} className="underline text-blue-600 hover:text-blue-700">
-                Entre com sua conta
-              </Link>
-            </div>
-          </DialogFooter>
-        </form>
+          </form>
+        </div>
+        <DialogFooter className="flex flex-col gap-4 pt-4 px-6"> {/* Adicionado padding horizontal ao rodapé */}
+          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
+            {loading ? 'Criando Conta...' : 'Criar Conta'}
+          </Button>
+          <div className="mt-4 text-center text-sm">
+            Já tem cadastro?{' '}
+            <Link to="#" onClick={() => { onClose(); onOpenLoginModal(); }} className="underline text-blue-600 hover:text-blue-700">
+              Entre com sua conta
+            </Link>
+          </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
