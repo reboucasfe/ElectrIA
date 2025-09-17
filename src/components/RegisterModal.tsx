@@ -134,15 +134,15 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] flex flex-col max-h-[90vh] p-0"> {/* Adicionado flex flex-col e p-0 */}
-        <DialogHeader className="p-6 pb-4"> {/* Adicionado padding ao cabeçalho */}
+      <DialogContent className="sm:max-w-[425px] flex flex-col max-h-[90vh] h-full p-0 overflow-hidden"> {/* Adicionado h-full e overflow-hidden */}
+        <DialogHeader className="p-6 pb-4 shrink-0"> {/* Adicionado shrink-0 */}
           <DialogTitle className="text-2xl text-center">Criar conta</DialogTitle>
           <DialogDescription className="text-center">
             Você está muito perto de dar um passo importante na profissionalização dos seus serviços. Não deixe para depois!
           </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto px-6"> {/* Esta div será a área de rolagem */}
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-0 space-y-4"> {/* Removido mt-6, adicionado mt-0 */}
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-0 space-y-4">
             <div className="grid gap-2">
               <Label htmlFor="fullName">Nome Completo</Label>
               <Input
@@ -314,7 +314,7 @@ const RegisterModal = ({ isOpen, onClose, selectedPlanId, selectedBillingCycle, 
           </div>
           </form>
         </div>
-        <DialogFooter className="flex flex-col gap-4 pt-4 px-6"> {/* Adicionado padding horizontal ao rodapé */}
+        <DialogFooter className="flex flex-col gap-4 pt-4 px-6 shrink-0"> {/* Adicionado shrink-0 */}
           <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
             {loading ? 'Criando Conta...' : 'Criar Conta'}
           </Button>
