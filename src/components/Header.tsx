@@ -2,11 +2,11 @@
 
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Zap, Menu } from 'lucide-react'; // Importar Menu
+import { Zap, Menu } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMemo, useState } from 'react'; // Importar useState
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'; // Importar Sheet components
-import { cn } from '@/lib/utils'; // Importar cn para classes condicionais
+import { useMemo, useState } from 'react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   onOpenRegisterModal?: (planId?: string, billingCycle?: 'monthly' | 'annual') => void;
@@ -17,12 +17,15 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Estado para controlar o menu mobile
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Verifica explicitamente se o usuário está logado usando user.id
+  const isUserLoggedIn = !!user?.id;
   const isPaid = useMemo(() => user?.user_metadata?.payment_status === 'paid', [user]);
 
   const handleSignOut = async () => {
     await signOut();
+    setIsMobileMenuOpen(false); // Fechar menu mobile ao sair
     if (location.pathname === '/payment') {
       navigate('/');
     } else {
@@ -31,7 +34,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
   };
 
   const handleStartNowClick = () => {
-    setIsMobileMenuOpen(false); // Fechar menu mobile ao clicar
+    setIsMobileMenuOpen(false);
     if (onOpenRegisterModal) {
       onOpenRegisterModal();
     } else {
@@ -40,7 +43,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
   };
 
   const handleLoginClick = () => {
-    setIsMobileMenuOpen(false); // Fechar menu mobile ao clicar
+    setIsMobileMenuOpen(false);
     if (onOpenLoginModal) {
       onOpenLoginModal();
     } else {
@@ -49,19 +52,19 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
   };
 
   const handleFinalizeSubscriptionClick = () => {
-    setIsMobileMenuOpen(false); // Fechar menu mobile ao clicar
+    setIsMobileMenuOpen(false);
     navigate('/payment');
   };
 
   const handleLogoClick = () => {
-    setIsMobileMenuOpen(false); // Fechar menu mobile ao clicar
+    setIsMobileMenuOpen(false);
     if (!user) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleNavLinkClick = (path: string) => {
-    setIsMobileMenuOpen(false); // Fechar menu mobile ao clicar em um link
+    setIsMobileMenuOpen(false);
     navigate(path);
   };
 
@@ -76,7 +79,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
     <header className="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
         <Link 
-          to={user ? "/#planos" : "/"} 
+          to={isUserLoggedIn ? "/dashboard" : "/"} // Redireciona para /dashboard se logado
           className="flex items-center"
           onClick={handleLogoClick}
         >
@@ -104,7 +107,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
             <SheetContent side="left" className="p-0 w-64">
               <div className="flex flex-col h-full bg-gray-50">
                 <div className="p-4 border-b">
-                  <Link to={user ? "/#planos" : "/"} className="flex items-center" onClick={handleLogoClick}>
+                  <Link to={isUserLoggedIn ? "/dashboard" : "/"} className="flex items-center" onClick={handleLogoClick}>
                     <Zap className="h-8 w-8 text-blue-600 mr-2" />
                     <span className="text-xl font-bold text-gray-900">EletricIA</span>
                   </Link>
@@ -124,7 +127,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
                     </Link>
                   ))}
                   <div className="pt-4 border-t mt-4 space-y-2">
-                    {user ? (
+                    {isUserLoggedIn ? (
                       isPaid ? (
                         <>
                           <Button onClick={() => handleNavLinkClick('/dashboard')} className="w-full bg-blue-600 hover:bg-blue-700">Dashboard</Button>
@@ -151,7 +154,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
 
         {/* Desktop Auth/Action Buttons */}
         <div className="hidden md:flex items-center space-x-4">
-          {user ? (
+          {isUserLoggedIn ? (
             isPaid ? (
               <>
                 <Button onClick={() => navigate('/dashboard')} className="bg-blue-600 hover:bg-blue-700">Dashboard</Button>
