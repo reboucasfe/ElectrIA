@@ -128,7 +128,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
               </>
             )
           ) : (
-            // Apenas o botão de Login para usuários não logados no cabeçalho mobile
+            // Apenas o botão de Login para usuários não logados no cabeçalho mobile (barra superior)
             <Button size="sm" variant="ghost" onClick={handleLoginClick}>Login</Button>
           )}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -173,8 +173,11 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
                         </>
                       )
                     ) : (
-                      // Apenas o botão de Login para usuários não logados dentro do menu lateral
-                      <Button variant="ghost" onClick={handleLoginClick} className="w-full">Login</Button>
+                      // Botões de Login E Começar Agora para usuários não logados dentro do menu lateral
+                      <>
+                        <Button variant="ghost" onClick={handleLoginClick} className="w-full">Login</Button>
+                        <Button onClick={handleStartNowClick} className="w-full bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
+                      </>
                     )}
                   </div>
                 </nav>
