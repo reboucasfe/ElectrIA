@@ -128,10 +128,8 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
               </>
             )
           ) : (
-            <>
-              <Button size="sm" variant="ghost" onClick={handleLoginClick}>Login</Button>
-              <Button size="sm" onClick={handleStartNowClick} className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
-            </>
+            // Apenas o botão de Login para usuários não logados no cabeçalho mobile
+            <Button size="sm" variant="ghost" onClick={handleLoginClick}>Login</Button>
           )}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
@@ -161,6 +159,24 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
                       {item.label}
                     </Link>
                   ))}
+                  <div className="pt-4 border-t mt-4 space-y-2">
+                    {isUserLoggedIn ? (
+                      isPaid ? (
+                        <>
+                          <Button onClick={() => handleNavLinkClick('/dashboard')} className="w-full bg-blue-600 hover:bg-blue-700">Dashboard</Button>
+                          <Button variant="ghost" onClick={handleSignOut} className="w-full">Sair</Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button variant="ghost" onClick={handleSignOut} className="w-full">Sair</Button>
+                          <Button onClick={handleFinalizeSubscriptionClick} className="w-full bg-blue-600 hover:bg-blue-700">Finalizar Assinatura</Button>
+                        </>
+                      )
+                    ) : (
+                      // Apenas o botão de Login para usuários não logados dentro do menu lateral
+                      <Button variant="ghost" onClick={handleLoginClick} className="w-full">Login</Button>
+                    )}
+                  </div>
                 </nav>
               </div>
             </SheetContent>
