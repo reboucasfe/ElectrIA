@@ -23,8 +23,8 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
   const isPaid = useMemo(() => user?.user_metadata?.payment_status === 'paid', [user]);
 
   const handleSignOut = async () => {
+    setIsMobileMenuOpen(false); // Fecha o menu ao sair
     await signOut();
-    setIsMobileMenuOpen(false);
     if (location.pathname === '/payment') {
       navigate('/');
     } else {
@@ -33,7 +33,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
   };
 
   const handleStartNowClick = () => {
-    setIsMobileMenuOpen(false);
+    setIsMobileMenuOpen(false); // Fecha o menu
     if (onOpenRegisterModal) {
       onOpenRegisterModal();
     } else {
@@ -42,7 +42,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
   };
 
   const handleLoginClick = () => {
-    setIsMobileMenuOpen(false);
+    setIsMobileMenuOpen(false); // Fecha o menu
     if (onOpenLoginModal) {
       onOpenLoginModal();
     } else {
@@ -51,19 +51,20 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
   };
 
   const handleFinalizeSubscriptionClick = () => {
-    setIsMobileMenuOpen(false);
+    setIsMobileMenuOpen(false); // Fecha o menu
     navigate('/payment');
   };
 
   const handleLogoClick = () => {
-    setIsMobileMenuOpen(false);
+    setIsMobileMenuOpen(false); // Fecha o menu
     if (!user) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
+  // A função handleNavLinkClick já fecha o menu, mas vamos garantir que os onClicks chamem ela
   const handleNavLinkClick = (path: string) => {
-    setIsMobileMenuOpen(false);
+    setIsMobileMenuOpen(false); // Fecha o menu
     navigate(path);
   };
 
@@ -150,7 +151,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
                     <Link
                       key={item.href}
                       to={item.href}
-                      onClick={() => handleNavLinkClick(item.href)}
+                      onClick={() => handleNavLinkClick(item.href)} // Chama handleNavLinkClick que fecha o menu
                       className={cn(
                         'flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-200',
                         location.hash === item.href.split('#')[1] && 'bg-blue-600 text-white hover:bg-blue-700'
