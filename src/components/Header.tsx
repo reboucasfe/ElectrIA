@@ -55,18 +55,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
     navigate('/payment');
   };
 
-  const handleLogoClick = () => {
-    setIsMobileMenuOpen(false); // Fecha o menu
-    if (!user) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  // A função handleNavLinkClick já fecha o menu, mas vamos garantir que os onClicks chamem ela
-  const handleNavLinkClick = (path: string) => {
-    setIsMobileMenuOpen(false); // Fecha o menu
-    navigate(path);
-  };
+  // Removido handleNavLinkClick, pois agora o setIsMobileMenuOpen(false) será chamado diretamente no onClick
 
   const navItems = [
     { href: '/#como-funciona', label: 'Como Funciona' },
@@ -81,7 +70,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
         <Link 
           to={isUserLoggedIn ? "/dashboard" : "/"}
           className="flex items-center"
-          onClick={handleLogoClick}
+          onClick={() => setIsMobileMenuOpen(false)} // Fecha o menu ao clicar no logo
         >
           <Zap className="h-8 w-8 text-blue-600 mr-2" />
           <span className="text-xl font-bold text-gray-900">EletricIA</span>
@@ -97,7 +86,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
           {isUserLoggedIn ? (
             isPaid ? (
               <>
-                <Button onClick={() => navigate('/dashboard')} className="bg-blue-600 hover:bg-blue-700">Dashboard</Button>
+                <Button onClick={() => { setIsMobileMenuOpen(false); navigate('/dashboard'); }} className="bg-blue-600 hover:bg-blue-700">Dashboard</Button>
                 <Button variant="ghost" onClick={handleSignOut}>Sair</Button>
               </>
             ) : (
@@ -119,7 +108,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
           {isUserLoggedIn ? (
             isPaid ? (
               <>
-                <Button size="sm" onClick={() => handleNavLinkClick('/dashboard')} className="bg-blue-600 hover:bg-blue-700">Dashboard</Button>
+                <Button size="sm" onClick={() => { setIsMobileMenuOpen(false); navigate('/dashboard'); }} className="bg-blue-600 hover:bg-blue-700">Dashboard</Button>
                 <Button size="sm" variant="ghost" onClick={handleSignOut}>Sair</Button>
               </>
             ) : (
@@ -141,7 +130,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
             <SheetContent side="left" className="p-0 w-64">
               <div className="flex flex-col h-full bg-gray-50">
                 <div className="p-4 border-b">
-                  <Link to={isUserLoggedIn ? "/dashboard" : "/"} className="flex items-center" onClick={handleLogoClick}>
+                  <Link to={isUserLoggedIn ? "/dashboard" : "/"} className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
                     <Zap className="h-8 w-8 text-blue-600 mr-2" />
                     <span className="text-xl font-bold text-gray-900">EletricIA</span>
                   </Link>
@@ -151,7 +140,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
                     <Link
                       key={item.href}
                       to={item.href}
-                      onClick={() => handleNavLinkClick(item.href)} // Chama handleNavLinkClick que fecha o menu
+                      onClick={() => setIsMobileMenuOpen(false)} // Fecha o menu diretamente
                       className={cn(
                         'flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-200',
                         location.hash === item.href.split('#')[1] && 'bg-blue-600 text-white hover:bg-blue-700'
@@ -164,7 +153,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
                     {isUserLoggedIn ? (
                       isPaid ? (
                         <>
-                          <Button onClick={() => handleNavLinkClick('/dashboard')} className="w-full bg-blue-600 hover:bg-blue-700">Dashboard</Button>
+                          <Button onClick={() => { setIsMobileMenuOpen(false); navigate('/dashboard'); }} className="w-full bg-blue-600 hover:bg-blue-700">Dashboard</Button>
                           <Button variant="ghost" onClick={handleSignOut} className="w-full">Sair</Button>
                         </>
                       ) : (
@@ -174,7 +163,6 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
                         </>
                       )
                     ) : (
-                      // Botões de Login E Começar Agora para usuários não logados dentro do menu lateral
                       <>
                         <Button variant="ghost" onClick={handleLoginClick} className="w-full">Login</Button>
                         <Button onClick={handleStartNowClick} className="w-full bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
