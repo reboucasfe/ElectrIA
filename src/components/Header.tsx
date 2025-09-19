@@ -19,13 +19,12 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Verifica explicitamente se o usuário está logado usando user.id
   const isUserLoggedIn = !!user?.id;
   const isPaid = useMemo(() => user?.user_metadata?.payment_status === 'paid', [user]);
 
   const handleSignOut = async () => {
     await signOut();
-    setIsMobileMenuOpen(false); // Fechar menu mobile ao sair
+    setIsMobileMenuOpen(false);
     if (location.pathname === '/payment') {
       navigate('/');
     } else {
@@ -79,7 +78,7 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
     <header className="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
         <Link 
-          to={isUserLoggedIn ? "/dashboard" : "/"} // Redireciona para /dashboard se logado
+          to={isUserLoggedIn ? "/dashboard" : "/"}
           className="flex items-center"
           onClick={handleLogoClick}
         >
@@ -87,17 +86,53 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
           <span className="text-xl font-bold text-gray-900">EletricIA</span>
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation and Auth Buttons */}
         <div className="hidden md:flex items-center space-x-8">
           {navItems.map(item => (
             <Link key={item.href} to={item.href} className="text-gray-600 hover:text-blue-600 transition-colors">
               {item.label}
             </Link>
           ))}
+          {isUserLoggedIn ? (
+            isPaid ? (
+              <>
+                <Button onClick={() => navigate('/dashboard')} className="bg-blue-600 hover:bg-blue-700">Dashboard</Button>
+                <Button variant="ghost" onClick={handleSignOut}>Sair</Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={handleSignOut}>Sair</Button>
+                <Button onClick={handleFinalizeSubscriptionClick} className="bg-blue-600 hover:bg-blue-700">Finalizar Assinatura</Button>
+              </>
+            )
+          ) : (
+            <>
+              <Button variant="ghost" onClick={handleLoginClick}>Login</Button>
+              <Button onClick={handleStartNowClick} className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
+            </>
+          )}
         </div>
 
-        {/* Mobile Menu Button */}
-        <div className="md:hidden flex items-center">
+        {/* Mobile-specific elements: Auth buttons and Hamburger menu */}
+        <div className="md:hidden flex items-center space-x-2">
+          {isUserLoggedIn ? (
+            isPaid ? (
+              <>
+                <Button size="sm" onClick={() => handleNavLinkClick('/dashboard')} className="bg-blue-600 hover:bg-blue-700">Dashboard</Button>
+                <Button size="sm" variant="ghost" onClick={handleSignOut}>Sair</Button>
+              </>
+            ) : (
+              <>
+                <Button size="sm" variant="ghost" onClick={handleSignOut}>Sair</Button>
+                <Button size="sm" onClick={handleFinalizeSubscriptionClick} className="bg-blue-600 hover:bg-blue-700">Finalizar Assinatura</Button>
+              </>
+            )
+          ) : (
+            <>
+              <Button size="sm" variant="ghost" onClick={handleLoginClick}>Login</Button>
+              <Button size="sm" onClick={handleStartNowClick} className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
+            </>
+          )}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">
@@ -126,52 +161,10 @@ export const Header = ({ onOpenRegisterModal, onOpenLoginModal }: HeaderProps) =
                       {item.label}
                     </Link>
                   ))}
-                  <div className="pt-4 border-t mt-4 space-y-2">
-                    {isUserLoggedIn ? (
-                      isPaid ? (
-                        <>
-                          <Button onClick={() => handleNavLinkClick('/dashboard')} className="w-full bg-blue-600 hover:bg-blue-700">Dashboard</Button>
-                          <Button variant="ghost" onClick={handleSignOut} className="w-full">Sair</Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button variant="ghost" onClick={handleSignOut} className="w-full">Sair</Button>
-                          <Button onClick={handleFinalizeSubscriptionClick} className="w-full bg-blue-600 hover:bg-blue-700">Finalizar Assinatura</Button>
-                        </>
-                      )
-                    ) : (
-                      <>
-                        <Button variant="ghost" onClick={handleLoginClick} className="w-full">Login</Button>
-                        <Button onClick={handleStartNowClick} className="w-full bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
-                      </>
-                    )}
-                  </div>
                 </nav>
               </div>
             </SheetContent>
           </Sheet>
-        </div>
-
-        {/* Desktop Auth/Action Buttons */}
-        <div className="hidden md:flex items-center space-x-4">
-          {isUserLoggedIn ? (
-            isPaid ? (
-              <>
-                <Button onClick={() => navigate('/dashboard')} className="bg-blue-600 hover:bg-blue-700">Dashboard</Button>
-                <Button variant="ghost" onClick={handleSignOut}>Sair</Button>
-              </>
-            ) : (
-              <>
-                <Button variant="ghost" onClick={handleSignOut}>Sair</Button>
-                <Button onClick={handleFinalizeSubscriptionClick} className="bg-blue-600 hover:bg-blue-700">Finalizar Assinatura</Button>
-              </>
-            )
-          ) : (
-            <>
-              <Button variant="ghost" onClick={handleLoginClick}>Login</Button>
-              <Button onClick={handleStartNowClick} className="bg-blue-600 hover:bg-blue-700">Começar Agora</Button>
-            </>
-          )}
         </div>
       </nav>
     </header>
