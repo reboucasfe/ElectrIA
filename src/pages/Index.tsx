@@ -88,10 +88,10 @@ const Index = ({ onOpenRegisterModal, onOpenLoginModal }: IndexProps) => {
 
   return (
     <TooltipProvider>
-    <div className="bg-white text-gray-800">
+    <div className="bg-white text-gray-800 min-h-screen"> {/* Adicionado min-h-screen */}
       <Header onOpenRegisterModal={onOpenRegisterModal} onOpenLoginModal={onOpenLoginModal} />
 
-      <main>
+      <main className="pb-20"> {/* Adicionado pb-20 para garantir espaço para o rodapé */}
         {/* Hero Section */}
         <section className="relative text-center md:text-left py-20 px-4 md:py-32">
           <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
